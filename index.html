@@ -25,6 +25,7 @@
         #top-nav {
             background: #161B22; /* Dark panel */
             border-bottom: 1px solid #30363D; /* Border */
+            min-height: 60px;
         }
 
         #bottom-nav {
@@ -575,22 +576,22 @@
                     </div>
 
                     <!-- Desktop Navigation - Centered Pill Style -->
-                    <div class="hidden md:flex items-center space-x-2 bg-[#161B22]/80 backdrop-blur-lg px-3 py-2 rounded-full border border-[#30363D]">
-                        <button data-screen="home-screen" class="top-nav-btn px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300">
-                            <svg class="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6-4v4m0-4h4"></path></svg>
-                            Home
+                    <div class="flex items-center space-x-1 md:space-x-2 bg-[#161B22]/80 backdrop-blur-lg px-2 md:px-3 py-2 rounded-full border border-[#30363D]">
+                        <button data-screen="home-screen" class="top-nav-btn px-2 md:px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-300">
+                            <svg class="w-4 h-4 inline-block mr-0.5 md:mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6-4v4m0-4h4"></path></svg>
+                            <span class="hidden sm:inline">Home</span>
                         </button>
-                        <button data-screen="leaderboard-screen" class="top-nav-btn px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300">
-                            <svg class="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                            Leaders
+                        <button data-screen="leaderboard-screen" class="top-nav-btn px-2 md:px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-300">
+                            <svg class="w-4 h-4 inline-block mr-0.5 md:mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            <span class="hidden sm:inline">Leaders</span>
                         </button>
-                        <button data-screen="pledge-pool-screen" class="top-nav-btn px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300">
-                            <svg class="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                            Pledges
+                        <button data-screen="pledge-pool-screen" class="top-nav-btn px-2 md:px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-300">
+                            <svg class="w-4 h-4 inline-block mr-0.5 md:mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                            <span class="hidden sm:inline">Pledges</span>
                         </button>
-                        <button data-screen="create-market-screen" class="top-nav-btn px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300">
-                            <svg class="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                            Create
+                        <button data-screen="create-market-screen" class="top-nav-btn px-2 md:px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-300">
+                            <svg class="w-4 h-4 inline-block mr-0.5 md:mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                            <span class="hidden sm:inline">Create</span>
                         </button>
                     </div>
 
@@ -1888,12 +1889,10 @@
             if (!screenId) return;
             console.log(`Navigating to: ${screenId}`);
 
-            // Special case: Hide nav bars on login or full-screen modes
+            // Special case: Hide nav bars on full-screen game modes
             if (dom.topNav && dom.bottomNav) {
-                // List of all screens that should NOT have nav bars
+                // List of screens that should NOT have nav bars (full-screen game experiences)
                 const noNavScreens = [
-                    'login-screen', 
-                    'otp-screen', 
                     'quick-play-screen', 
                     'admin-password-screen'
                 ];
