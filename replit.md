@@ -23,8 +23,12 @@ Preferred communication style: Simple, everyday language.
 - Responsive design with mobile-first approach (meta viewport configuration)
 - CDN-based dependencies to minimize build complexity and improve load times
 - Glow-pulse animations for interactive feedback
+- Modern GenZ-friendly navigation: Sleek top navigation bar with pill-style buttons instead of traditional sidebar
+  - Desktop: Centered glassmorphic pill container with rounded navigation buttons
+  - Mobile: Bottom navigation bar with prominent center "Create" button
+  - Smooth transitions and hover effects with gradient active states
 
-**Rationale**: Choosing vanilla JavaScript with CDN-based libraries provides rapid prototyping capability and reduced deployment complexity, suitable for a demo/hackathon build.
+**Rationale**: Choosing vanilla JavaScript with CDN-based libraries provides rapid prototyping capability and reduced deployment complexity, suitable for a demo/hackathon build. The modern top navigation design appeals to GenZ users by avoiding outdated sidebar patterns and embracing contemporary UI trends seen in popular apps.
 
 ### Backend Architecture
 

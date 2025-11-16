@@ -548,93 +548,69 @@
                 }
 
 
-        /* --- Desktop Sidebar Button Styles --- */
-        .sidebar-btn {
+        /* --- Modern Top Nav Button Styles --- */
+        .top-nav-btn {
             color: #9CA3AF; /* gray-400 */
-            transition: all 0.2s ease;
+            position: relative;
         }
-        .sidebar-btn:hover {
-            background-color: #30363D; /* gray-700 */
-            color: white;
+        .top-nav-btn:hover {
+            color: #38BDF8;
+            background-color: rgba(56, 189, 248, 0.1);
         }
-        .sidebar-btn.active {
+        .top-nav-btn.active {
             background: linear-gradient(to right, #38BDF8, #6366F1);
             color: white;
-            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
         }
     </style>
 </head>
 <body class="text-gray-100">
-    <div class="md:flex">
+    <!-- Modern Top Navigation Bar -->
+        <nav id="top-nav" class="sticky top-0 z-50 shadow-lg shadow-black/20">
+            <div class="max-w-7xl mx-auto px-4 py-3 md:py-4">
+                <div class="flex justify-between items-center">
+                    <!-- Logo -->
+                    <div>
+                        <h1 id="app-title" class="text-2xl md:text-3xl font-extrabold gradient-text tracking-tight cursor-pointer" onclick="showScreen('home-screen')">Predora</h1>
+                    </div>
 
-        <nav id="desktop-sidebar" class="hidden md:block md:w-64 bg-[#161B22] border-r border-[#30363D] min-h-screen p-4 fixed top-0 left-0">
-            <div class="flex flex-col h-full">
-                <h1 class="text-3xl font-extrabold gradient-text tracking-tight cursor-pointer mb-8">Predora</h1>
+                    <!-- Desktop Navigation - Centered Pill Style -->
+                    <div class="hidden md:flex items-center space-x-2 bg-[#161B22]/80 backdrop-blur-lg px-3 py-2 rounded-full border border-[#30363D]">
+                        <button data-screen="home-screen" class="top-nav-btn px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300">
+                            <svg class="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6-4v4m0-4h4"></path></svg>
+                            Home
+                        </button>
+                        <button data-screen="leaderboard-screen" class="top-nav-btn px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300">
+                            <svg class="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            Leaders
+                        </button>
+                        <button data-screen="pledge-pool-screen" class="top-nav-btn px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300">
+                            <svg class="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                            Pledges
+                        </button>
+                        <button data-screen="create-market-screen" class="top-nav-btn px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300">
+                            <svg class="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                            Create
+                        </button>
+                    </div>
 
-                <div class="flex flex-col space-y-3">
-                    <button data-screen="home-screen" class="sidebar-btn w-full flex items-center p-3 rounded-lg text-lg font-semibold active">
-                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6-4v4m0-4h4"></path></svg>
-                        Home
-                    </button>
-                    <button data-screen="leaderboard-screen" class="sidebar-btn w-full flex items-center p-3 rounded-lg text-lg font-semibold">
-                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                        Leaders
-                    </button>
-                    <button data-screen="pledge-pool-screen" class="sidebar-btn w-full flex items-center p-3 rounded-lg text-lg font-semibold">
-                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                        Pledges
-                    </button>
-                    <button data-screen="create-market-screen" class="sidebar-btn w-full flex items-center p-3 rounded-lg text-lg font-semibold">
-                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                        Create
-                    </button>
+                    <!-- Right Side: Live Counter + Profile -->
+                    <div class="flex items-center space-x-3 md:space-x-4">
+                        <div id="live-user-counter" class="hidden sm:flex items-center text-xs md:text-sm text-gray-300">
+                            <span class="w-2 h-2 bg-green-400 rounded-full mr-2 live-dot"></span>
+                            <span id="live-user-count-text">147</span>
+                            <span class="ml-1">online</span>
+                        </div>
+
+                        <button data-screen="profile-screen" id="nav-profile-button" class="w-9 h-9 md:w-10 md:h-10 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl hover:shadow-indigo-500/50 active:scale-95">
+                            P
+                        </button>
+                    </div>
                 </div>
-
-                <div class="flex-grow"></div>
-
-                <button data-screen="profile-screen" class="sidebar-btn w-full flex items-center p-3 rounded-lg text-lg font-semibold">
-                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    Profile
-                </button>
             </div>
         </nav>
 
-                <div class="flex-1 md:ml-64 min-h-screen relative">
-
-
-            <nav id="top-nav" class="sticky top-0 z-50 p-4 flex justify-between items-center shadow-lg shadow-black/20 md:hidden">
-            <div>
-                <h1 id="app-title" class="text-3xl font-extrabold gradient-text tracking-tight cursor-pointer">Predora</h1>
-            </div>
-
-            <div class="hidden md:flex items-center space-x-6">
-                <button onclick="showScreen('home-screen')" class="text-gray-300 hover:text-sky-400 font-semibold transition-colors">
-                    Home
-                </button>
-                <button onclick="showScreen('leaderboard-screen')" class="text-gray-300 hover:text-sky-400 font-semibold transition-colors">
-                    Leaderboard
-                </button>
-                <button onclick="showScreen('pledge-pool-screen')" class="text-gray-300 hover:text-sky-400 font-semibold transition-colors">
-                    Pledges
-                </button>
-                <button onclick="showScreen('create-market-screen')" class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem;">
-                    Create Market
-                </button>
-            </div>
-
-
-            <div class="flex items-center space-x-4">
-                <div id="live-user-counter">
-                    <span class="w-2 h-2 bg-green-400 rounded-full mr-2 live-dot"></span>
-                    <span id="live-user-count-text">147</span>
-                    <span class="ml-1">online</span>
-                </div>
-
-                <button onclick="showScreen('profile-screen')" id="nav-profile-button" class="w-9 h-9 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg transition-transform active:scale-95">
-                    P
-                </button>
-            </div>
-        </nav>
+        <div class="min-h-screen relative">
 
             <main class="max-w-md md:max-w-xl lg:max-w-7xl mx-auto relative p-4">
 
@@ -1713,7 +1689,7 @@
 
             dom.publicHistoryContent = document.getElementById('public-history-content');
 
-            dom.sidebarButtons = document.querySelectorAll('.sidebar-btn');
+            dom.topNavButtons = document.querySelectorAll('.top-nav-btn');
 
             // --- Create Market Liquidity Inputs ---
             dom.marketLiquidityInput = document.getElementById('market-liquidity-input');
@@ -1977,9 +1953,9 @@
                 createBtn.classList.add('text-gray-400'); 
             }
 
-            // 2. Update Desktop Sidebar
-            if (dom.sidebarButtons) {
-                dom.sidebarButtons.forEach(button => {
+            // 2. Update Top Navigation Buttons
+            if (dom.topNavButtons) {
+                dom.topNavButtons.forEach(button => {
                     const buttonScreen = button.dataset.screen;
                     button.classList.toggle('active', buttonScreen === currentScreenId);
                 });
@@ -5704,9 +5680,9 @@ dom.searchBarInput.addEventListener('input', handleSearch);
             // Setup create market listeners (like the odds calculator)
             setupCreateMarketListeners();
 
-            // --- Wire up Desktop Sidebar Buttons ---
-            if (dom.sidebarButtons) {
-                dom.sidebarButtons.forEach(btn => {
+            // --- Wire up Top Navigation Buttons ---
+            if (dom.topNavButtons) {
+                dom.topNavButtons.forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         showScreen(e.currentTarget.dataset.screen);
                     });
