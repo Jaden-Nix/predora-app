@@ -1,0 +1,408 @@
+/*
+ * index.js - The Secure Backend Server for Predora
+ *
+ * FINAL VERSION 2 - This fixes the /api/gemini endpoint to
+ * correctly handle 'tools' (for Search) and 'jsonSchema' (for JSON Mode)
+ * sent from the frontend.
+ */
+
+// --- ESM Imports ---
+import express from 'express';
+import fetch from 'node-fetch';
+import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import admin from 'firebase-admin'; // Use the ADMIN SDK
+
+// --- Constants ---
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PORT = process.env.PORT || 8080;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const CRON_SECRET = process.env.CRON_SECRET;
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
+const APP_ID = 'predora-hackathon';
+
+// --- Firebase Admin SDK Initialization  ---
+try {
+    const serviceAccountString = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    if (!serviceAccountString) {
+        throw new Error("GOOGLE_APPLICATION_CREDENTIALS secret is not set.");
+    }
+    const serviceAccount = JSON.parse(serviceAccountString);
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+    });
+    console.log("Firebase Admin SDK initialized successfully.");
+} catch (e) {
+    console.error("CRITICAL: Firebase Admin initialization failed.", e.message);
+}
+
+const db = admin.firestore();
+const app = express();
+
+// --- Express Middleware ---
+app.use(express.json());
+app.use(cors());
+app.use(express.static(path.join(__dirname, '/')));
+
+// --- Main Route: Serve the App ---
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// --- API Endpoint 1: Secure AI Proxy [FINAL FIX] ---
+
+app.post('/api/gemini', async (req, res) => {
+    console.log("Server: /api/gemini endpoint hit");
+
+    // 1. Get ALL parts from the frontend
+    const { systemPrompt, userPrompt, tools, jsonSchema } = req.body;
+
+    if (!GEMINI_API_KEY) {
+        return res.status(500).json({ error: "API Key is not set up on the server." });
+    }
+    if (!systemPrompt || !userPrompt) {
+        return res.status(400).json({ error: "Missing systemPrompt or userPrompt" });
+    }
+
+    // 2. Build the base payload
+    const payload = {
+        systemInstruction: {
+            parts: [{ text: systemPrompt }]
+        },
+        contents: [
+            { parts: [{ text: userPrompt }] }
+        ]
+    };
+
+    
+    // Add tools OR generationConfig, but not both.
+    if (jsonSchema) {
+        // JSON Mode (for AI Judge)
+        payload.generationConfig = {
+            responseMimeType: "application/json",
+            responseSchema: jsonSchema
+        };
+        // NOTE: We do NOT add Google Search here, as it's not supported.
+    } else {
+        // Normal text or Function Calling Mode (for AI Assist / Explain)
+        payload.tools = tools; // This will be the 'tools' array from the frontend
+    }
+    // --- END OF FIX ---
+
+    // 4. Call the Google API
+    try {
+        const googleResponse = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await googleResponse.json();
+
+        if (!googleResponse.ok) {
+            console.error("Google API Error:", data);
+            return res.status(googleResponse.status).json(data);
+        }
+        res.status(200).json(data);
+
+    } catch (error) {
+        console.error("Error in /api/gemini:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+// --- Internal Helper: Secure AI Caller (for Oracle) ---
+async function callGoogleApi(payload) {
+    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not set.");
+
+    const googleResponse = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    const data = await googleResponse.json();
+
+    if (!googleResponse.ok) {
+        console.error("Oracle Google API Error:", data);
+        throw new Error(`Google API Error: ${data.error.message}`);
+    }
+
+    return data;
+}
+
+// --- Oracle Job 1: Auto-Resolve Markets [FINAL VERSION - WITH PAYOUTS] ---
+async function autoResolveMarkets() {
+    console.log("ORACLE: Running autoResolveMarkets...");
+    const today = new Date().toISOString().split('T')[0];
+
+    const collectionPath = `artifacts/${APP_ID}/public/data/standard_markets`;
+    const q = db.collection(collectionPath).where('isResolved', '==', false);
+    const snapshot = await q.get();
+
+    if (snapshot.empty) {
+        console.log("ORACLE: No unresolved markets found.");
+        return;
+    }
+
+    const marketsToResolve = snapshot.docs.filter(doc => 
+        doc.data().resolutionDate <= today
+    );
+
+    if (marketsToResolve.length === 0) {
+        console.log("ORACLE: No markets are due for resolution.");
+        return;
+    }
+
+    console.log(`ORACLE: Found ${marketsToResolve.length} markets to resolve.`);
+    let resolvedCount = 0;
+
+    for (const doc of marketsToResolve) {
+        const market = doc.data();
+        const marketId = doc.id;
+        const marketTitle = market.title;
+
+        // This job ONLY needs Google Search
+        const systemPrompt = `You are a decisive oracle. Based on all available public data as of ${today}, you must determine the final outcome of the market.
+        - First, analyze the user's market question.
+        - Second, use Google Search to find the factual, final answer.
+        - Third, respond with ONLY ONE WORD: 'YES', 'NO', or, if it is factually impossible to know, 'AMBIGUOUS'.`;
+        const userPrompt = `Market Title: "${marketTitle}"`;
+        const payload = {
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+            contents: [{ parts: [{ text: userPrompt }] }],
+            tools: [{ "google_search": {} }]
+        };
+
+        try {
+            const response = await callGoogleApi(payload);
+            const outcome = response.candidates[0].content.parts[0].text;
+            const winningOutcome = outcome.trim().toUpperCase();
+
+            if (winningOutcome === 'YES' || winningOutcome === 'NO') {
+                console.log(`ORACLE: Resolving market ${marketId} as ${winningOutcome}. Now processing payouts...`);
+
+                const pledgeCollectionPath = `artifacts/${APP_ID}/public/data/pledges`;
+                const pledgeQuery = db.collection(pledgeCollectionPath)
+                    .where('marketId', '==', marketId)
+                    .where('isResolved', '==', false);
+
+                const pledgeSnapshot = await pledgeQuery.get();
+                const batch = db.batch();
+
+                batch.update(doc.ref, {
+                    isResolved: true,
+                    winningOutcome: winningOutcome
+                });
+
+                if (!pledgeSnapshot.empty) {
+                    for (const pledgeDoc of pledgeSnapshot.docs) {
+                        const pledge = pledgeDoc.data();
+                        const isWinner = pledge.pick === winningOutcome;
+
+                        const winningOdds = winningOutcome === 'YES' 
+                            ? (market.yesPercent || 60) 
+                            : (market.noPercent || 40);
+
+                        const payoutUsd = isWinner ? (pledge.amountUsd / (winningOdds / 100)) : 0;
+                        const principalReturn = market.isNoLoss ? pledge.amountUsd : 0;
+                        const totalReturnUsd = isWinner ? payoutUsd : principalReturn;
+                        const payoutAmount = totalReturnUsd / getMockPrice(pledge.asset);
+
+                        let xpChange = isWinner ? (10 + Math.floor(pledge.amountUsd / 5)) : -10;
+                        if (isWinner) {
+                            if (pledge.amountUsd <= 50) xpChange *= 5;
+                            else if (pledge.amountUsd >= 1000) xpChange = Math.floor(xpChange / 2);
+                        }
+
+                        const streakUpdate = isWinner ? admin.firestore.FieldValue.increment(1) : 0;
+
+                        batch.update(pledgeDoc.ref, {
+                            isResolved: true,
+                            isWinner: isWinner,
+                            payout: totalReturnUsd
+                        });
+
+                        const profileRef = db.doc(`artifacts/${APP_ID}/public/data/profile/${pledge.userId}`);
+                        batch.update(profileRef, {
+                            [getBalanceField(pledge.asset)]: admin.firestore.FieldValue.increment(payoutAmount),
+                            xp: admin.firestore.FieldValue.increment(xpChange),
+                            streak: streakUpdate
+                        });
+
+                        const publicProfileRef = db.doc(`artifacts/${APP_ID}/public/data/leaderboard/${pledge.userId}`);
+                        batch.update(publicProfileRef, {
+                            xp: admin.firestore.FieldValue.increment(xpChange)
+                        });
+                    }
+                    console.log(`ORACLE: Processed ${pledgeSnapshot.size} pledges for market ${marketId}.`);
+                }
+
+                await batch.commit();
+                resolvedCount++;
+
+            } else {
+                console.log(`ORACLE: Market ${marketId} outcome is AMBIGUOUS. Skipping.`);
+            }
+        } catch (e) {
+            console.error(`ORACLE: Failed to resolve market ${marketId}:`, e.message);
+        }
+    }
+    console.log(`ORACLE: Finished. Resolved ${resolvedCount} markets.`);
+}
+
+// --- Oracle Job 2: Create Daily Markets [FINAL 2-CALL-CHAIN FIX] ---
+async function createDailyMarkets() {
+    console.log("ORACLE: Running createDailyMarkets...");
+    const todayId = new Date().toISOString().split('T')[0];
+
+    const flagRef = db.collection('artifacts').doc(APP_ID).collection('dailyFlags').doc(todayId);
+    const flagDoc = await flagRef.get();
+
+    if (flagDoc.exists) {
+        console.log("ORACLE: Daily markets already created. Skipping.");
+        return;
+    }
+
+    // --- Tool Definition ---
+    const createMarketTool = {
+        "functionDeclarations": [{
+            "name": "create_market_form",
+            "description": "Creates a new prediction market.",
+            "parameters": {
+                "type": "OBJECT",
+                "properties": {
+                    "title": { "type": "STRING" }, "insight": { "type": "STRING" },
+                    "resolutionDate": { "type": "STRING" },
+                    "yesPercent": { "type": "NUMBER" }, "noPercent": { "type": "NUMBER" }
+                }, "required": ["title", "insight", "resolutionDate", "yesPercent", "noPercent"]
+            }
+        }]
+    };
+    const functionTools = [ createMarketTool ];
+    const searchTools = [{ "google_search": {} }];
+    // --- End Tool Definition ---
+
+    const topics = [
+        { topic: "global news", category: "Politics" },
+        { topic: "crypto", category: "Crypto" },
+        { topic: "pop culture", category: "Entertainment" }
+    ];
+
+    for (const item of topics) {
+        try {
+            // --- CALL 1: GET "SMART" IDEAS (Google Search only) ---
+            const systemPrompt_1 = `You are a research assistant. Use Google Search to find up-to-date, real-time information.
+Find a *single, specific, future-focused* event (for 2025 or 2026) about the user's topic.
+Respond ONLY with a 1-2 sentence summary of this event.`;
+            const userPrompt_1 = `Topic: "${item.topic}"`;
+
+            const payload_1 = {
+                systemInstruction: { parts: [{ text: systemPrompt_1 }] },
+                contents: [{ parts: [{ text: userPrompt_1 }] }],
+                tools: searchTools
+            };
+            const response_1 = await callGoogleApi(payload_1);
+            const ideaText = response_1.candidates[0].content.parts[0].text;
+
+            if (!ideaText || ideaText.length < 10) {
+                throw new Error("AI (Step 1) failed to find a valid event.");
+            }
+
+            // --- CALL 2: "AUTO-FILL" THE FORM (Function Calling only) ---
+            const systemPrompt_2 = `You are a market creator. A user has provided context about a future event.
+Your ONLY job is to use the 'create_market_form' tool.
+The 'title' must be a yes/no question.
+The 'insight' must be a brief summary of the context.
+The 'resolutionDate' must be in 'YYYY-MM-DD' format (for 2025 or 2026).
+Odds (yesPercent, noPercent) must be between 1 and 99, and sum to 100.
+You MUST use the 'create_market_form' tool.`;
+            const userPrompt_2 = `Context: "${ideaText}"`;
+
+            const payload_2 = {
+                systemInstruction: { parts: [{ text: systemPrompt_2 }] },
+                contents: [{ parts: [{ text: userPrompt_2 }] }],
+                tools: functionTools
+            };
+            const response_2 = await callGoogleApi(payload_2);
+            const part = response_2.candidates[0].content.parts[0];
+
+            if (part.functionCall && part.functionCall.name === 'create_market_form') {
+                const marketData = part.functionCall.args;
+                const yesP = parseFloat(marketData.yesPercent);
+                const noP = parseFloat(marketData.noPercent);
+
+                const isNoLossMarket = (item.topic === "crypto");
+                const yieldProtocolFinal = isNoLossMarket ? 'aave' : null;
+                const newMarketDoc = {
+                    ...marketData,
+                    isResolved: false, 
+                        isNoLoss: isNoLossMarket, 
+                        yieldProtocol: yieldProtocolFinal,
+                        creatorId: 'AI_ORACLE',
+                    category: item.category,
+                    yesPercent: yesP, noPercent: noP,
+                    yesPool: 1000 * (yesP / 100), noPool: 1000 * (noP / 100),
+                    totalStakeVolume: 0,
+                    refundVolumeGoal: 100, refundStakerGoal: 10,
+                    creationTimestamp: admin.firestore.FieldValue.serverTimestamp()
+                };
+
+                const collectionPath = `artifacts/${APP_ID}/public/data/standard_markets`;
+                await db.collection(collectionPath).add(newMarketDoc);
+                console.log(`ORACLE: Created market: ${marketData.title}`);
+            } else {
+                throw new Error("AI (Step 2) failed to use function call.");
+            }
+        } catch (e) {
+            console.error(`ORACLE: Failed to create market for ${item.topic}:`, e.message);
+        }
+    }
+    // Set the flag
+    await flagRef.set({ ranAt: admin.firestore.FieldValue.serverTimestamp() });
+}
+
+// --- API Endpoint 2: Secure Cron Job Runner ---
+app.post('/api/run-jobs', async (req, res) => {
+    console.log("Server: /api/run-jobs endpoint hit");
+    const { key } = req.body;
+
+    if (!CRON_SECRET || key !== CRON_SECRET) {
+        console.warn("ORACLE: Unauthorized attempt to run jobs.");
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    try {
+        await autoResolveMarkets();
+        await createDailyMarkets();
+        res.status(200).json({ success: true, message: "Oracle jobs ran successfully." });
+    } catch (e) {
+        console.error("ORACLE: A job failed to run.", e);
+        res.status(500).json({ error: "Oracle job execution failed." });
+    }
+});
+
+// --- HELPER FUNCTIONS ---
+function getMockPrice(asset) {
+    if (asset === 'BNB') return 500;
+    if (asset === 'CAKE') return 3.5;
+    return 1;
+}
+
+function getBalanceField(asset) {
+    if (asset === 'BNB') return 'bnbBalance';
+    if (asset === 'CAKE') return 'cakeBalance';
+    return 'balance';
+}
+// --- END HELPER FUNCTIONS ---
+
+// --- Start the Server ---
+app.listen(PORT, () => {
+    console.log(`Predora Backend Server is live on port ${PORT}`);
+    if (!GEMINI_API_KEY) console.warn("WARNING: GEMINI_API_KEY is not set.");
+    if (!CRON_SECRET) console.warn("WARNING: CRON_SECRET is not set.");
+    if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) console.warn("INTERNAL: GOOGLE_APPLICATION_CREDENTIALS is not set. Firebase Admin will fail.");
+});
