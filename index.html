@@ -83,6 +83,14 @@
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             }
 
+        /* --- NAVIGATION VISIBILITY --- */
+        /* Hide top navigation on mobile (small screens), show on desktop */
+        @media (max-width: 767px) {
+            #top-nav {
+                display: none !important;
+            }
+        }
+
         /* --- ANIMATION --- */
         @keyframes glow-pulse {
             0%, 100% {
@@ -2013,12 +2021,14 @@
             if (!screenId) return;
             console.log(`Navigating to: ${screenId}`);
 
-            // Special case: Hide nav bars on full-screen game modes
+            // Special case: Hide nav bars on full-screen game modes and auth screens
             if (dom.topNav && dom.bottomNav) {
-                // List of screens that should NOT have nav bars (full-screen game experiences)
+                // List of screens that should NOT have nav bars
                 const noNavScreens = [
                     'quick-play-screen', 
-                    'admin-password-screen'
+                    'admin-password-screen',
+                    'login-screen',
+                    'otp-screen'
                 ];
 
                 const shouldHideNavs = noNavScreens.includes(screenId);
@@ -2140,6 +2150,7 @@
          * Shows or hides the full-screen loading overlay.
          */
         function showLoadingOverlay(show, message = 'Loading...') {
+            if (!dom.loadingMessage || !dom.loadingOverlay) return;
             if (show) {
                 dom.loadingMessage.innerText = message;
                 dom.loadingOverlay.classList.remove('hidden');
@@ -3260,6 +3271,7 @@
          */
         function renderPledgePool() {
             const emptyState = document.getElementById('pledge-pool-empty');
+            if (!dom.pledgePoolContent) return;
             if (pledgePoolItems.length === 0) {
                 // Show empty state, hide grid
                 if (emptyState) emptyState.classList.remove('hidden');
