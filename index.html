@@ -665,7 +665,7 @@
             }
         }
         
-        /* Fix Light Mode Text Contrast */
+        /* Fix Light Mode Text Contrast - Comprehensive Coverage */
         :root.light-mode,
         body.light-mode {
             color: #0F172A !important;
@@ -675,18 +675,33 @@
         :root.light-mode h2,
         :root.light-mode h3,
         :root.light-mode h4,
+        :root.light-mode h5,
+        :root.light-mode h6,
         body.light-mode h1,
         body.light-mode h2,
         body.light-mode h3,
-        body.light-mode h4 {
+        body.light-mode h4,
+        body.light-mode h5,
+        body.light-mode h6 {
             color: #0F172A !important;
         }
         
+        :root.light-mode p,
+        :root.light-mode span,
+        :root.light-mode div,
+        body.light-mode p,
+        body.light-mode span,
+        body.light-mode div {
+            color: inherit;
+        }
+        
+        /* Override all white text */
         :root.light-mode .text-white,
         body.light-mode .text-white {
             color: #0F172A !important;
         }
         
+        /* Override all gray shades to dark readable colors */
         :root.light-mode .text-gray-300,
         body.light-mode .text-gray-300 {
             color: #475569 !important;
@@ -697,6 +712,70 @@
             color: #64748B !important;
         }
         
+        :root.light-mode .text-gray-500,
+        body.light-mode .text-gray-500 {
+            color: #475569 !important;
+        }
+        
+        :root.light-mode .text-gray-600,
+        body.light-mode .text-gray-600 {
+            color: #334155 !important;
+        }
+        
+        /* Override all slate shades */
+        :root.light-mode .text-slate-300,
+        body.light-mode .text-slate-300 {
+            color: #475569 !important;
+        }
+        
+        :root.light-mode .text-slate-400,
+        body.light-mode .text-slate-400 {
+            color: #334155 !important;
+        }
+        
+        :root.light-mode .text-slate-500,
+        body.light-mode .text-slate-500 {
+            color: #1E293B !important;
+        }
+        
+        :root.light-mode .text-slate-600,
+        body.light-mode .text-slate-600 {
+            color: #0F172A !important;
+        }
+        
+        /* Override all neutral shades */
+        :root.light-mode .text-neutral-300,
+        body.light-mode .text-neutral-300 {
+            color: #475569 !important;
+        }
+        
+        :root.light-mode .text-neutral-400,
+        body.light-mode .text-neutral-400 {
+            color: #334155 !important;
+        }
+        
+        :root.light-mode .text-neutral-500,
+        body.light-mode .text-neutral-500 {
+            color: #1E293B !important;
+        }
+        
+        :root.light-mode .text-neutral-600,
+        body.light-mode .text-neutral-600 {
+            color: #0F172A !important;
+        }
+        
+        /* Override sky colors for better contrast */
+        :root.light-mode .text-sky-300,
+        body.light-mode .text-sky-300 {
+            color: #0369A1 !important;
+        }
+        
+        :root.light-mode .text-sky-400,
+        body.light-mode .text-sky-400 {
+            color: #0369A1 !important;
+        }
+        
+        /* Gradient text with darker colors */
         :root.light-mode .gradient-text,
         body.light-mode .gradient-text {
             background: linear-gradient(to right, #0369A1, #6366F1);
@@ -2060,6 +2139,7 @@
 
         // Initialize theme on load
         window.toggleTheme = toggleTheme;
+        window.toggleThemeWithFlip = toggleThemeWithFlip;
 
         // --- INITIALIZATION ---
         document.addEventListener("DOMContentLoaded", () => {
