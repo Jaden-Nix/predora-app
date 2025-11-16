@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-       
+
         body {
             font-family: 'Inter', sans-serif;
             background: #0D1117; /* Dark background */
@@ -36,7 +36,7 @@
             .ui-panel {
                 background: rgba(22, 27, 34, 0.7); 
                 backdrop-filter: blur(10px);      /* This is the "glass" effect */
-            
+
             background: #161B22; /* Dark panel */
             border: 1px solid #30363D; /* Border */
             border-radius: 1rem; /* 16px */
@@ -200,7 +200,7 @@
         .btn:active {
             transform: scale(0.98);
         }
-        
+
         .btn-secondary {
             background: rgba(56, 189, 248, 0.1); /* sky-400/10 */
             border: 1px solid #38BDF8; /* sky-400 */
@@ -516,7 +516,7 @@
             transform: scale(1);
         }
 
-    
+
         /* --- (This is at the end of your <style> tag) --- */
 
                 /* --- NEW: Category Filter Bar --- */
@@ -546,7 +546,7 @@
                     color: white;
                     box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2);
                 }
-    
+
 
         /* --- Desktop Sidebar Button Styles --- */
         .sidebar-btn {
@@ -567,7 +567,7 @@
 <body class="text-gray-100">
     <div class="md:flex">
 
-        <nav id="desktop-sidebar" class="hidden md:block md:w-64 bg-[#161B22] border-r border-[#30363D] min-h-screen p-4 fixed">
+        <nav id="desktop-sidebar" class="hidden md:block md:w-64 bg-[#161B22] border-r border-[#30363D] min-h-screen p-4 fixed top-0 left-0">
             <div class="flex flex-col h-full">
                 <h1 class="text-3xl font-extrabold gradient-text tracking-tight cursor-pointer mb-8">Predora</h1>
 
@@ -598,7 +598,7 @@
                 </button>
             </div>
         </nav>
-        
+
                 <div class="flex-1 md:ml-64 min-h-screen relative">
 
 
@@ -622,7 +622,7 @@
                 </button>
             </div>
 
-            
+
             <div class="flex items-center space-x-4">
                 <div id="live-user-counter">
                     <span class="w-2 h-2 bg-green-400 rounded-full mr-2 live-dot"></span>
@@ -636,53 +636,53 @@
             </div>
         </nav>
 
-        <main class="relative p-4">
+            <main class="max-w-md md:max-w-xl lg:max-w-7xl mx-auto relative p-4">
 
-            <div id="login-screen" class="screen screen-active space-y-6">
-                <h1 class="text-3xl font-bold gradient-text text-center">Welcome to Predora</h1>
-                <p class="text-center text-gray-300">Select a demo account to get started.</p>
+            <div id="login-screen" class="screen screen-active space-y-6 max-w-md mx-auto lg:max-w-lg lg:space-y-8">
+                <h1 class="text-3xl lg:text-4xl font-bold gradient-text text-center">Welcome to Predora</h1>
+                <p class="text-center text-gray-300 lg:text-lg">Select a demo account to get started.</p>
 
-                <div class="space-y-3">
-                    <button onclick="mockLogin('judge-123', '@Judge')" class="btn btn-primary">Sign in as @Judge</button>
-                    <button onclick="mockLogin('alice-456', '@Alice')" class="btn btn-secondary">Sign in as @Alice</button>
-                    <button onclick="mockLogin('bob-789', '@Bob')" class="btn btn-secondary">Sign in as @Bob</button>
+                <div class="space-y-3 lg:space-y-4">
+                    <button onclick="mockLogin('judge-123', '@Judge')" class="btn btn-primary lg:text-lg">Sign in as @Judge</button>
+                    <button onclick="mockLogin('alice-456', '@Alice')" class="btn btn-secondary lg:text-lg">Sign in as @Alice</button>
+                    <button onclick="mockLogin('bob-789', '@Bob')" class="btn btn-secondary lg:text-lg">Sign in as @Bob</button>
                 </div>
 
-                <div class="ui-panel space-y-4">
-                    <p class="text-center text-gray-400 text-sm">Or, test the (mock) OTP flow:</p>
-                    <input id="mock-email-input" type="email" class="ui-input" placeholder="your-email@gmail.com">
-                    <button onclick="validateAndShowOtp()" class="btn btn-secondary w-full">Sign in with Email</button>
+                <div class="ui-panel space-y-4 lg:space-y-5">
+                    <p class="text-center text-gray-400 text-sm lg:text-base">Or, test the (mock) OTP flow:</p>
+                    <input id="mock-email-input" type="email" class="ui-input lg:text-lg" placeholder="your-email@gmail.com">
+                    <button onclick="validateAndShowOtp()" class="btn btn-secondary w-full lg:text-lg">Sign in with Email</button>
 
                 </div>
             </div>
 
-            <div id="otp-screen" class="screen screen-inactive space-y-4">
-                <button onclick="showScreen('login-screen')" class="flex items-center text-sky-400 font-medium">
-                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            <div id="otp-screen" class="screen screen-inactive space-y-4 max-w-md mx-auto lg:max-w-lg lg:space-y-6">
+                <button onclick="showScreen('login-screen')" class="flex items-center text-sky-400 font-medium lg:text-lg">
+                    <svg class="w-5 h-5 mr-1 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                     Back
                 </button>
-                <h1 class="text-2xl font-bold gradient-text">Enter OTP</h1>
-                <p class="text-gray-300">A (mock) code was sent. <br> Hint: It's `123456`</p>
-                <input id="mock-otp-input" type="text" class="ui-input text-center text-2xl tracking-[1em]" placeholder="123456" maxlength="6">
-                <button onclick="mockOtpLogin()" class="btn btn-primary w-full">Verify & Sign In</button>
+                <h1 class="text-2xl lg:text-3xl font-bold gradient-text">Enter OTP</h1>
+                <p class="text-gray-300 lg:text-lg">A (mock) code was sent. <br> Hint: It's `123456`</p>
+                <input id="mock-otp-input" type="text" class="ui-input text-center text-2xl lg:text-3xl tracking-[1em]" placeholder="123456" maxlength="6">
+                <button onclick="mockOtpLogin()" class="btn btn-primary w-full lg:text-lg">Verify & Sign In</button>
             </div>
 
                 <div id="home-screen" class="screen screen-inactive space-y-5">
-                    
 
-                <div onclick="showScreen('quick-play-screen')" class="ui-panel glowing-card flex items-center justify-between p-4 cursor-pointer transition-all duration-300 hover:scale-[1.02]">
+
+                <div onclick="showScreen('quick-play-screen')" class="ui-panel glowing-card flex items-center justify-between p-4 lg:p-6 cursor-pointer transition-all duration-300 hover:scale-[1.02]">
                     <div>
-                        <h3 class="text-lg font-bold gradient-text">Quick Plays</h3>
-                        <p class="text-sm text-gray-300">Fast markets, fast results.</p>
+                        <h3 class="text-lg lg:text-xl font-bold gradient-text">Quick Plays</h3>
+                        <p class="text-sm lg:text-base text-gray-300">Fast markets, fast results.</p>
                     </div>
-                    <svg class="w-8 h-8 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <svg class="w-8 h-8 lg:w-10 lg:h-10 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 </div>
 
                     <!--   SEARCH BAR BLOCK -->
                     <div class="relative w-full my-5">
-                        <input type="text" id="search-bar-input" class="ui-input pl-10" placeholder="Search markets (e.g., 'BTC', 'Elections')">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <input type="text" id="search-bar-input" class="ui-input pl-10 lg:pl-12 lg:text-lg" placeholder="Search markets (e.g., 'BTC', 'Elections')">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 lg:pl-4 pointer-events-none">
+                            <svg class="w-5 h-5 lg:w-6 lg:h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                     </div>
 
@@ -702,14 +702,17 @@
                     </div>
                     <!-- END OF FILTER BAR -->
 
-                <h2 class="text-xl font-semibold text-white tracking-tight pt-2">Trending Markets</h2>
-                <div id="standard-markets-feed" class="space-y-4">
-                    <p class="text-gray-400 text-center">Loading markets...</p>
+                <h2 class="text-xl lg:text-2xl font-semibold text-white tracking-tight pt-2">Trending Markets</h2>
+                <div id="standard-markets-feed" class="space-y-4 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0 xl:grid-cols-3">
+                    <p class="text-gray-400 text-center lg:col-span-2 xl:col-span-3">Loading markets...</p>
                 </div>
             </div>
 
             <div id="create-market-screen" class="screen screen-inactive space-y-6">
-                <h1 class="text-2xl font-bold gradient-text">Create Standard Market</h1>
+                <h1 class="text-2xl lg:text-3xl font-bold gradient-text">Create Standard Market</h1>
+
+                <div class="lg:grid lg:grid-cols-3 lg:gap-6 space-y-6 lg:space-y-0">
+                    <div class="lg:col-span-2 space-y-6">
 
                 <div class="ui-panel p-4 space-y-3">
                     <h3 class="text-base font-semibold text-sky-300">AI Assistant (LIVE)</h3>
@@ -785,26 +788,36 @@
                 <!-- END OF  BLOCK -->
 
                 <div class="space-y-4">
-                    <h3 class="text-base font-semibold text-gray-200">Creation Fee</h3>
-                    <div class="ui-panel p-4">
-                        <div class="flex justify-between items-center">
-                            <span class="font-medium text-gray-300">AI Oracle & Hosting Fee</span>
-                            <span class="font-bold text-white">5 BUSD (Mock)</span>
-                        </div>
+                    <h3 class="text-base font-semibold text-gray-200">Initial Liquidity</h3>
+                    <div class="ui-panel p-4 space-y-4">
+                        <p class="text-sm text-gray-400">
+                            You must provide the initial liquidity for this market. This amount is locked and used to create the starting odds.
+                        </p>
 
-                        <div class="text-center p-3 mt-4 rounded-lg bg-green-500/10 border border-green-400">
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="col-span-2 space-y-1">
+                                <label for="market-liquidity-input" class="text-xs font-medium text-gray-300">Amount</label>
+                                <input type="number" id="market-liquidity-input" class="ui-input" placeholder="100.00">
+                            </div>
+                            <div class="col-span-1 space-y-1">
+                                <label for="market-liquidity-asset" class="text-xs font-medium text-gray-300">Asset</label>
+                                <select id="market-liquidity-asset" class="ui-select">
+                                    </select>
+                            </div>
+                        </div>
+                        <div class="text-center p-3 mt-2 rounded-lg bg-green-500/10 border border-green-400">
                             <p class="font-semibold text-green-300">
                                 Get a 100% Refund!
                             </p>
                             <p class="text-xs text-gray-300">
-                                This fee is refunded if your market hits
+                                Your initial liquidity is refunded if your market hits
                                 <span class="font-bold">$100 in Stake Volume</span> from at least
                                 <span class="font-bold">10 different stakers.</span>
                             </p>
                         </div>
-                        </div>
+                    </div>
                 </div>
-                
+
                 <div id="no-loss-options" class="space-y-4">
                     <h3 class="text-base font-semibold text-gray-200">Yield Protocol</h3>
                     <div class="ui-panel p-4 space-y-3">
@@ -832,31 +845,39 @@
                     </div>
                 </div>
 
-                <div class="space-y-3 pt-4">
-                    <h3 class="text-base font-semibold text-gray-200">Live Preview</h3>
-                    <div class="ui-panel opacity-70">
-                        <h3 id="preview-title" class="text-lg font-semibold text-white mb-3 leading-tight">...</h3>
-                        <div class="flex justify-around my-5">
-                            <div class="text-center">
-                                <div id="preview-yes" class="text-4xl font-bold text-gray-400">--%</div>
-                                <div class="text-sm text-gray-300">YES</div>
-                            </div>
-                            <div class="text-center">
-                                <div id="preview-no" class="text-4xl font-bold text-gray-400">--%</div>
-                                <div class="text-sm text-gray-300">NO</div>
+                <button id="create-market-btn" class="btn btn-primary lg:text-lg">Create Market</button>
+                    </div>
+
+                    <div class="lg:col-span-1">
+                        <div class="lg:sticky lg:top-4 space-y-3">
+                            <h3 class="text-base font-semibold text-gray-200">Live Preview</h3>
+                            <div class="ui-panel">
+                                <h3 id="preview-title" class="text-lg font-semibold text-white mb-3 leading-tight">...</h3>
+                                <div class="flex justify-around my-5">
+                                    <div class="text-center">
+                                        <div id="preview-yes" class="text-4xl font-bold text-gray-400">--%</div>
+                                        <div class="text-sm text-gray-300">YES</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div id="preview-no" class="text-4xl font-bold text-gray-400">--%</div>
+                                        <div class="text-sm text-gray-300">NO</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <button id="create-market-btn" class="btn btn-primary">Create Market</button>
             </div>
 
             <div id="market-detail-screen" class="screen screen-inactive space-y-6">
-                <button onclick="goBack()" class="flex items-center text-sky-400 font-medium transition-colors hover:text-sky-300">
-                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                <button onclick="goBack()" class="flex items-center text-sky-400 font-medium transition-colors hover:text-sky-300 lg:text-lg">
+                    <svg class="w-5 h-5 mr-1 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                     Back to Home
                 </button>
-                <h1 id="detail-title" class="text-2xl font-bold text-white">...</h1>
+                <h1 id="detail-title" class="text-2xl lg:text-3xl font-bold text-white">...</h1>
+
+                <div class="lg:grid lg:grid-cols-3 lg:gap-6 space-y-6 lg:space-y-0">
+                    <div class="lg:col-span-2 space-y-6">
 
                 <div class="ui-panel">
                     <p id="detail-insight" class="text-gray-300 text-sm mb-6">...</p>
@@ -873,7 +894,7 @@
                     <button id="ai-explain-btn" class="btn btn-secondary w-full">
                         ✨ Explain these Odds (AI)
                     </button>
-                    
+
                     <div id="ai-explain-panel" class="hidden mt-4 space-y-2 p-3 bg-black/20 rounded-lg text-sm text-gray-300">
                     </div>
                 </div>
@@ -884,29 +905,6 @@
                     <div class="flex justify-between items-center">
                         <span class="text-gray-300">Total Yield Accrued:</span>
                         <span id="detail-yield-counter" class="text-2xl font-bold text-green-400">$0.00</span>
-                    </div>
-                </div>
-
-                <div class="ui-panel space-y-4">
-                    <h2 class="text-base font-semibold text-gray-200">Place Your Stake</h2>
-
-                    <div class="space-y-2">
-                        <label for="stake-asset-select" class="text-sm font-medium text-gray-300">Stake with:</label>
-                        <select id="stake-asset-select" class="ui-select">
-                        </select>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label for="stake-amount-input" class="text-sm font-medium text-gray-300">Amount</label>
-                        <input type="number" id="stake-amount-input" class="ui-input" placeholder="0.00">
-                    </div>
-                    <div id="stake-section" class="grid grid-cols-2 gap-4">
-                        <button id="stake-yes-btn" class="btn btn-stake-yes">
-                            Stake YES
-                        </button>
-                        <button id="stake-no-btn" class="btn btn-stake-no">
-                            Stake NO
-                        </button>
                     </div>
                 </div>
 
@@ -928,30 +926,59 @@
                             <span id="ticker-comment-count" class="ml-2 bg-sky-600 text-white text-xs font-bold px-2 py-0.5 rounded-full hidden">0</span>
                         </button>
                     </div>
-                 </div> 
-                
+                 </div>
+                    </div>
+
+                    <div class="lg:col-span-1">
+                        <div class="lg:sticky lg:top-4">
+                            <div class="ui-panel space-y-4">
+                                <h2 class="text-base font-semibold text-gray-200">Place Your Stake</h2>
+
+                                <div class="space-y-2">
+                                    <label for="stake-asset-select" class="text-sm font-medium text-gray-300">Stake with:</label>
+                                    <select id="stake-asset-select" class="ui-select">
+                                    </select>
+                                </div>
+
+                                <div class="space-y-2">
+                                    <label for="stake-amount-input" class="text-sm font-medium text-gray-300">Amount</label>
+                                    <input type="number" id="stake-amount-input" class="ui-input" placeholder="0.00">
+                                </div>
+                                <div id="stake-section" class="grid grid-cols-2 gap-4">
+                                    <button id="stake-yes-btn" class="btn btn-stake-yes">
+                                        Stake YES
+                                    </button>
+                                    <button id="stake-no-btn" class="btn btn-stake-no">
+                                        Stake NO
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+
             </div>
 
-               
-            
+
+
             <div id="leaderboard-screen" class="screen screen-inactive space-y-6">
-                <h1 class="text-2xl font-bold gradient-text">Leaderboard</h1>
-                <div id="user-rank-panel" class="ui-panel text-center p-6 border-l-4 border-sky-400">
-                    <p class="text-gray-400">Loading your rank...</p>
+                <h1 class="text-2xl lg:text-3xl font-bold gradient-text">Leaderboard</h1>
+                <div id="user-rank-panel" class="ui-panel text-center p-6 lg:p-8 border-l-4 border-sky-400">
+                    <p class="text-gray-400 lg:text-lg">Loading your rank...</p>
                 </div>
-                <div class="flex justify-around border-b border-white/10">
-                    <button class="profile-tab active" data-filter="all-time">All-Time</button>
-                    <button class="profile-tab" data-filter="weekly">Weekly</button>
-                    <button class="profile-tab" data-filter="daily">Daily</button>
+                <div class="flex justify-around border-b border-white/10 max-w-2xl mx-auto">
+                    <button class="profile-tab active lg:text-lg" data-filter="all-time">All-Time</button>
+                    <button class="profile-tab lg:text-lg" data-filter="weekly">Weekly</button>
+                    <button class="profile-tab lg:text-lg" data-filter="daily">Daily</button>
                 </div>
-                <div id="ranking-list" class="space-y-2">
-                    <p class="text-gray-400 text-center pt-8">Fetching top players...</p>
+                <div id="ranking-list" class="space-y-2 lg:space-y-3 max-w-3xl mx-auto">
+                    <p class="text-gray-400 text-center pt-8 lg:text-lg">Fetching top players...</p>
                 </div>
             </div>
 
             <div id="pledge-pool-screen" class="screen screen-inactive space-y-6">
-                <h1 class="text-2xl font-bold gradient-text">Pledge Pool (Quick Plays)</h1>
-                <div id="pledge-pool-content" class="space-y-4">
+                <h1 class="text-2xl lg:text-3xl font-bold gradient-text">Pledge Pool (Quick Plays)</h1>
+                <div id="pledge-pool-content" class="space-y-4 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0 xl:grid-cols-3">
                 </div>
 
                 <div id="pledge-pool-footer" class="ui-panel p-4 space-y-4 hidden">
@@ -985,47 +1012,49 @@
             </div>
 
             <div id="profile-screen" class="screen screen-inactive space-y-6">
-                <div class="ui-panel flex flex-col items-center">
-                    <div class="w-20 h-20 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-4xl shadow-lg mb-4">
-                        P
-                    </div>
-                    <h1 id="profile-display-name" class="text-2xl font-bold text-white">...</h1>
-                    <p id="profile-wallet-address" class="text-sm text-gray-400 mt-2">Connecting wallet...</p>
-                    <div class="flex flex-wrap justify-center gap-2 mt-3">
-                        <span id="profile-xp-badge" class="badge badge-xp">... XP</span>
-                        <span id="profile-rank-badge" class="badge badge-rank">Rank: ...</span>
-                        <span id="profile-accuracy-badge" class="badge badge-green">...% Accuracy</span>
-                        <span id="user-streak-text" class="badge badge-blue">🔥 0 Wins</span>
-                    </div>
-                </div>
-
-               
-                <div class="ui-panel p-4 space-y-3">
-                    <h3 class="text-base font-semibold text-sky-300">AI Performance Review</h3>
-                    <p class="text-sm text-gray-400">Get a summary of your prediction history.</p>
-                    <button id="ai-profile-summary-btn" class="btn btn-secondary w-full">
-                        ✨ Generate My Summary
-                    </button>
-                    <div id="ai-profile-summary-panel" class="hidden mt-3 p-3 bg-black/20 rounded-lg text-sm text-gray-300">
-    
-                    </div>
-
-                </div>
-                
-
-                <div class="ui-panel">
-                    <h2 class="text-base font-semibold gradient-text mb-3">Staking Summary</h2>
-                    <div class="grid grid-cols-2 gap-4 text-center">
-                        <div>
-                            <span class="text-xs text-gray-400">Total Staked</span>
-                            <p id="total-principal" class="text-xl font-semibold text-white">$0.00</p>
+                <div class="lg:grid lg:grid-cols-3 lg:gap-6 space-y-6 lg:space-y-0">
+                    <div class="lg:col-span-1 space-y-6">
+                        <div class="ui-panel flex flex-col items-center lg:p-6">
+                            <div class="w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-4xl lg:text-5xl shadow-lg mb-4">
+                                P
+                            </div>
+                            <h1 id="profile-display-name" class="text-2xl lg:text-3xl font-bold text-white">...</h1>
+                            <p id="profile-wallet-address" class="text-sm lg:text-base text-gray-400 mt-2">Connecting wallet...</p>
+                            <div class="flex flex-wrap justify-center gap-2 mt-3">
+                                <span id="profile-xp-badge" class="badge badge-xp">... XP</span>
+                                <span id="profile-rank-badge" class="badge badge-rank">Rank: ...</span>
+                                <span id="profile-accuracy-badge" class="badge badge-green">...% Accuracy</span>
+                                <span id="user-streak-text" class="badge badge-blue">🔥 0 Wins</span>
+                            </div>
                         </div>
-                        <div>
-                            <span class="text-xs text-gray-400">Mock BUSD</span>
-                            <p id="mock-balance" class="text-xl font-semibold text-green-400">$100.00</p>
+
+                        <div class="ui-panel p-4 lg:p-6 space-y-3">
+                            <h3 class="text-base font-semibold text-sky-300">AI Performance Review</h3>
+                            <p class="text-sm text-gray-400">Get a summary of your prediction history.</p>
+                            <button id="ai-profile-summary-btn" class="btn btn-secondary w-full">
+                                ✨ Generate My Summary
+                            </button>
+                            <div id="ai-profile-summary-panel" class="hidden mt-3 p-3 bg-black/20 rounded-lg text-sm text-gray-300">
+
+                            </div>
+                        </div>
+
+                        <div class="ui-panel lg:p-6">
+                            <h2 class="text-base font-semibold gradient-text mb-3">Staking Summary</h2>
+                            <div class="grid grid-cols-2 gap-4 text-center">
+                                <div>
+                                    <span class="text-xs text-gray-400">Total Staked</span>
+                                    <p id="total-principal" class="text-xl lg:text-2xl font-semibold text-white">$0.00</p>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-gray-400">Mock BUSD</span>
+                                    <p id="mock-balance" class="text-xl lg:text-2xl font-semibold text-green-400">$100.00</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+
+                    <div class="lg:col-span-2">
 
                 <div>
                     <div class="grid grid-cols-4 border-b border-white/10">
@@ -1041,11 +1070,11 @@
                         <div id="history-content" class="hidden">
                             <p class="text-gray-400 text-center pt-8">Loading history...</p>
                         </div>
-    
+
                 <div id="assets-content" class="hidden space-y-3">
                     <p class="text-gray-400 text-center pt-8">Loading assets...</p>
                 </div> 
-                    
+
                         <div id="networking-content" class="hidden space-y-4">
                             <div class="flex justify-around border-b border-white/10">
                                 <button id="sub-tab-followers" class="profile-tab active" data-subtab="followers" onclick="handleNetworkingTab('followers')">Followers</button>
@@ -1060,14 +1089,16 @@
                                 </div>
                             </div>
                         </div>
-                    
-                        
+
+
 </div> </div> <div id="logout-button-container" class="pt-4 hidden">
 
-            <button onclick="logout()" class="btn btn-secondary w-full" style="border-color: #EF4444; color: #F87171;">
+            <button onclick="logout()" class="btn btn-secondary w-full lg:w-auto lg:px-8" style="border-color: #EF4444; color: #F87171;">
                 Log Out
             </button>
         </div>
+                    </div>
+                </div>
 
     </div> 
 
@@ -1148,7 +1179,7 @@
                         WIPE ALL DEMO DATA (Admin Only)
                     </button>
                 </div>
-                
+
                 <div class="ui-panel p-4 space-y-3">
                     <h2 class="text-lg font-semibold text-yellow-400">🚨 Admin Test: Run Oracle</h2>
                     <p class="text-sm text-gray-400">This manually runs the auto-resolve and daily-create jobs. Make sure you've set your CRON_SECRET in Replit.</p>
@@ -1156,7 +1187,7 @@
                         Run Oracle Jobs
                     </button>
                 </div>
-                
+
             </div>
 
 
@@ -1221,10 +1252,10 @@
                     </div>
                 </div>
             </div>
-            
 
 
-            
+
+
         </main>
 
                 <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 z-50 max-w-md mx-auto px-2 py-3 flex justify-around md:hidden">
@@ -1288,7 +1319,7 @@
                 Got it
             </button>
         </div>
-        
+
     </div>
 
     <div id="ai-verdict-modal" class="hidden fixed inset-0 z-[995] bg-black/70 backdrop-blur-sm flex justify-center items-center p-4">
@@ -1336,7 +1367,7 @@
                 </div>
             </div>
         </div>
-        
+
     <div id="ticker-modal" class="hidden fixed inset-0 z-[995] bg-black/70 backdrop-blur-sm flex flex-col justify-end">
 
         <!-- This is the slide-up panel -->
@@ -1372,7 +1403,7 @@
         </div>
     </div>
 
-    
+
     <script type="module">
         // --- Import Firebase modules ---
         // These are imported from the web to make the HTML file self-contained
@@ -1383,7 +1414,7 @@
             onAuthStateChanged,
             signInWithCustomToken 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        
+
         import { 
             getFirestore, 
             doc, getDoc, setDoc, 
@@ -1447,11 +1478,11 @@
             "https://res.cloudinary.com/djslxbghy/image/upload/IMG_4945_ymkcqz.png",
             "https://res.cloudinary.com/djslxbghy/image/upload/IMG_4948_qskmio.png"
         ];
-        
+
         const ADMIN_PASSWORD = "predora-admin";
 
         // --- GEMINI API CONSTANTS ---
-        
+
           const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
         const GEMINI_API_KEY = "";
 
@@ -1495,7 +1526,7 @@
 
         // --- INITIALIZATION ---
         document.addEventListener("DOMContentLoaded", () => {
-          
+
             // Load the pledge pool from storage
             const savedPledgePool = localStorage.getItem('pledgePool');
             if (savedPledgePool) {
@@ -1525,7 +1556,7 @@
             const { getFirestore, setLogLevel } = window.firebase.firestore;
 
             try {
-             
+
                 const firebaseConfig = {
                     apiKey: "AIzaSyCr36OARwTBJduV9PJI6FfhDKRVwxarBBM",
                     authDomain: "predora-app.firebaseapp.com",
@@ -1578,11 +1609,11 @@
          */
         function cacheDomElements() {
 
-           
+
             dom.userStreakText = document.getElementById('user-streak-text');
-            
+
             dom.screens = document.querySelectorAll('.screen');
-            
+
             dom.navButtons = document.querySelectorAll('.nav-button');
             dom.topNav = document.getElementById('top-nav');
             dom.bottomNav = document.getElementById('bottom-nav');
@@ -1640,23 +1671,23 @@
             dom.adminQpYes = document.getElementById('admin-qp-yes');
             dom.adminQpNo = document.getElementById('admin-qp-no');
             dom.logoutButtonContainer = document.getElementById('logout-button-container');
-            
+
             dom.quickPlayDetailModal = document.getElementById('quick-play-detail-modal');
             dom.qpModalTitle = document.getElementById('qp-modal-title');
             dom.qpModalInsight = document.getElementById('qp-modal-insight');
             dom.aiVerdictModal = document.getElementById('ai-verdict-modal');
             dom.verdictModalOutcome = document.getElementById('verdict-modal-outcome');
-            
+
             dom.verdictModalRationale = document.getElementById('verdict-modal-rationale');
-            
+
             dom.verdictModalSource = document.getElementById('verdict-modal-source');
 
             dom.detailTotalPool = document.getElementById('detail-total-pool');
             dom.marketTvlText = document.getElementById('market-tvl-text');
-      
+
             dom.searchBarInput = document.getElementById('search-bar-input');
             dom.standardMarketsFeed = document.getElementById('standard-markets-feed');
-            
+
               dom.avatarModal = document.getElementById('avatar-modal');
 
             // --- Ticker Modal Elements ---
@@ -1679,11 +1710,15 @@
             dom.publicProfileAccuracyBadge = document.getElementById('public-profile-accuracy-badge');
             dom.followBtn = document.getElementById('follow-btn');
             dom.publicActiveStakesContent = document.getElementById('public-active-stakes-content');
-            
+
             dom.publicHistoryContent = document.getElementById('public-history-content');
-            
+
             dom.sidebarButtons = document.querySelectorAll('.sidebar-btn');
-            
+
+            // --- Create Market Liquidity Inputs ---
+            dom.marketLiquidityInput = document.getElementById('market-liquidity-input');
+            dom.marketLiquidityAsset = document.getElementById('market-liquidity-asset');
+
         }
 
         // =====================================================================
@@ -1704,7 +1739,7 @@
         }
         // ---- END OF NEW FUNCTION --
 
-        
+
         /**
          * Logs in as a demo user. Cleans up old listeners, sets localStorage,
          * and initializes the user's profile in Firebase.
@@ -1769,7 +1804,7 @@
         // ---- END OF NEW FUNCTION ----
 
 
-        
+
         /**
          * Loads or creates a user's profile in Firestore.
          * This is ASYNC and returns a promise.
@@ -1977,6 +2012,9 @@
                     renderResolutionPanel();
                     renderQuickPlayResolutionPanel();
                     break;
+                    case 'create-market-screen':
+                    populateAssetSelector();
+                    break;
             }
         }
 
@@ -2174,7 +2212,7 @@
         function attachFollowerListener() {
             const { collection, query, onSnapshot, where, serverTimestamp } = window.firebase.firestore;
 
-       
+
             const loadTime = new Date();
 
             const q = query(
@@ -2188,7 +2226,7 @@
                         const follower = change.doc.data();
                         const followTime = follower.followedAt?.toDate();
 
-                        
+
                         if (followTime && followTime > loadTime) {
                             console.log("New follower detected:", follower.displayName);
                             showToast(`✨ ${follower.displayName} just followed you!`);
@@ -2214,7 +2252,7 @@
                 const avatarUrl = profile.avatarUrl || LOGO_URL; 
 
                 if (profileAvatarContainer) {
-                 
+
                     profileAvatarContainer.innerHTML = `
                         <img src="${avatarUrl}" class="w-20 h-20 rounded-full" alt="Profile Avatar">
                     `;
@@ -2225,7 +2263,7 @@
                 // --- AVATAR LOGIC (Top Nav Button) ---
                 const navProfileButton = document.getElementById('nav-profile-button');
                 if (navProfileButton) {
-            
+
                     navProfileButton.innerHTML = `
                         <img src="${avatarUrl}" class="w-full h-full rounded-full" alt="Profile">
                     `;
@@ -2267,7 +2305,7 @@
             const networkingContent = document.getElementById('networking-content');
             if(networkingContent) networkingContent.classList.add('hidden');
             // --- END NEW ---
-            
+
             // Show the correct content panel
             const contentEl = document.getElementById(`${tabName}-content`) || document.getElementById(`${tabName}-stakes-content`);
             if (contentEl) contentEl.classList.remove('hidden');
@@ -2389,10 +2427,17 @@
                     [field]: increment(amount) 
                 });
 
+
+                userProfile[field] = (userProfile[field] || 0) + amount;
+
+
+                renderAssetsContent();
+                updateProfileUI(userProfile);
+
                 showLoadingOverlay(false);
                 showToast(`✅ ${amount} ${asset} received!`);
-                renderAssetsContent(); 
-             
+
+
             } catch (error) {
                 console.error("Faucet claim failed:", error);
                 showLoadingOverlay(false);
@@ -2738,17 +2783,30 @@
         /**
          * Populates the <select> dropdown with the user's current asset balances.
          */
+        /**
+         * Populates ALL <select> dropdowns with the user's current asset balances.
+         */
         function populateAssetSelector() {
-            if (!dom.stakeAssetSelect) return;
             const busdBal = userProfile.balance || 0;
             const bnbBal = userProfile.bnbBalance || 0;
             const cakeBal = userProfile.cakeBalance || 0;
 
-            dom.stakeAssetSelect.innerHTML = `
+            // Create the HTML for the options once
+            const optionsHtml = `
                 <option value="BUSD">BUSD (Balance: ${busdBal.toFixed(2)})</option>
                 <option value="BNB">BNB (Balance: ${bnbBal.toFixed(4)})</option>
                 <option value="CAKE">CAKE (Balance: ${cakeBal.toFixed(2)})</option>
             `;
+
+            // 1. Populate the original Market Detail stake select
+            if (dom.stakeAssetSelect) {
+                dom.stakeAssetSelect.innerHTML = optionsHtml;
+            }
+
+            // 2. NEW: Populate the new Create Market liquidity select
+            if (dom.marketLiquidityAsset) {
+                dom.marketLiquidityAsset.innerHTML = optionsHtml;
+            }
         }
 
         /**
@@ -2772,7 +2830,7 @@
 
         async function stakeMarket(pick) {
             // 1. Get all Firebase functions
-            const { doc, updateDoc, increment, addDoc, collection, query, where, getDocs, runTransaction } = window.firebase.firestore;
+            const { doc, updateDoc, increment, addDoc, collection, serverTimestamp, runTransaction } = window.firebase.firestore;
 
             // 2. Get Form Values
             const amount = parseFloat(dom.stakeAmountInput.value);
@@ -2792,189 +2850,123 @@
                 return;
             }
 
-            // 4. --- BALANCE CHECK ---
-            let currentAssetBalance = 0;
-            let balanceFieldToUpdate = "";
-            let amountInUsd = 0;
-
-            if (selectedAsset === "BUSD") {
-                currentAssetBalance = userProfile.balance;
-                balanceFieldToUpdate = "balance";
-                amountInUsd = amount;
-            } else if (selectedAsset === "BNB") {
-                currentAssetBalance = userProfile.bnbBalance;
-                balanceFieldToUpdate = "bnbBalance";
-                amountInUsd = amount * getMockPrice('BNB');
-            } else if (selectedAsset === "CAKE") {
-                currentAssetBalance = userProfile.cakeBalance;
-                balanceFieldToUpdate = "cakeBalance";
-                amountInUsd = amount * getMockPrice('CAKE');
-            }
-
-            if (amount > currentAssetBalance) {
-                showToast(`Insufficient ${selectedAsset} balance. You only have ${currentAssetBalance.toFixed(4)}.`);
-                return;
-            }
-
-            // 5. --- MOCK DELAY ---
+            // 4. --- MOCK DELAY ---
             showLoadingOverlay(true, "Confirming on-chain...");
-            await new Promise(res => setTimeout(res, 3000));
+            await new Promise(res => setTimeout(res, 1500)); // Shortened delay
 
-            // 6. --- MAIN LOGIC ---
+            // 5. --- MAIN LOGIC (NOW INSIDE A TRANSACTION) ---
             try {
-                const profileRef = doc(db, 'artifacts', APP_ID, 'public', 'data', USER_PROFILE_COLLECTION, currentUserId);
-                const publicProfileRef = doc(db, 'artifacts', APP_ID, 'public', 'data', PUBLIC_LEADERBOARD_COLLECTION, currentUserId);
-                const pledgeCollection = collection(db, 'artifacts', APP_ID, 'public', 'data', PLEDGES_COLLECTION);
-
-                let xpToAward = getRandomXP(10);
+                const balanceFieldToUpdate = getBalanceField(selectedAsset);
+                const amountInUsd = amount * getMockPrice(selectedAsset);
+                const xpToAward = getRandomXP(10);
                 const txHash = generateFakeTxHash();
 
-                // ------------------------------------------------------------------
-                //  THIS IS THE CRITICAL FIX: WE CHECK THE MARKET TYPE
-                // ------------------------------------------------------------------
+                // --- THIS IS THE FIX ---
+                // We wrap all database reads and writes in a transaction
+                await runTransaction(db, async (transaction) => {
+                    const profileRef = doc(db, 'artifacts', APP_ID, 'public', 'data', USER_PROFILE_COLLECTION, currentUserId);
+                    const publicProfileRef = doc(db, 'artifacts', APP_ID, 'public', 'data', PUBLIC_LEADERBOARD_COLLECTION, currentUserId);
+                    const pledgeCollection = collection(db, 'artifacts', APP_ID, 'public', 'data', PLEDGES_COLLECTION);
 
-                if (currentMarket.isNoLoss) {
+                    // 1. TRANSACTION READ: Get user's profile to check balance
+                    const profileSnap = await transaction.get(profileRef);
+                    if (!profileSnap.exists()) {
+                        throw new Error("User profile not found.");
+                    }
 
-                    // --- LOGIC A: "NO-LOSS" MARKET (FIXED ODDS) [CORRECTED "CRASH-FREE" MODEL] ---
+                    // 2. BALANCE CHECK:
+                    const currentAssetBalance = profileSnap.data()[balanceFieldToUpdate] || 0;
+                    if (amount > currentAssetBalance) {
+                        throw new Error(`Insufficient ${selectedAsset} balance. You only have ${currentAssetBalance.toFixed(4)}.`);
+                    }
 
-                    const odds = pick === 'YES' ? currentMarket.yesPercent : currentMarket.noPercent;
-                    // This is the total payout the user will receive if they win
-                    const potentialReturnUsd = (amountInUsd / (odds / 100)); 
+                    // 3. TRANSACTION READ: Get the market (unless it's the mock)
+                    let market, marketRef, potentialPayoutUsd;
 
-                    // We REMOVED the complex query that was failing silently.
-                    // We will now create a new pledge document every single time,
-                    // which does not require a special database index.
+                    if (currentMarket.isMock) {
+                        market = MOCK_ETH_MARKET;
+                        const odds = pick === 'YES' ? market.yesPercent : market.noPercent;
+                        potentialPayoutUsd = (amountInUsd / (odds / 100));
+                    } else {
+                        marketRef = doc(db, 'artifacts', APP_ID, 'public', 'data', STANDARD_MARKETS_COLLECTION, currentMarketId);
+                        const marketSnap = await transaction.get(marketRef);
+                        if (!marketSnap.exists()) { throw new Error("Market not found"); }
+                        market = marketSnap.data();
+                        if (market.isResolved) { throw new Error("Market is closed."); }
 
-                    await addDoc(pledgeCollection, {
+                        // 4. AMM MATH (Only for Traditional markets)
+                        if (!market.isNoLoss) {
+                            let yesPool = market.yesPool;
+                            let noPool = market.noPool;
+                            const k = yesPool * noPool;
+
+                            if (pick === 'YES') {
+                                const newYesPool = yesPool + amountInUsd;
+                                const newNoPool = k / newYesPool;
+                                potentialPayoutUsd = noPool - newNoPool; // Shares
+                                yesPool = newYesPool;
+                                noPool = newNoPool;
+                            } else {
+                                const newNoPool = noPool + amountInUsd;
+                                const newYesPool = k / newNoPool;
+                                potentialPayoutUsd = yesPool - newYesPool; // Shares
+                                yesPool = newYesPool;
+                                noPool = newNoPool;
+                            }
+                            const totalPool = yesPool + noPool;
+
+                            // 5. TRANSACTION WRITE 1: Update the Market
+                            transaction.update(marketRef, {
+                                yesPool: yesPool,
+                                noPool: noPool,
+                                yesPercent: (yesPool / totalPool) * 100,
+                                noPercent: (noPool / totalPool) * 100,
+                                totalStakeVolume: increment(amountInUsd)
+                            });
+                        } else {
+                            // Logic for No-Loss markets
+                            const odds = pick === 'YES' ? market.yesPercent : market.noPercent;
+                            potentialPayoutUsd = (amountInUsd / (odds / 100));
+                            transaction.update(marketRef, { totalStakeVolume: increment(amountInUsd) });
+                        }
+                    }
+
+                    // 6. TRANSACTION WRITE 2: Create the Pledge
+                    const newPledgeRef = doc(pledgeCollection);
+                    transaction.set(newPledgeRef, {
                         marketId: currentMarketId,
-                        marketTitle: currentMarket.title,
+                        marketTitle: market.title,
                         userId: currentUserId,
                         pick: pick,
-                        amount: amount, 
-                        asset: selectedAsset, 
-                        amountUsd: amountInUsd, 
-                        potentialReturn: potentialReturnUsd, // This is the total payout
-                        txHash: txHash, 
+                        amount: amount,
+                        asset: selectedAsset,
+                        amountUsd: amountInUsd,
+                        potentialReturn: potentialPayoutUsd,
+                        txHash: txHash,
                         isResolved: false,
                         isWinner: null,
                         payout: 0,
                         createdAt: new Date().toISOString()
                     });
 
-                    // --- ADD FOR CHART LOGGING ---
-                    // [FIX] We must check if this is a REAL market before logging
+                    // 7. TRANSACTION WRITE 3: Log for the chart
                     if (!currentMarket.isMock) {
-                        const marketRef = doc(db, 'artifacts', APP_ID, 'public', 'data', STANDARD_MARKETS_COLLECTION, currentMarketId);
-                        await updateDoc(marketRef, { totalStakeVolume: increment(amountInUsd) });
-                        await addDoc(collection(db, 'artifacts', APP_ID, 'public', 'data', STAKE_LOGS_COLLECTION), {
+                        const logRef = doc(collection(db, 'artifacts', APP_ID, 'public', 'data', STAKE_LOGS_COLLECTION));
+                        transaction.set(logRef, {
                             marketId: currentMarketId,
                             amountUsd: amountInUsd,
                             timestamp: serverTimestamp()
                         });
                     }
-                    // --- END CHART LOGGING ---
-                    
-                    console.log("No-Loss Stake (Logic A) Succeeded: New pledge created.");
 
-                } else {
-
-                                    // --- LOGIC B: "TRADITIONAL" MARKET (AMM LIVE ODDS) [FINAL "CRASH-FREE" MODEL] ---
-
-                                    const marketRef = doc(db, 'artifacts', APP_ID, 'public', 'data', STANDARD_MARKETS_COLLECTION, currentMarketId);
-
-                                    // Run as a Transaction
-                                    await runTransaction(db, async (transaction) => {
-                                        // 1. TRANSACTION READ: Get the current market state
-                                        const marketSnap = await transaction.get(marketRef);
-                                        if (!marketSnap.exists()) { throw new Error("Market not found"); }
-                                        const market = marketSnap.data();
-
-                                        // 2. AMM MATH: Calculate new pools and shares
-                                        let yesPool = market.yesPool || 0;
-                                        let noPool = market.noPool || 0;
-                                        const k = yesPool * noPool; // AMM constant
-                                        let potentialPayoutUsd = 0; // This is the number of "shares"
-
-                                        if (pick === 'YES') {
-                                            const newYesPool = yesPool + amountInUsd;
-                                            const newNoPool = k / newYesPool;
-                                            potentialPayoutUsd = noPool - newNoPool; // Shares
-                                            yesPool = newYesPool;
-                                            noPool = newNoPool;
-                                        } else { // pick === 'NO'
-                                            const newNoPool = noPool + amountInUsd;
-                                            const newYesPool = k / newNoPool;
-                                            potentialPayoutUsd = yesPool - newYesPool; // Shares
-                                            yesPool = newYesPool;
-                                            noPool = newNoPool;
-                                        }
-
-                                        const totalPool = yesPool + noPool;
-                                        const newYesPercent = (yesPool / totalPool) * 100;
-                                        const newNoPercent = (noPool / totalPool) * 100;
-
-                                        // 3. TRANSACTION WRITE 1: Update the Market's pools and odds
-                                        transaction.update(marketRef, {
-                                            yesPool: yesPool,
-                                            noPool: noPool,
-                                            yesPercent: newYesPercent,
-                                            noPercent: newNoPercent,
-                                            totalStakeVolume: increment(amountInUsd)
-                                        });
-
-                                        // 4. TRANSACTION WRITE 2: Create the Pledge (CRASH-FREE MODEL)
-                                        // We REMOVED the query. We always create a new pledge.
-                                        const newPledgeRef = doc(pledgeCollection); // Create a ref for the new doc
-                                        transaction.set(newPledgeRef, { // Use transaction.set
-                                            marketId: currentMarketId,
-                                            marketTitle: market.title,
-                                            userId: currentUserId,
-                                            pick: pick,
-                                            amount: amount, 
-                                            asset: selectedAsset, 
-                                            amountUsd: amountInUsd, 
-                                            potentialReturn: potentialPayoutUsd, // Set the initial "shares"
-                                            txHash: txHash, 
-                                            isResolved: false,
-                                            isWinner: null,
-                                            payout: 0,
-                                            createdAt: new
-                Date().toISOString()
-                                        });
-
-                                            // --- ADD FOR CHART LOGGING ---
-                                            const logRef = doc(collection(db, 'artifacts', APP_ID, 'public', 'data', STAKE_LOGS_COLLECTION));
-                                            transaction.set(logRef, {
-                                                marketId: currentMarketId,
-                                                amountUsd: amountInUsd,
-                                                timestamp: serverTimestamp()
-                                            });
-                                            // --- END CHART LOGGING ---
-
-                                        // 5. TRANSACTION WRITE 3: Update user's profile (balance and XP)
-                                        transaction.update(profileRef, { 
-                                            xp: increment(xpToAward),
-                                            [balanceFieldToUpdate]: increment(-amount) // Deduct the asset amount
-                                        });
-                                        transaction.update(publicProfileRef, { xp: increment(xpToAward) });
-                                    });
-                                    // --- End of runTransaction ---
-
-                                    console.log("Traditional Stake (Logic B) Succeeded: Transaction complete.");
-                                }
-                // 7. --- END OF LOGIC ---
-
-                // This runs *after* either logic path succeeds
-                // THIS IS THE CRITICAL BUG FIX
-                if (currentMarket.isNoLoss) { 
-                    // This is a "No-Loss" market, so we deduct balance/add XP here.
-                    // (The "Traditional" AMM market logic already handled this inside its transaction).
-                    await updateDoc(profileRef, { 
-                        xp: increment(xpToAward),
-                        [balanceFieldToUpdate]: increment(-amount)
+                    // 8. TRANSACTION WRITE 4 & 5: Update user's profile and leaderboard
+                    transaction.update(profileRef, {
+                        [balanceFieldToUpdate]: increment(-amount),
+                        xp: increment(xpToAward)
                     });
-                    await updateDoc(publicProfileRef, { xp: increment(xpToAward) });
-                }
+                    transaction.update(publicProfileRef, { xp: increment(xpToAward) });
+                });
+                // --- END OF TRANSACTION ---
 
                 showLoadingOverlay(false);
                 showToast(`✅ Stake Confirmed! +${xpToAward} XP`);
@@ -2982,10 +2974,10 @@
             } catch (error) {
                 console.error("Staking failed:", error);
                 showLoadingOverlay(false);
-                showToast(`Staking failed: ${String(error)}`);
+                showToast(`Staking failed: ${error.message}`); // This will now show "Insufficient balance"
             }
         }
-        
+
         // =====================================================================
         // --- QUICK PLAY & PLEDGE POOL ---
         // =====================================================================
@@ -3064,7 +3056,7 @@
             `;
         }
 
-        
+
         /**
          * Shows a mock insight/detail modal for a Quick Play card.
          */
@@ -3090,7 +3082,7 @@
             dom.quickPlayDetailModal.classList.add('hidden');
         }
         // ---- END OF NEW FUNCTION ----
-        
+
         /**
          * Handles the (YES/NO/SKIP) swipe/button press on the Quick Play screen.
          */
@@ -3552,12 +3544,10 @@
         }
         // ---- END OF NEW FUNCTION ----
 
-        
-        async function createMarket() {
-            // --- PASTE THIS NEW, CLEAN BLOCK ---
 
+        async function createMarket() {
             // 1. Get all Firebase functions
-            const { addDoc, collection, doc, updateDoc, increment, serverTimestamp } = window.firebase.firestore;
+            const { addDoc, collection, doc, updateDoc, increment, serverTimestamp, runTransaction } = window.firebase.firestore;
 
             // 2. Get all form values
             const title = document.getElementById('market-title-input').value;
@@ -3565,101 +3555,114 @@
             const yesPercent = parseFloat(dom.marketYesInput.value, 10);
             const noPercent = parseFloat(dom.marketNoInput.value, 10);
             const stakeDuration = document.getElementById('market-stake-duration').value;
-            
             const resolutionDate = document.getElementById('market-resolution-date').value;
-            
             const category = document.getElementById('market-category-select').value;
 
-            // 3. Get the market type (This is the clean logic)
+            // Get the new liquidity info
+            const liquidityAmount = parseFloat(dom.marketLiquidityInput.value);
+            const liquidityAsset = dom.marketLiquidityAsset.value;
+            const balanceFieldToUpdate = getBalanceField(liquidityAsset);
+            const liquidityAmountInUsd = liquidityAmount * getMockPrice(liquidityAsset);
+
             const selectedMarketType = document.getElementById('market-type-input').value;
             const isNoLossFinal = selectedMarketType === 'no-loss';
             const yieldProtocolFinal = isNoLossFinal ? document.getElementById('selected-yield-protocol').value : null;
 
-            // --- END OF NEW BLOCK ---
-
-            // 4. Validate (This line should already be in your code, right after)
-            // --- NEW, STRICTER VALIDATION ---
-            if (!title || !insight || !stakeDuration || !resolutionDate || isNaN(yesPercent) || isNaN(noPercent)) {
-                showToast("Please fill out all fields.");
+            // 3. --- NEW, STRICTER VALIDATION ---
+            if (!title || !insight || !stakeDuration || !resolutionDate || isNaN(yesPercent) || isNaN(noPercent) || !liquidityAmount || liquidityAmount <= 0) {
+                showToast("Please fill out all fields, including a valid liquidity amount.");
                 return;
             }
             if (Math.abs(yesPercent + noPercent - 100) > 0.001) {
                 showToast("Error: Percentages must add up to 100%.");
                 return;
             }
-            // THIS IS THE NEW BUG FIX:
             if (yesPercent <= 0 || yesPercent >= 100) {
                 showToast("Error: For AMM markets, odds must be between 1% and 99%.");
                 return;
             }
-
-            if (category === "Other") { // <-- ADD THIS BLOCK
+            if (category === "Other") {
                 showToast("Please select a market category.");
                 return;
             }
-            // --- END OF NEW VALIDATION ---
-            // ...
+            // --- END NEW VALIDATION ---
+
             showLoadingOverlay(true, "Creating market...");
 
             try {
-                // 3. Add to standard_markets collection
-                // --- REPLACE your old await addDoc block with this ---
-                // --- REPLACE your old await addDoc block with this ---
-                // --- REPLACE your old await addDoc block with this ---
-                await addDoc(collection(db, 'artifacts', APP_ID, 'public', 'data', STANDARD_MARKETS_COLLECTION), {
-                    title,
-                    insight,
-                    category: category,
-                    yesPercent: yesPercent, // The initial display odds
-                    noPercent: noPercent, // The initial display odds
+                // --- THIS IS THE CORRECT, SECURE TRANSACTION ---
+                await runTransaction(db, async (transaction) => {
+                    const profileRef = doc(db, 'artifacts', APP_ID, 'public', 'data', USER_PROFILE_COLLECTION, currentUserId);
+                    const publicProfileRef = doc(db, 'artifacts', APP_ID, 'public', 'data', PUBLIC_LEADERBOARD_COLLECTION, currentUserId);
+                    const marketCollectionRef = collection(db, 'artifacts', APP_ID, 'public', 'data', STANDARD_MARKETS_COLLECTION);
 
-                    // ---- THIS IS THE FIX ----
-                    // We add the starting liquidity for the AMM
-                    yesPool: 1000 * (yesPercent / 100), // e.g., $555
-                    noPool: 1000 * (noPercent / 100),  // e.g., $445
-                    // ---- END FIX ----
+                    // 1. TRANSACTION READ: Get user's profile to check balance
+                    const profileSnap = await transaction.get(profileRef);
+                    if (!profileSnap.exists()) {
+                        throw new Error("User profile not found.");
+                    }
 
-                    isNoLoss: isNoLossFinal, 
-                    stakeDuration,
-                    resolutionDate,
-                    yieldProtocol: yieldProtocolFinal,
+                    // 2. BALANCE CHECK:
+                    const currentAssetBalance = profileSnap.data()[balanceFieldToUpdate] || 0;
+                    if (liquidityAmount > currentAssetBalance) {
+                        throw new Error(`Insufficient ${liquidityAsset} balance. You need ${liquidityAmount}.`);
+                    }
 
-                    // ---- Anti-Spam Logic ----
-                    totalStakeVolume: 0,
-                    uniqueStakerCount: 0,
-                    refundVolumeGoal: 100,
-                    refundStakerGoal: 10,
+                    // 3. TRANSACTION WRITE 1: Create the new market
+                    const newMarketRef = doc(marketCollectionRef); // Create ref for the new doc
+                    transaction.set(newMarketRef, {
+                        title,
+                        insight,
+                        category: category,
+                        yesPercent: yesPercent,
+                        noPercent: noPercent,
+                        // Use the user's staked liquidity
+                        yesPool: liquidityAmountInUsd * (yesPercent / 100),
+                        noPool: liquidityAmountInUsd * (noPercent / 100),
+                        isNoLoss: isNoLossFinal,
+                        stakeDuration,
+                        resolutionDate,
+                        yieldProtocol: yieldProtocolFinal,
+                        totalStakeVolume: liquidityAmountInUsd, // The creator's stake is the starting volume
+                        uniqueStakerCount: 1, // The creator is the first staker
+                        refundVolumeGoal: 100,
+                        refundStakerGoal: 10,
+                        isResolved: false,
+                        winningOutcome: null,
+                        createdAt: serverTimestamp(),
+                        createdBy: currentUserId,
+                        createdByDisplayName: userProfile.displayName
+                    });
 
-                    isResolved: false,
-                    winningOutcome: null,
-                    createdAt: serverTimestamp(),
-                    createdBy: currentUserId,
-                    createdByDisplayName: userProfile.displayName
+                    // 4. TRANSACTION WRITE 2: Deduct liquidity AND award XP
+                    const xpToAward = getRandomXP(50);
+                    transaction.update(profileRef, {
+                        [balanceFieldToUpdate]: increment(-liquidityAmount),
+                        xp: increment(xpToAward)
+                    });
+
+                    // 5. TRANSACTION WRITE 3: Update public leaderboard
+                    transaction.update(publicProfileRef, { xp: increment(xpToAward) });
                 });
-                // 4. Award XP for creating a market
-                const xpToAward = getRandomXP(50);
-                const profileRef = doc(db, 'artifacts', APP_ID, 'public', 'data', USER_PROFILE_COLLECTION, currentUserId);
-                await updateDoc(profileRef, { xp: increment(xpToAward) });
-
-                const publicProfileRef = doc(db, 'artifacts', APP_ID, 'public', 'data', PUBLIC_LEADERBOARD_COLLECTION, currentUserId);
-                await updateDoc(publicProfileRef, { xp: increment(xpToAward) });
+                // --- END OF TRANSACTION ---
 
                 showLoadingOverlay(false);
                 showToast("Market created successfully!");
                 showScreen('home-screen');
 
-                // 5. Clear the form
+                // 6. Clear the form
                 document.getElementById('market-title-input').value = '';
                 document.getElementById('market-insight-input').value = '';
-                document.getElementById('market-yes-input').value = '';
-                document.getElementById('market-no-input').value = '';
+                dom.marketYesInput.value = '';
+                dom.marketNoInput.value = '';
                 document.getElementById('market-stake-duration').value = '';
                 document.getElementById('market-resolution-date').value = '';
+                dom.marketLiquidityInput.value = '';
 
             } catch (error) {
                 console.error("Error creating market:", error);
                 showLoadingOverlay(false);
-                showToast("Market creation failed.");
+                showToast(`Market creation failed: ${error.message}`);
             }
         }
 
@@ -4192,8 +4195,8 @@ ${historyText}`;
                                         Resolve NO
                                     </button>
                                 </div>
-                                
-                                
+
+
                             </div>
                         `;
                     } else {
@@ -4348,8 +4351,8 @@ ${historyText}`;
                 const winningOdds = winningOutcome === 'YES' 
                     ? (market.yesPercent || 60) 
                     : (market.noPercent || 40);
-                
-                
+
+
 
                 for (const pledgeDoc of snapshot.docs) {
                     const pledge = pledgeDoc.data();
@@ -4568,7 +4571,7 @@ ${historyText}`;
             closeVerdictModal();
         }
         // ---- END OF NEW FUNCTIONS ----
-        
+
 
         // ---- PASTE THIS NEW FUNCTION ----
         /**
@@ -4751,9 +4754,9 @@ ${historyText}`;
                 }
             });
         }
-        
 
-        
+
+
         /**
          * Admin function to manually trigger the backend Oracle jobs.
          */
@@ -5196,7 +5199,7 @@ ${historyText}`;
             } else if (tabName === 'history') {
                 renderPublicHistoryStakes(userId);
             }
-            
+
         }
 
         /**
@@ -5573,7 +5576,7 @@ ${historyText}`;
             feed.innerHTML = html;
         }
 
-        
+
 
         /**
          * Filters the main market feed by category.
@@ -5610,7 +5613,7 @@ ${historyText}`;
             renderMarketFeed(results);
         }
 
-        
+
         /**
          * Wires up all global functions to the window object and attaches
          * listeners to buttons that are always present.
@@ -5622,9 +5625,9 @@ ${historyText}`;
             window.handleProfileTab = handleProfileTab;
 
             window.filterMarkets = filterMarkets;
-            
+
             window.viewMarketDetail = viewMarketDetail;
-            
+
             window.handleQuickPlay = handleQuickPlay;
             window.removeItemFromPledgePool = removeItemFromPledgePool;
             window.resolveMarket = resolveMarket;
@@ -5643,31 +5646,31 @@ ${historyText}`;
             window.selectMarketType = selectMarketType;
             window.viewQuickPlayDetails = viewQuickPlayDetails;
             window.closeQuickPlayDetails = closeQuickPlayDetails;
-            
+
             window.closeVerdictModal = closeVerdictModal;
-            
+
             window.handleDispute = handleDispute;
 
             window.showVerdictModal = showVerdictModal;
-            
+
             window.adminReOpenMarket = adminReOpenMarket;
 
               window.showAvatarModal = showAvatarModal; 
                   window.closeAvatarModal = closeAvatarModal; 
-            
+
                   window.selectAvatar = selectAvatar;
 
             window.showTickerModal = showTickerModal; 
-            
+
             window.closeTickerModal = closeTickerModal; 
-            
+
             window.postComment = postComment;
 
             window.viewUserProfile = viewUserProfile;
 
             window.handlePublicProfileTab = handlePublicProfileTab;
             window.handleNetworkingTab = handleNetworkingTab;
-            
+
             // Attach listeners to static buttons
             document.getElementById('ai-generate-btn').addEventListener('click', getAIAssist);
             document.getElementById('create-market-btn').addEventListener('click', createMarket);
@@ -5709,7 +5712,7 @@ dom.searchBarInput.addEventListener('input', handleSearch);
                     });
                 });
             }
-        
+
         }
 
     </script>

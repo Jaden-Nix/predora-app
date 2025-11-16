@@ -17,13 +17,13 @@ import admin from 'firebase-admin'; // Use the ADMIN SDK
 // --- Constants ---
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 5000;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const CRON_SECRET = process.env.CRON_SECRET;
 const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
 const APP_ID = 'predora-hackathon';
 
-// --- Firebase Admin SDK Initialization  ---
+// --- Firebase Admin SDK Initialization [FIXED] ---
 try {
     const serviceAccountString = process.env.GOOGLE_APPLICATION_CREDENTIALS;
     if (!serviceAccountString) {
@@ -52,7 +52,10 @@ app.get('/', (req, res) => {
 });
 
 // --- API Endpoint 1: Secure AI Proxy [FINAL FIX] ---
-
+/**
+ * This endpoint now correctly handles 'tools' (for Search/Functions)
+ * AND 'jsonSchema' (for JSON Mode).
+ */
 app.post('/api/gemini', async (req, res) => {
     console.log("Server: /api/gemini endpoint hit");
 
@@ -76,7 +79,7 @@ app.post('/api/gemini', async (req, res) => {
         ]
     };
 
-    
+    // 3. --- THIS IS THE FIX ---
     // Add tools OR generationConfig, but not both.
     if (jsonSchema) {
         // JSON Mode (for AI Judge)
@@ -166,10 +169,7 @@ async function autoResolveMarkets() {
         const marketTitle = market.title;
 
         // This job ONLY needs Google Search
-        const systemPrompt = `You are a decisive oracle. Based on all available public data as of ${today}, you must determine the final outcome of the market.
-        - First, analyze the user's market question.
-        - Second, use Google Search to find the factual, final answer.
-        - Third, respond with ONLY ONE WORD: 'YES', 'NO', or, if it is factually impossible to know, 'AMBIGUOUS'.`;
+        const systemPrompt = `As of ${today}, what was the outcome of "[Market Title]"? Respond ONLY 'YES', 'NO', 'AMBIGUOUS'.`;
         const userPrompt = `Market Title: "${marketTitle}"`;
         const payload = {
             systemInstruction: { parts: [{ text: systemPrompt }] },
@@ -286,19 +286,15 @@ async function createDailyMarkets() {
     const searchTools = [{ "google_search": {} }];
     // --- End Tool Definition ---
 
-    const topics = [
-        { topic: "global news", category: "Politics" },
-        { topic: "crypto", category: "Crypto" },
-        { topic: "pop culture", category: "Entertainment" }
-    ];
+    const topics = ["global news", "crypto", "pop culture"];
 
-    for (const item of topics) {
+    for (const topic of topics) {
         try {
             // --- CALL 1: GET "SMART" IDEAS (Google Search only) ---
             const systemPrompt_1 = `You are a research assistant. Use Google Search to find up-to-date, real-time information.
 Find a *single, specific, future-focused* event (for 2025 or 2026) about the user's topic.
 Respond ONLY with a 1-2 sentence summary of this event.`;
-            const userPrompt_1 = `Topic: "${item.topic}"`;
+            const userPrompt_1 = `Topic: "${topic}"`;
 
             const payload_1 = {
                 systemInstruction: { parts: [{ text: systemPrompt_1 }] },
@@ -335,15 +331,10 @@ You MUST use the 'create_market_form' tool.`;
                 const yesP = parseFloat(marketData.yesPercent);
                 const noP = parseFloat(marketData.noPercent);
 
-                const isNoLossMarket = (item.topic === "crypto");
-                const yieldProtocolFinal = isNoLossMarket ? 'aave' : null;
                 const newMarketDoc = {
                     ...marketData,
-                    isResolved: false, 
-                        isNoLoss: isNoLossMarket, 
-                        yieldProtocol: yieldProtocolFinal,
-                        creatorId: 'AI_ORACLE',
-                    category: item.category,
+                    isResolved: false, isNoLoss: true, yieldProtocol: 'aave',
+                    creatorId: 'AI_ORACLE',
                     yesPercent: yesP, noPercent: noP,
                     yesPool: 1000 * (yesP / 100), noPool: 1000 * (noP / 100),
                     totalStakeVolume: 0,
@@ -358,7 +349,7 @@ You MUST use the 'create_market_form' tool.`;
                 throw new Error("AI (Step 2) failed to use function call.");
             }
         } catch (e) {
-            console.error(`ORACLE: Failed to create market for ${item.topic}:`, e.message);
+            console.error(`ORACLE: Failed to create market for ${topic}:`, e.message);
         }
     }
     // Set the flag
