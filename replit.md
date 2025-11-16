@@ -19,16 +19,20 @@ Preferred communication style: Simple, everyday language.
 - Inter font family from Google Fonts
 
 **Design Decisions**
-- Dark theme with glassmorphism effects (`backdrop-filter: blur`) for modern UI aesthetics
+- **Dual-theme system** with equally beautiful dark and light modes:
+  - **Dark Mode**: Deep blacks (#0D1117) with neon accent glows and glassmorphism effects
+  - **Light Mode**: Luminous & Airy aesthetic with soft backgrounds (#F5F7FB), pastel accents, dual-shadow system (ambient + drop), and frosted glass effects
+  - Theme persistence via localStorage with smooth transitions
 - Responsive design with mobile-first approach (meta viewport configuration)
 - CDN-based dependencies to minimize build complexity and improve load times
-- Glow-pulse animations for interactive feedback
+- Glow-pulse animations for interactive feedback in both themes
 - Modern GenZ-friendly navigation: Sleek top navigation bar with pill-style buttons instead of traditional sidebar
   - Desktop: Centered glassmorphic pill container with rounded navigation buttons
-  - Mobile: Bottom navigation bar with prominent center "Create" button
+  - Mobile: Bottom navigation bar with 6 buttons (Home, Leaders, Pledges, Create, Theme, Profile) for full feature access including theme toggle
   - Smooth transitions and hover effects with gradient active states
+  - Navigation automatically hidden on login/OTP screens for clean authentication UX
 
-**Rationale**: Choosing vanilla JavaScript with CDN-based libraries provides rapid prototyping capability and reduced deployment complexity, suitable for a demo/hackathon build. The modern top navigation design appeals to GenZ users by avoiding outdated sidebar patterns and embracing contemporary UI trends seen in popular apps.
+**Rationale**: Choosing vanilla JavaScript with CDN-based libraries provides rapid prototyping capability and reduced deployment complexity, suitable for a demo/hackathon build. The modern top navigation design appeals to GenZ users by avoiding outdated sidebar patterns and embracing contemporary UI trends seen in popular apps. Dual-theme support ensures accessibility and user preference accommodation.
 
 ### Backend Architecture
 
@@ -138,3 +142,23 @@ Preferred communication style: Simple, everyday language.
 - Modern CSS features: `backdrop-filter` for glassmorphism effects
 - CSS animations: Keyframe-based glow effects
 - Responsive design APIs: Viewport meta tag configuration
+- localStorage: Theme preference persistence
+
+## Recent Enhancements (November 16, 2025)
+
+### Light Mode Redesign
+Implemented comprehensive light mode styling with "Luminous & Airy" aesthetic to match dark mode quality:
+- **Color Palette**: Daylight Mist (#F5F7FB), Airy Blue-Gray (#E8EEFF), Soft Blue borders (#CBD5F5), Coral accents (#F26D85), Emerald accents (#3CBF8C)
+- **Dual-Shadow System**: Ambient white glow + soft blue drop shadows for depth
+- **Complete Component Coverage**: All interactive elements styled including buttons (primary gradient #5CC6FF→#7B8CFF, secondary, stake yes/no), inputs/selects (white backgrounds with soft blue borders), badges (all variants with pastels and high-contrast text), Quick Play screens and buttons (including SVG icon color overrides), toast notifications, wallet modal, live user counter, glowing cards, and filter pills
+
+### Mobile Theme Toggle
+- Added theme toggle button to mobile bottom navigation (6 buttons total)
+- Reduced icon sizes to w-5 for compact layout
+- Fixed updateNavStyles() to safely handle non-navigation buttons
+- Theme toggle now accessible on all screen sizes
+
+### Follower Notification Fix
+- Implemented isFirstLoad flag to skip initial Firestore snapshot
+- Prevents false-positive "user followed you" toasts on every login
+- Only shows notifications for new followers after authentication completes
