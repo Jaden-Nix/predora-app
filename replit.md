@@ -162,12 +162,13 @@ Implemented comprehensive light mode styling with "Luminous & Airy" aesthetic to
 - Fixed updateNavStyles() to safely handle non-navigation buttons
 
 ### Enhanced Light Mode Text Contrast
-- Comprehensive text color overrides for maximum readability:
+- Targeted text color overrides for improved readability while preserving colorful UI:
   - Base text: #0F172A (dark slate, ~14:1 contrast ratio)
-  - All Tailwind gray/slate/neutral utilities mapped to darker colors
+  - Specific Tailwind gray/slate/neutral utilities mapped to darker colors
   - Sky colors updated to #0369A1 for better visibility
-  - All text meets WCAG AA accessibility standards
-- Gradient text uses darker blue gradient (#0369A1 → #6366F1)
+  - Gradient text uses darker blue gradient (#0369A1 → #6366F1)
+  - Intentionally preserved: green/red/emerald/rose colors for financial metrics (gains/losses/yields)
+  - Design decision: Avoided blanket element overrides to maintain semantic color coding
 
 ### Follower Notification Fix
 - Implemented isFirstLoad flag to skip initial Firestore snapshot
