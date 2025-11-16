@@ -152,11 +152,22 @@ Implemented comprehensive light mode styling with "Luminous & Airy" aesthetic to
 - **Dual-Shadow System**: Ambient white glow + soft blue drop shadows for depth
 - **Complete Component Coverage**: All interactive elements styled including buttons (primary gradient #5CC6FF→#7B8CFF, secondary, stake yes/no), inputs/selects (white backgrounds with soft blue borders), badges (all variants with pastels and high-contrast text), Quick Play screens and buttons (including SVG icon color overrides), toast notifications, wallet modal, live user counter, glowing cards, and filter pills
 
-### Mobile Theme Toggle
-- Added theme toggle button to mobile bottom navigation (6 buttons total)
-- Reduced icon sizes to w-5 for compact layout
+### Theme Toggle in Profile Panel
+- Moved theme toggle to top-right of profile panel (removed from mobile bottom nav)
+- Mobile bottom nav now has 5 buttons (Home, Leaders, Pledges, Create, Profile)
+- Theme toggle features smooth flip animation when clicked
+  - Panel flips left (rotateY animation) with cubic-bezier easing
+  - Theme change happens at animation midpoint for smooth visual transition
+  - Duration: 0.6s with bounce effect
 - Fixed updateNavStyles() to safely handle non-navigation buttons
-- Theme toggle now accessible on all screen sizes
+
+### Enhanced Light Mode Text Contrast
+- Comprehensive text color overrides for maximum readability:
+  - Base text: #0F172A (dark slate, ~14:1 contrast ratio)
+  - All Tailwind gray/slate/neutral utilities mapped to darker colors
+  - Sky colors updated to #0369A1 for better visibility
+  - All text meets WCAG AA accessibility standards
+- Gradient text uses darker blue gradient (#0369A1 → #6366F1)
 
 ### Follower Notification Fix
 - Implemented isFirstLoad flag to skip initial Firestore snapshot
