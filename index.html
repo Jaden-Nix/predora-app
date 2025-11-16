@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Predora - Demo Build</title>
 
+    <!-- Apply theme before first paint to prevent flash -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.add('light-mode');
+            }
+        })();
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,36 +24,64 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
+        /* === THEME VARIABLES === */
+        :root {
+            --bg-primary: #0D1117;
+            --bg-secondary: #161B22;
+            --bg-panel: #161B22;
+            --border-color: #30363D;
+            --text-primary: #E6EDF3;
+            --text-secondary: #9CA3AF;
+            --text-tertiary: #6B7280;
+        }
+
+        :root.light-mode,
+        body.light-mode {
+            --bg-primary: #F9FAFB;
+            --bg-secondary: #FFFFFF;
+            --bg-panel: #FFFFFF;
+            --border-color: #E5E7EB;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --text-tertiary: #9CA3AF;
+        }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #0D1117; /* Dark background */
+            background: var(--bg-primary);
+            color: var(--text-primary);
             padding-bottom: 90px;
             overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         #top-nav {
-            background: #161B22; /* Dark panel */
-            border-bottom: 1px solid #30363D; /* Border */
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
             min-height: 60px;
+            transition: all 0.3s ease;
         }
 
         #bottom-nav {
-            background: #161B22; /* Dark panel */
-            border-top: 1px solid #30363D; /* Border */
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            transition: all 0.3s ease;
         }
 
         /* ---  UI PANEL  --- */
             .ui-panel {
-                background: rgba(22, 27, 34, 0.7); 
-                backdrop-filter: blur(10px);      /* This is the "glass" effect */
-
-            background: #161B22; /* Dark panel */
-            border: 1px solid #30363D; /* Border */
-            border-radius: 1rem; /* 16px */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            padding: 1.25rem; /* 20px */
-        }
+                background: var(--bg-panel);
+                border: 1px solid var(--border-color);
+                border-radius: 1rem; /* 16px */
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                padding: 1.25rem; /* 20px */
+                transition: all 0.3s ease;
+            }
+            
+            :root.light-mode .ui-panel,
+            body.light-mode .ui-panel {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            }
 
         /* --- ANIMATION --- */
         @keyframes glow-pulse {
@@ -595,13 +633,23 @@
                         </button>
                     </div>
 
-                    <!-- Right Side: Live Counter + Profile -->
-                    <div class="flex items-center space-x-3 md:space-x-4">
+                    <!-- Right Side: Live Counter + Theme + Profile -->
+                    <div class="flex items-center space-x-2 md:space-x-3">
                         <div id="live-user-counter" class="hidden sm:flex items-center text-xs md:text-sm text-gray-300">
                             <span class="w-2 h-2 bg-green-400 rounded-full mr-2 live-dot"></span>
                             <span id="live-user-count-text">147</span>
                             <span class="ml-1">online</span>
                         </div>
+
+                        <!-- Theme Toggle -->
+                        <button id="theme-toggle" onclick="toggleTheme()" class="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-gray-400 hover:text-sky-400 transition-all duration-300 hover:scale-110 active:scale-95 hover:bg-gray-800/30" title="Toggle theme">
+                            <svg id="theme-icon-sun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            <svg id="theme-icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                            </svg>
+                        </button>
 
                         <button data-screen="profile-screen" id="nav-profile-button" class="w-9 h-9 md:w-10 md:h-10 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl hover:shadow-indigo-500/50 active:scale-95">
                             P
@@ -954,8 +1002,26 @@
             </div>
 
             <div id="pledge-pool-screen" class="screen screen-inactive space-y-6">
-                <h1 class="text-2xl lg:text-3xl font-bold gradient-text">Pledge Pool (Quick Plays)</h1>
-                <div id="pledge-pool-content" class="space-y-4 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0 xl:grid-cols-3">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl lg:text-3xl font-bold gradient-text">Pledge Pool (Quick Plays)</h1>
+                </div>
+                
+                <!-- Empty State -->
+                <div id="pledge-pool-empty" class="hidden max-w-2xl mx-auto text-center py-16 lg:py-24">
+                    <div class="ui-panel p-8 lg:p-12">
+                        <svg class="w-20 h-20 lg:w-24 lg:h-24 mx-auto mb-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                        <h3 class="text-xl lg:text-2xl font-bold text-gray-300 mb-3">No Active Pledges</h3>
+                        <p class="text-gray-400 lg:text-lg mb-6">Your pledge pool is empty. Join Quick Plays to see your pending pledges here!</p>
+                        <button onclick="showScreen('quick-play-screen')" class="btn btn-primary lg:text-lg">
+                            Explore Quick Plays
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Pledges Grid -->
+                <div id="pledge-pool-content" class="space-y-4 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0 xl:grid-cols-3 2xl:grid-cols-4">
                 </div>
 
                 <div id="pledge-pool-footer" class="ui-panel p-4 space-y-4 hidden">
@@ -1501,8 +1567,61 @@
             isMock: true
         };
 
+        // === THEME MANAGEMENT ===
+        function toggleTheme() {
+            const html = document.documentElement;
+            const body = document.body;
+            const sunIcon = document.getElementById('theme-icon-sun');
+            const moonIcon = document.getElementById('theme-icon-moon');
+            
+            html.classList.toggle('light-mode');
+            body.classList.toggle('light-mode');
+            const isLightMode = html.classList.contains('light-mode');
+            
+            // Toggle icons
+            if (isLightMode) {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+            
+            // Save preference
+            localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+        }
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const html = document.documentElement;
+            const body = document.body;
+            const sunIcon = document.getElementById('theme-icon-sun');
+            const moonIcon = document.getElementById('theme-icon-moon');
+            
+            if (!sunIcon || !moonIcon) return; // DOM not ready yet
+            
+            // Sync body class with html class (set by inline script)
+            if (html.classList.contains('light-mode')) {
+                body.classList.add('light-mode');
+            }
+            
+            // Sync icons
+            if (savedTheme === 'light') {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        }
+
+        // Initialize theme on load
+        window.toggleTheme = toggleTheme;
+
         // --- INITIALIZATION ---
         document.addEventListener("DOMContentLoaded", () => {
+            // Initialize theme immediately when DOM is ready
+            initTheme();
 
             // Load the pledge pool from storage
             const savedPledgePool = localStorage.getItem('pledgePool');
@@ -1513,6 +1632,11 @@
                     console.error("Could not parse pledge pool:", e);
                     pledgePoolItems = []; // Start fresh if data is corrupt
                 }
+            }
+            
+            // Render pledge pool to show empty state on initial load
+            if (typeof renderPledgePool === 'function') {
+                renderPledgePool();
             }
             // ---- END ADD ----
 
@@ -3135,16 +3259,16 @@
          * Renders the "Pledge Pool" screen with all items from the local array.
          */
         function renderPledgePool() {
+            const emptyState = document.getElementById('pledge-pool-empty');
             if (pledgePoolItems.length === 0) {
-                // Show empty state
-                dom.pledgePoolContent.innerHTML = `
-                    <div class="ui-panel text-center">
-                        <p class="text-gray-400">Your pledge pool is empty.</p>
-                        <p class="text-sm text-gray-500 mt-1">Add markets from the Quick Play feed.</p>
-                    </div>
-                `;
+                // Show empty state, hide grid
+                if (emptyState) emptyState.classList.remove('hidden');
+                dom.pledgePoolContent.classList.add('hidden');
                 dom.pledgePoolFooter.classList.add('hidden');
             } else {
+                // Hide empty state, show grid
+                if (emptyState) emptyState.classList.add('hidden');
+                dom.pledgePoolContent.classList.remove('hidden');
                 // Build the list of pledge items
                 let html = '';
                 pledgePoolItems.forEach(item => {
