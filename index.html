@@ -1540,6 +1540,17 @@
                             </div>
                             <h1 id="profile-display-name" class="text-2xl lg:text-3xl font-bold text-white">...</h1>
                             <p id="profile-wallet-address" class="text-sm lg:text-base text-gray-400 mt-2">Connecting wallet...</p>
+                            
+                            <!-- Follower Count - Clickable -->
+                            <button onclick="handleProfileTab('networking'); handleNetworkingTab('followers');" class="mt-2 px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 transition-all duration-200 border border-white/10">
+                                <span id="profile-follower-count" class="text-sm text-gray-400">
+                                    <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                    </svg>
+                                    0 Followers
+                                </span>
+                            </button>
+                            
                             <div class="flex flex-wrap justify-center gap-2 mt-3">
                                 <span id="profile-xp-badge" class="badge badge-xp">... XP</span>
                                 <span id="profile-rank-badge" class="badge badge-rank">Rank: ...</span>
@@ -1746,6 +1757,17 @@
                     <div id="public-profile-avatar" class="w-20 h-20 rounded-full flex items-center justify-center shadow-lg mb-4 bg-gradient-to-br from-indigo-600 to-blue-600">
                         </div>
                     <h1 id="public-profile-name" class="text-2xl font-bold text-white">...</h1>
+                    
+                    <!-- Follower Count Display for Public Profile -->
+                    <button onclick="viewUserFollowers(currentPublicUserId)" class="mt-2 px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 transition-all duration-200 border border-white/10">
+                        <span id="public-profile-follower-count" class="text-sm text-gray-400">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            0 Followers
+                        </span>
+                    </button>
+                    
                     <div class="flex flex-wrap justify-center gap-2 mt-3">
                         <span id="public-profile-xp-badge" class="badge badge-xp">... XP</span>
                         <span id="public-profile-rank-badge" class="badge badge-rank">Rank: ...</span>
@@ -1758,9 +1780,10 @@
                 </button>
 
                 <div>
-                    <div class="flex justify-around border-b border-white/10">
+                    <div class="grid grid-cols-3 border-b border-white/10">
                         <button class="profile-tab active" data-pubtab="active" onclick="handlePublicProfileTab('active')">Active</button>
                         <button class="profile-tab" data-pubtab="history" onclick="handlePublicProfileTab('history')">History</button>
+                        <button class="profile-tab" data-pubtab="followers" onclick="handlePublicProfileTab('followers')">Followers</button>
                     </div>
                     <div class="pt-4">
                         <div id="public-active-stakes-content">
@@ -1768,6 +1791,9 @@
                         </div>
                         <div id="public-history-content" class="hidden">
                             <p class="text-gray-400 text-center pt-8">Loading history...</p>
+                        </div>
+                        <div id="public-followers-content" class="hidden space-y-3">
+                            <p class="text-gray-400 text-center pt-8">Loading followers...</p>
                         </div>
                     </div>
                 </div>
@@ -1788,12 +1814,12 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                 <span class="text-xs mt-1">Leaders</span>
             </button>
+            <button onclick="showScreen('create-market-screen')" class="nav-button flex flex-col items-center text-gray-400 -mt-2 bg-gradient-to-br from-indigo-600 to-blue-600 p-3 rounded-full shadow-lg shadow-blue-500/30 border-2 border-sky-400">
+                <svg class="w-5 h-5" fill="none" stroke="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            </button>
             <button onclick="showScreen('pledge-pool-screen')" class="nav-button flex flex-col items-center text-gray-400">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                 <span class="text-xs mt-1">Pledges</span>
-            </button>
-            <button onclick="showScreen('create-market-screen')" class="nav-button flex flex-col items-center text-gray-400 -mt-2 bg-gradient-to-br from-indigo-600 to-blue-600 p-3 rounded-full shadow-lg shadow-blue-500/30 border-2 border-sky-400">
-                <svg class="w-5 h-5" fill="none" stroke="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
             </button>
             <button onclick="showScreen('profile-screen')" class="nav-button flex flex-col items-center text-gray-400">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
@@ -2890,6 +2916,9 @@
                     // Clean up old styles
                     profileAvatarContainer.classList.remove('bg-gradient-to-br', 'from-indigo-600', 'to-blue-600');
                 }
+                
+                // Update follower count
+                updateFollowerCount(currentUserId);
 
                 // --- AVATAR LOGIC (Top Nav Button) ---
                 const navProfileButton = document.getElementById('nav-profile-button');
@@ -5783,6 +5812,9 @@ ${historyText}`;
                 dom.publicProfileName.innerText = profile.displayName || 'Anonymous';
                 dom.publicProfileAvatar.innerHTML = `<img src="${profile.avatarUrl || LOGO_URL}" class="w-20 h-20 rounded-full" alt="Profile Avatar">`;
                 dom.publicProfileXpBadge.innerText = `${(profile.xp || 0).toLocaleString()} XP`;
+                
+                // Update follower count for this user
+                updateFollowerCount(userId);
                 dom.publicProfileRankBadge.innerText = `Rank: N/A`; // Note: Rank is tricky to get for a single user
                 dom.publicProfileAccuracyBadge.innerText = `${profile.xp > 0 ? '82' : '0'}% Accuracy`; // Still mocked
 
@@ -5811,7 +5843,7 @@ ${historyText}`;
         }
 
         /**
-         * Handles the tab switching on the public profile screen (Active, History).
+         * Handles the tab switching on the public profile screen (Active, History, Followers).
          */
         window.handlePublicProfileTab = (tabName) => {
             document.querySelectorAll('#public-profile-screen .profile-tab').forEach(btn => btn.classList.remove('active'));
@@ -5820,6 +5852,10 @@ ${historyText}`;
 
             dom.publicActiveStakesContent.classList.toggle('hidden', tabName !== 'active');
             dom.publicHistoryContent.classList.toggle('hidden', tabName !== 'history');
+            const publicFollowersContent = document.getElementById('public-followers-content');
+            if (publicFollowersContent) {
+                publicFollowersContent.classList.toggle('hidden', tabName !== 'followers');
+            }
 
             // Get the userId from the follow button
             const userId = dom.followBtn.dataset.targetUserId;
@@ -5830,8 +5866,54 @@ ${historyText}`;
                 renderPublicActiveStakes(userId);
             } else if (tabName === 'history') {
                 renderPublicHistoryStakes(userId);
+            } else if (tabName === 'followers') {
+                renderPublicFollowersList(userId);
             }
 
+        }
+        
+        /**
+         * Renders the list of users who follow a specific user (for public profiles)
+         */
+        async function renderPublicFollowersList(userId) {
+            const { collection, getDocs, query } = window.firebase.firestore;
+            const content = document.getElementById('public-followers-content');
+            content.innerHTML = '<p class="text-gray-400 text-center pt-8">Loading followers...</p>';
+
+            try {
+                const followersCol = collection(db, 'artifacts', APP_ID, 'public', 'data', USER_PROFILE_COLLECTION, userId, 'followers');
+                const snapshot = await getDocs(query(followersCol));
+
+                if (snapshot.empty) {
+                    content.innerHTML = `<div class="ui-panel text-center"><p class="text-gray-400">This user has no followers yet.</p></div>`;
+                    return;
+                }
+
+                let html = '';
+                snapshot.forEach(doc => {
+                    const user = doc.data();
+                    html += `
+                        <div class="ui-panel p-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <img src="${user.avatarUrl || LOGO_URL}" class="w-10 h-10 rounded-full" alt="Avatar">
+                                    <div>
+                                        <p class="font-semibold text-white">${user.displayName}</p>
+                                        <p class="text-sm text-gray-400">${(user.xp || 0).toLocaleString()} XP</p>
+                                    </div>
+                                </div>
+                                <button onclick="viewUserProfile('${user.userId}')" class="btn btn-secondary" style="width: auto; padding: 0.375rem 1rem; font-size: 0.875rem;">
+                                    View Profile
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                content.innerHTML = html;
+            } catch (error) {
+                console.error("Failed to render public followers:", error);
+                content.innerHTML = `<p class="text-red-400 text-center">Error loading followers.</p>`;
+            }
         }
 
         /**
@@ -5858,6 +5940,45 @@ ${historyText}`;
             }
         }
 
+        /**
+         * Updates the follower count display for the current user's profile
+         */
+        async function updateFollowerCount(userId = currentUserId) {
+            const { collection, getDocs, query } = window.firebase.firestore;
+            
+            try {
+                const followersCol = collection(db, 'artifacts', APP_ID, 'public', 'data', USER_PROFILE_COLLECTION, userId, 'followers');
+                const snapshot = await getDocs(query(followersCol));
+                const count = snapshot.size;
+                
+                // Update profile follower count if viewing own profile
+                if (userId === currentUserId) {
+                    const profileCountEl = document.getElementById('profile-follower-count');
+                    if (profileCountEl) {
+                        profileCountEl.innerHTML = `
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            ${count} Follower${count !== 1 ? 's' : ''}
+                        `;
+                    }
+                } else {
+                    // Update public profile follower count
+                    const publicCountEl = document.getElementById('public-profile-follower-count');
+                    if (publicCountEl) {
+                        publicCountEl.innerHTML = `
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            ${count} Follower${count !== 1 ? 's' : ''}
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to update follower count:", error);
+            }
+        }
+        
         /**
          * Renders the list of users who follow the current user.
          */
@@ -5896,10 +6017,25 @@ ${historyText}`;
                     `;
                 });
                 content.innerHTML = html;
+                
+                // Update follower count
+                updateFollowerCount(currentUserId);
             } catch (error) {
                 console.error("Failed to render followers:", error);
                 content.innerHTML = `<p class="text-red-400 text-center">Error loading followers.</p>`;
             }
+        }
+        
+        /**
+         * Opens a modal/screen showing a user's followers with full details
+         */
+        window.viewUserFollowers = async function(userId) {
+            // For now, navigate to their profile and show the followers tab
+            await viewUserProfile(userId);
+            // Give it a moment to load, then switch to followers view
+            setTimeout(() => {
+                handlePublicProfileTab('followers');
+            }, 500);
         }
 
         /**
