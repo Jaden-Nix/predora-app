@@ -5779,7 +5779,7 @@ ${historyText}`;
         /**
          * Shows the public profile page for a given user.
          */
-        window.viewUserProfile = (userId) => {
+        window.viewUserProfile = (userId, initialTab = 'active') => {
             if (!userId) return;
 
             if (userId === currentUserId) {
@@ -5787,14 +5787,14 @@ ${historyText}`;
                 showScreen('profile-screen');
             } else {
                 // Load the public profile screen
-                loadPublicProfile(userId);
+                loadPublicProfile(userId, initialTab);
             }
         }
 
         /**
          * Loads and displays a public profile for a given user ID.
          */
-        async function loadPublicProfile(userId) {
+        async function loadPublicProfile(userId, initialTab = 'active') {
             const { doc, getDoc } = window.firebase.firestore;
             showLoadingOverlay(true, "Loading profile...");
 
@@ -5827,11 +5827,16 @@ ${historyText}`;
 
                 // 5. Show the screen
                 showScreen('public-profile-screen');
-                handlePublicProfileTab('active'); // Default to 'active' tab
+                handlePublicProfileTab(initialTab); // Use the provided initial tab
 
-                // 6. Load the user's stakes (we'll just show empty for now)
-                renderPublicActiveStakes(userId);
-                renderPublicHistoryStakes(userId);
+                // 6. Load the user's data based on the initial tab
+                if (initialTab === 'active') {
+                    renderPublicActiveStakes(userId);
+                } else if (initialTab === 'history') {
+                    renderPublicHistoryStakes(userId);
+                } else if (initialTab === 'followers') {
+                    renderPublicFollowersList(userId);
+                }
 
             } catch (error) {
                 console.error("Error loading public profile:", error);
@@ -6029,13 +6034,9 @@ ${historyText}`;
         /**
          * Opens a modal/screen showing a user's followers with full details
          */
-        window.viewUserFollowers = async function(userId) {
-            // For now, navigate to their profile and show the followers tab
-            await viewUserProfile(userId);
-            // Give it a moment to load, then switch to followers view
-            setTimeout(() => {
-                handlePublicProfileTab('followers');
-            }, 500);
+        window.viewUserFollowers = function(userId) {
+            // Navigate to their profile with the followers tab open
+            viewUserProfile(userId, 'followers');
         }
 
         /**
