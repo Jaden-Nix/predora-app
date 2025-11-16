@@ -462,6 +462,186 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+        
+        /* Quick Play Screens */
+        :root.light-mode #quick-play-screen,
+        body.light-mode #quick-play-screen {
+            background: #F5F7FB;
+        }
+        
+        :root.light-mode #quick-play-card,
+        body.light-mode #quick-play-card {
+            background: #FFFFFF;
+            border: 1px solid #CBD5F5;
+            box-shadow: 
+                0 4px 20px rgba(92, 198, 255, 0.1),
+                0 1px 3px rgba(15, 23, 42, 0.08);
+        }
+        
+        /* Toast Notification */
+        :root.light-mode #toast-notification,
+        body.light-mode #toast-notification {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #CBD5F5;
+            box-shadow: 
+                0 8px 32px rgba(92, 198, 255, 0.15),
+                0 2px 8px rgba(15, 23, 42, 0.1);
+            color: #0F172A;
+            backdrop-filter: blur(12px);
+        }
+        
+        /* Mock Wallet Modal */
+        :root.light-mode #mock-wallet-modal,
+        body.light-mode #mock-wallet-modal {
+            background: rgba(245, 247, 251, 0.9);
+        }
+        
+        :root.light-mode #mock-wallet-modal > div,
+        body.light-mode #mock-wallet-modal > div {
+            background: #FFFFFF;
+            border: 1px solid #CBD5F5;
+            box-shadow: 
+                0 20px 60px rgba(92, 198, 255, 0.2),
+                0 4px 12px rgba(15, 23, 42, 0.1);
+        }
+        
+        /* Live User Counter */
+        :root.light-mode #live-user-counter,
+        body.light-mode #live-user-counter {
+            background: #FFFFFF;
+            border: 1px solid #CBD5F5;
+            box-shadow: 0 2px 8px rgba(92, 198, 255, 0.1);
+        }
+        
+        /* Glowing Cards */
+        :root.light-mode .glowing-card,
+        body.light-mode .glowing-card {
+            border: 1px solid #CBD5F5;
+            background: #FFFFFF;
+            box-shadow: 
+                0 4px 20px rgba(92, 198, 255, 0.15),
+                0 1px 3px rgba(15, 23, 42, 0.08);
+        }
+        
+        /* Filter Pills */
+        :root.light-mode .filter-pill,
+        body.light-mode .filter-pill {
+            background-color: rgba(92, 198, 255, 0.1);
+            border: 1px solid rgba(92, 198, 255, 0.2);
+            color: #0F172A;
+        }
+        
+        :root.light-mode .filter-pill:hover,
+        body.light-mode .filter-pill:hover {
+            background-color: rgba(92, 198, 255, 0.2);
+        }
+        
+        :root.light-mode .filter-pill.active,
+        body.light-mode .filter-pill.active {
+            background: linear-gradient(to right, #5CC6FF, #7B8CFF);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 15px rgba(92, 198, 255, 0.3);
+        }
+        
+        /* Additional Badge Variants */
+        :root.light-mode .badge-timer,
+        body.light-mode .badge-timer {
+            background-color: rgba(92, 198, 255, 0.15);
+            color: #0369A1;
+        }
+        
+        :root.light-mode .badge-pick-yes,
+        body.light-mode .badge-pick-yes {
+            background-color: rgba(60, 191, 140, 0.15);
+            color: #047857;
+            border: 1px solid #3CBF8C;
+        }
+        
+        :root.light-mode .badge-pick-no,
+        body.light-mode .badge-pick-no {
+            background-color: rgba(242, 109, 133, 0.15);
+            color: #DC2626;
+            border: 1px solid #F26D85;
+        }
+        
+        /* Quick Play Buttons */
+        :root.light-mode .quick-play-btn,
+        body.light-mode .quick-play-btn {
+            background: rgba(92, 198, 255, 0.08) !important;
+            border: 2px solid #CBD5F5 !important;
+        }
+        
+        :root.light-mode .quick-play-btn-yes,
+        body.light-mode .quick-play-btn-yes {
+            background: rgba(60, 191, 140, 0.15) !important;
+            border-color: #3CBF8C !important;
+            color: #047857 !important;
+            box-shadow: 0 0 20px rgba(60, 191, 140, 0.25) !important;
+        }
+        
+        :root.light-mode .quick-play-btn-yes:hover,
+        body.light-mode .quick-play-btn-yes:hover {
+            background: rgba(60, 191, 140, 0.25) !important;
+            box-shadow: 0 0 30px rgba(60, 191, 140, 0.35) !important;
+        }
+        
+        :root.light-mode .quick-play-btn-yes:active,
+        body.light-mode .quick-play-btn-yes:active {
+            transform: scale(0.9);
+        }
+        
+        :root.light-mode .quick-play-btn-no,
+        body.light-mode .quick-play-btn-no {
+            background: rgba(242, 109, 133, 0.15) !important;
+            border-color: #F26D85 !important;
+            color: #DC2626 !important;
+            box-shadow: 0 0 20px rgba(242, 109, 133, 0.25) !important;
+        }
+        
+        :root.light-mode .quick-play-btn-no:hover,
+        body.light-mode .quick-play-btn-no:hover {
+            background: rgba(242, 109, 133, 0.25) !important;
+            box-shadow: 0 0 30px rgba(242, 109, 133, 0.35) !important;
+        }
+        
+        :root.light-mode .quick-play-btn-no:active,
+        body.light-mode .quick-play-btn-no:active {
+            transform: scale(0.9);
+        }
+        
+        :root.light-mode .quick-play-btn-skip,
+        body.light-mode .quick-play-btn-skip {
+            background: rgba(107, 114, 128, 0.1) !important;
+            border-color: #9CA3AF !important;
+            color: #4B5563 !important;
+        }
+        
+        :root.light-mode .quick-play-btn-skip:hover,
+        body.light-mode .quick-play-btn-skip:hover {
+            background: rgba(107, 114, 128, 0.18) !important;
+        }
+        
+        :root.light-mode .quick-play-btn-skip:active,
+        body.light-mode .quick-play-btn-skip:active {
+            transform: scale(0.9);
+        }
+        
+        /* Quick Play Button Icons - override text-white class */
+        :root.light-mode .quick-play-btn-yes svg,
+        body.light-mode .quick-play-btn-yes svg {
+            color: #047857 !important;
+        }
+        
+        :root.light-mode .quick-play-btn-no svg,
+        body.light-mode .quick-play-btn-no svg {
+            color: #DC2626 !important;
+        }
+        
+        :root.light-mode .quick-play-btn-skip svg,
+        body.light-mode .quick-play-btn-skip svg {
+            color: #4B5563 !important;
+        }
 
         /* --- Custom Toggle Switch --- */
         .toggle-label {
