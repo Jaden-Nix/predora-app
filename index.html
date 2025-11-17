@@ -7517,7 +7517,17 @@ ${historyText}`;
         /**
          * Helper to format timestamps as "time ago"
          */
-        function getTimeAgo(seconds) {
+        function getTimeAgo(dateOrSeconds) {
+            // Handle both Date objects and Unix timestamps (seconds)
+            let seconds;
+            if (dateOrSeconds instanceof Date) {
+                seconds = dateOrSeconds.getTime() / 1000;
+            } else if (typeof dateOrSeconds === 'number') {
+                seconds = dateOrSeconds;
+            } else {
+                return 'just now';
+            }
+            
             const now = Date.now() / 1000;
             const diff = now - seconds;
             
@@ -8941,8 +8951,8 @@ ${historyText}`;
                 const userXP = userProfile.xp || 0;
                 
                 html += `
-                    <div class="p-3 bg-white/5 rounded-lg border border-white/10 space-y-2">
-                        <p class="text-sm text-white font-medium">${poll.question}</p>
+                    <div class="p-3 bg-white/5 dark:bg-white/5 light:bg-gray-100 rounded-lg border border-white/10 dark:border-white/10 light:border-gray-300 space-y-2">
+                        <p class="text-sm text-gray-900 dark:text-white font-medium">${poll.question}</p>
                         ${!userVoted ? `
                             <div class="flex gap-2 items-center">
                                 <input type="number" 
@@ -8951,30 +8961,30 @@ ${historyText}`;
                                        max="${Math.max(10, userXP)}" 
                                        value="10" 
                                        step="10"
-                                       class="w-20 px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-xs text-center"
+                                       class="w-20 px-2 py-1 bg-white/10 dark:bg-white/10 light:bg-white border border-white/20 dark:border-white/20 light:border-gray-300 rounded text-gray-900 dark:text-white text-xs text-center"
                                        placeholder="XP">
                                 <button onclick="voteOnPollWithInput('${poll.id}', 'YES')" 
-                                        class="flex-1 px-3 py-2 rounded bg-green-600/20 hover:bg-green-600/40 text-green-400 text-xs font-medium border border-green-500/30 transition-all">
+                                        class="flex-1 px-3 py-2 rounded bg-green-600/20 hover:bg-green-600/40 text-green-600 dark:text-green-400 text-xs font-medium border border-green-500/30 transition-all">
                                     YES ${yesPercent}%
                                 </button>
                                 <button onclick="voteOnPollWithInput('${poll.id}', 'NO')" 
-                                        class="flex-1 px-3 py-2 rounded bg-red-600/20 hover:bg-red-600/40 text-red-400 text-xs font-medium border border-red-500/30 transition-all">
+                                        class="flex-1 px-3 py-2 rounded bg-red-600/20 hover:bg-red-600/40 text-red-600 dark:text-red-400 text-xs font-medium border border-red-500/30 transition-all">
                                     NO ${noPercent}%
                                 </button>
                             </div>
-                            <p class="text-xs text-gray-500 text-center">You have ${userXP} XP</p>
+                            <p class="text-xs text-gray-600 dark:text-gray-500 text-center">You have ${userXP} XP</p>
                         ` : `
                             <div class="flex gap-2">
-                                <div class="flex-1 px-3 py-2 rounded ${userVoted.vote === 'YES' ? 'bg-green-500 text-white' : 'bg-white/10 text-gray-400'} text-xs font-medium text-center">
+                                <div class="flex-1 px-3 py-2 rounded ${userVoted.vote === 'YES' ? 'bg-green-500 text-white' : 'bg-white/10 dark:bg-white/10 light:bg-gray-200 text-gray-600 dark:text-gray-400'} text-xs font-medium text-center">
                                     YES ${yesPercent}%
                                 </div>
-                                <div class="flex-1 px-3 py-2 rounded ${userVoted.vote === 'NO' ? 'bg-red-500 text-white' : 'bg-white/10 text-gray-400'} text-xs font-medium text-center">
+                                <div class="flex-1 px-3 py-2 rounded ${userVoted.vote === 'NO' ? 'bg-red-500 text-white' : 'bg-white/10 dark:bg-white/10 light:bg-gray-200 text-gray-600 dark:text-gray-400'} text-xs font-medium text-center">
                                     NO ${noPercent}%
                                 </div>
                             </div>
-                            <p class="text-xs text-green-400 text-center">You staked ${userVoted.xpStaked || 10} XP on ${userVoted.vote}!</p>
+                            <p class="text-xs text-green-600 dark:text-green-400 text-center">You staked ${userVoted.xpStaked || 10} XP on ${userVoted.vote}!</p>
                         `}
-                        <p class="text-xs text-gray-500">${total} votes • ${totalXPPot} XP pot • ${poll.createdBy || 'Anonymous'}</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-500">${total} votes • ${totalXPPot} XP pot • ${poll.createdBy || 'Anonymous'}</p>
                     </div>
                 `;
             });
