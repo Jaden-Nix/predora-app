@@ -5626,10 +5626,14 @@ ${historyText}`;
                 // We'll sort in JavaScript to avoid an index
             );
 
-            tickerUnsubscribe = onSnapshot(q, (snapshot) => {
+            tickerUnsubscribe = onSnapshot(q, async (snapshot) => {
                 let comments = [];
                 snapshot.forEach(doc => {
-                    comments.push(doc.data());
+                    const data = doc.data();
+                    comments.push({
+                        ...data,
+                        commentId: doc.id // Use Firestore document ID
+                    });
                 });
 
                 // Sort by timestamp, newest first
@@ -5650,30 +5654,67 @@ ${historyText}`;
                 }
 
                 let html = '';
-                comments.forEach(comment => {
+                for (const comment of comments) {
                     const pickClass = comment.pick === 'YES' ? 'badge-pick-yes' : 'badge-pick-no';
                     const avatarUrl = comment.avatarUrl || YOUR_LOGO_URL;
                     const displayName = comment.displayName || 'Anonymous';
-
+                    const commentId = comment.commentId;
+                    const timeAgo = comment.timestamp ? getTimeAgo(comment.timestamp.seconds) : 'just now';
+                    
+                    // Load replies for this comment
+                    const commentRef = doc(db, 'artifacts', APP_ID, 'public', 'data', MARKET_COMMENTS_COLLECTION, commentId);
+                    const repliesCol = collection(commentRef, 'replies');
+                    const repliesSnapshot = await getDocs(query(repliesCol));
+                    
+                    let repliesHtml = '';
+                    if (!repliesSnapshot.empty) {
+                        repliesSnapshot.forEach(replyDoc => {
+                            const reply = replyDoc.data();
+                            const replyTimeAgo = reply.timestamp ? getTimeAgo(reply.timestamp.seconds) : 'just now';
+                            repliesHtml += `
+                                <div class="flex space-x-2 text-sm">
+                                    <img src="${reply.avatarUrl || YOUR_LOGO_URL}" class="w-6 h-6 rounded-full" alt="Avatar">
+                                    <div>
+                                        <div class="flex items-center space-x-2">
+                                            <span class="font-semibold text-gray-800 dark:text-gray-200 text-xs">${reply.displayName}</span>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">${replyTimeAgo}</span>
+                                        </div>
+                                        <p class="text-gray-700 dark:text-gray-300 text-xs mt-0.5">${reply.commentText}</p>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                    
                     html += `
-                        <div class="flex space-x-3">
+                        <div class="flex space-x-3 pb-3 border-b border-white/5" data-comment-id="${commentId}">
                             <img src="${avatarUrl}" class="w-10 h-10 rounded-full" alt="Avatar">
                             <div class="flex-grow">
                                 <div class="flex items-center space-x-2">
                                     ${comment.userId === currentUserId ? `
-    <span class="font-semibold text-white">${displayName}</span>
+    <span class="font-semibold text-gray-900 dark:text-white">${displayName}</span>
 ` : `
-    <button onclick=" closeTickerModal(); viewUserProfile('${comment.userId}')" class="font-semibold text-white hover:text-sky-400 transition-colors">
+    <button onclick=" closeTickerModal(); viewUserProfile('${comment.userId}')" class="font-semibold text-gray-900 dark:text-white hover:text-sky-500 dark:hover:text-sky-400 transition-colors">
         ${displayName}
     </button>
 `}
                                     ${comment.pick ? `<span class="badge ${pickClass}">${comment.pick}</span>` : ''}
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">${timeAgo}</span>
                                 </div>
-                                <p class="text-gray-300 text-sm mt-1">${comment.commentText}</p>
+                                <p class="text-gray-700 dark:text-gray-300 text-sm mt-1">${comment.commentText}</p>
+                                <button onclick="startReply('${commentId}', '${displayName.replace(/'/g, "\\'")}')" class="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-500 mt-1 flex items-center space-x-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                                    </svg>
+                                    <span>Reply${repliesSnapshot.size > 0 ? ` (${repliesSnapshot.size})` : ''}</span>
+                                </button>
+                                <div id="replies-${commentId}" class="mt-2 ml-4 space-y-2 ${repliesSnapshot.empty ? 'hidden' : ''}">
+                                    ${repliesHtml}
+                                </div>
                             </div>
                         </div>
                     `;
-                });
+                }
                 dom.tickerFeedContent.innerHTML = html;
             });
         }
@@ -5722,29 +5763,84 @@ ${historyText}`;
         }
 
         /**
-         * Posts a new comment to the live ticker.
+         * Helper to format timestamps as "time ago"
+         */
+        function getTimeAgo(seconds) {
+            const now = Date.now() / 1000;
+            const diff = now - seconds;
+            
+            if (diff < 60) return 'just now';
+            if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+            if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+            return `${Math.floor(diff / 86400)}d ago`;
+        }
+        
+        // Track current reply state
+        let replyingTo = null;
+        
+        /**
+         * Start replying to a comment
+         */
+        window.startReply = (commentId, displayName) => {
+            replyingTo = { commentId, displayName };
+            dom.tickerCommentInput.placeholder = `Replying to ${displayName}...`;
+            dom.tickerCommentInput.focus();
+            
+            // Update button text
+            dom.tickerPostBtn.innerText = 'Reply';
+        }
+        
+        /**
+         * Cancel reply mode
+         */
+        function cancelReply() {
+            replyingTo = null;
+            dom.tickerCommentInput.placeholder = 'Add your insight...';
+            dom.tickerPostBtn.innerText = 'Post';
+        }
+        
+        /**
+         * Posts a new comment or reply to the live ticker.
          */
         window.postComment = async () => {
             const commentText = dom.tickerCommentInput.value.trim();
             if (commentText.length < 1) return;
 
-            // --- WE HAVE REMOVED THE FAILING "getDocs" QUERY ---
-            // We will post the comment without the "YES/NO" badge
-            // to avoid the "Missing Index" database error.
-
             dom.tickerPostBtn.disabled = true;
             try {
-                // Save comment to database
-                const { addDoc, collection, serverTimestamp } = window.firebase.firestore;
-                await addDoc(collection(db, 'artifacts', APP_ID, 'public', 'data', MARKET_COMMENTS_COLLECTION), {
-                    marketId: currentMarketId,
-                    userId: currentUserId,
-                    displayName: userProfile.displayName,
-                    avatarUrl: userProfile.avatarUrl || LOGO_URL,
-                    pick: null, // We set this to null
-                    commentText: commentText,
-                    timestamp: serverTimestamp()
-                });
+                const { addDoc, collection, serverTimestamp, doc } = window.firebase.firestore;
+                
+                if (replyingTo) {
+                    // Posting a reply
+                    const commentRef = doc(db, 'artifacts', APP_ID, 'public', 'data', MARKET_COMMENTS_COLLECTION, replyingTo.commentId.toString());
+                    const repliesCol = collection(commentRef, 'replies');
+                    
+                    await addDoc(repliesCol, {
+                        userId: currentUserId,
+                        displayName: userProfile.displayName,
+                        avatarUrl: userProfile.avatarUrl || LOGO_URL,
+                        commentText: commentText,
+                        timestamp: serverTimestamp()
+                    });
+                    
+                    showToast('Reply posted!');
+                    cancelReply();
+                } else {
+                    // Posting a top-level comment
+                    const docRef = await addDoc(collection(db, 'artifacts', APP_ID, 'public', 'data', MARKET_COMMENTS_COLLECTION), {
+                        marketId: currentMarketId,
+                        userId: currentUserId,
+                        displayName: userProfile.displayName,
+                        avatarUrl: userProfile.avatarUrl || LOGO_URL,
+                        pick: null,
+                        commentText: commentText,
+                        timestamp: serverTimestamp()
+                    });
+                    
+                    // Store the document ID as commentId
+                    const commentId = docRef.id;
+                    console.log('Comment posted with ID:', commentId);
+                }
 
                 // Clear input
                 dom.tickerCommentInput.value = '';
