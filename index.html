@@ -1495,15 +1495,15 @@
                 </div>
 
                 <!-- Advanced Options - Collapsible -->
-                <details class="group">
-                    <summary class="cursor-pointer px-4 py-3 rounded-lg border transition-all hover:bg-white/5" style="border-color: rgba(156, 163, 175, 0.3);">
+                <details class="group border rounded-lg overflow-hidden" style="border-color: rgba(156, 163, 175, 0.3);">
+                    <summary class="cursor-pointer px-4 py-3 hover:bg-white/5 transition-colors">
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-medium theme-text-primary">Advanced Options</span>
                             <svg class="w-5 h-5 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
                     </summary>
                     
-                    <div class="mt-3 ui-panel p-4 space-y-4">
+                    <div class="px-4 pb-4 pt-2 space-y-4 bg-black/10">
                         <!-- Initial Liquidity -->
                         <div class="space-y-2">
                             <label class="text-xs font-medium theme-text-secondary">Initial Liquidity</label>
@@ -4443,35 +4443,73 @@
                         market = marketSnap.data();
                         if (market.isResolved) { throw new Error("Market is closed."); }
 
-                        // 4. AMM MATH (Only for Traditional markets)
+                        // 4. AMM MATH (Traditional markets only)
                         if (!market.isNoLoss) {
-                            let yesPool = market.yesPool;
-                            let noPool = market.noPool;
-                            const k = yesPool * noPool;
-
-                            if (pick === 'YES') {
-                                const newYesPool = yesPool + amountInUsd;
-                                const newNoPool = k / newYesPool;
-                                potentialPayoutUsd = noPool - newNoPool; // Shares
-                                yesPool = newYesPool;
-                                noPool = newNoPool;
+                            if (isMultiOption) {
+                                // MULTI-OPTION AMM: Dynamic odds shifting
+                                let options = market.options.map(opt => ({
+                                    ...opt,
+                                    pool: opt.pool || (opt.odds / 100) * 1000 // Initialize pools if missing
+                                }));
+                                
+                                // Find the option being staked on
+                                const stakedOptionIndex = options.findIndex(o => o.id === pick);
+                                if (stakedOptionIndex === -1) throw new Error("Invalid option selected.");
+                                
+                                // Add stake to the selected option's pool
+                                options[stakedOptionIndex].pool += amountInUsd;
+                                
+                                // Recalculate odds for ALL options using pool distribution
+                                const totalPool = options.reduce((sum, opt) => sum + opt.pool, 0);
+                                options = options.map(opt => ({
+                                    ...opt,
+                                    odds: (opt.pool / totalPool) * 100
+                                }));
+                                
+                                // Calculate payout (inverse of odds)
+                                const stakedOdds = options[stakedOptionIndex].odds;
+                                potentialPayoutUsd = amountInUsd / (stakedOdds / 100);
+                                
+                                // Update market with new options and pools
+                                transaction.update(marketRef, {
+                                    options: options.map(opt => ({
+                                        id: opt.id,
+                                        label: opt.label,
+                                        odds: parseFloat(opt.odds.toFixed(2)),
+                                        pool: opt.pool
+                                    })),
+                                    totalStakeVolume: increment(amountInUsd)
+                                });
                             } else {
-                                const newNoPool = noPool + amountInUsd;
-                                const newYesPool = k / newNoPool;
-                                potentialPayoutUsd = yesPool - newYesPool; // Shares
-                                yesPool = newYesPool;
-                                noPool = newNoPool;
-                            }
-                            const totalPool = yesPool + noPool;
+                                // BINARY AMM: YES/NO constant product formula
+                                let yesPool = market.yesPool;
+                                let noPool = market.noPool;
+                                const k = yesPool * noPool;
 
-                            // 5. TRANSACTION WRITE 1: Update the Market
-                            transaction.update(marketRef, {
-                                yesPool: yesPool,
-                                noPool: noPool,
-                                yesPercent: (yesPool / totalPool) * 100,
-                                noPercent: (noPool / totalPool) * 100,
-                                totalStakeVolume: increment(amountInUsd)
-                            });
+                                if (pick === 'YES') {
+                                    const newYesPool = yesPool + amountInUsd;
+                                    const newNoPool = k / newYesPool;
+                                    potentialPayoutUsd = noPool - newNoPool;
+                                    yesPool = newYesPool;
+                                    noPool = newNoPool;
+                                } else {
+                                    const newNoPool = noPool + amountInUsd;
+                                    const newYesPool = k / newNoPool;
+                                    potentialPayoutUsd = yesPool - newYesPool;
+                                    yesPool = newYesPool;
+                                    noPool = newNoPool;
+                                }
+                                const totalPool = yesPool + noPool;
+
+                                // Update market
+                                transaction.update(marketRef, {
+                                    yesPool: yesPool,
+                                    noPool: noPool,
+                                    yesPercent: (yesPool / totalPool) * 100,
+                                    noPercent: (noPool / totalPool) * 100,
+                                    totalStakeVolume: increment(amountInUsd)
+                                });
+                            }
                         } else {
                             // Logic for No-Loss markets
                             const odds = pick === 'YES' ? market.yesPercent : market.noPercent;

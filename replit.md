@@ -112,8 +112,9 @@ Preferred communication style: Simple, everyday language.
 - Payout calculation uses correct option odds
 - Compatible with both Fixed Pot Yield and Traditional AMM market types
 - Full staking flow: saves option ID and label to pledge documents
+- **AMM Integration**: Creator provides initial liquidity distributed across options by initial odds, then AMM dynamically shifts odds as users stake (more money in Option A → lower odds for A → higher payout for A winners)
 
-**Oracle Auto-Resolution** (NEW - COMPLETED November 2025):
+**Oracle Auto-Resolution** (COMPLETED November 2025):
 - AI Oracle now detects multi-option markets and resolves them automatically
 - Gemini API determines winning option ID from all available options
 - Quote-stripping sanitization prevents misclassification of valid responses
