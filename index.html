@@ -824,27 +824,20 @@
             #top-nav.nav-visible {
                 transform: translateY(0);
             }
-            /* Hover zone at top of screen to reveal nav */
-            .nav-hover-zone {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 60px;
-                z-index: 48;
-                pointer-events: auto;
-            }
+        }
+        
+        /* Hover zone at top of screen to reveal nav on desktop */
+        .nav-hover-zone {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            z-index: 48;
+            pointer-events: auto;
         }
 
-        /* --- Mobile Header --- */
-        @media (max-width: 767px) {
-            #mobile-header {
-                display: flex;
-            }
-        }
-        #mobile-header {
-            display: none;
-        }
+        /* Mobile header visibility handled by Tailwind md:hidden class */
 
         /* --- Profile Page Tabs --- */
         .profile-tab {
@@ -1119,11 +1112,8 @@
     </style>
 </head>
 <body class="text-gray-100">
-    <!-- Desktop hover zone to reveal navigation -->
-    <div class="nav-hover-zone hidden md:block"></div>
-
     <!-- Mobile Header (visible on mobile only) -->
-    <header id="mobile-header" class="sticky top-0 z-50 bg-[#0D1117] dark:bg-[#0D1117] light:bg-white border-b border-[#30363D] dark:border-[#30363D] light:border-gray-200 px-4 py-3">
+    <header id="mobile-header" class="sticky top-0 z-50 bg-[#0D1117] dark:bg-[#0D1117] light:bg-white border-b border-[#30363D] dark:border-[#30363D] light:border-gray-200 px-4 py-3 md:hidden">
         <div class="flex items-center justify-between">
             <h1 id="mobile-app-title" class="text-xl font-extrabold gradient-text tracking-tight cursor-pointer">Predora</h1>
             <div class="flex items-center space-x-2">
@@ -1147,7 +1137,12 @@
         </div>
     </header>
 
-    <!-- Modern Top Navigation Bar (Desktop - Auto-hide with hover) -->
+    <!-- Desktop Navigation Container (hidden on mobile) -->
+    <div class="hidden md:block">
+        <!-- Desktop hover zone to reveal navigation -->
+        <div class="nav-hover-zone"></div>
+        
+        <!-- Modern Top Navigation Bar (Desktop - Auto-hide with hover) -->
         <nav id="top-nav" class="sticky top-0 z-50 shadow-lg shadow-black/20 hidden md:block">
             <div class="max-w-7xl mx-auto px-4 py-3 md:py-4">
                 <div class="flex justify-between items-center">
@@ -1210,8 +1205,10 @@
                 </div>
             </div>
         </nav>
+    </div>
+    <!-- End Desktop Navigation Container -->
 
-        <div class="min-h-screen relative">
+    <div class="min-h-screen relative">
 
             <main class="max-w-md md:max-w-xl lg:max-w-7xl mx-auto relative p-4">
 
@@ -5139,7 +5136,12 @@ ${historyText}`;
             const hoverZone = document.querySelector('.nav-hover-zone');
             const topNav = document.getElementById('top-nav');
             
-            if (!hoverZone || !topNav) return;
+            console.log('setupDesktopNavAutoHide called', { hoverZone, topNav });
+            
+            if (!hoverZone || !topNav) {
+                console.error('Missing elements for nav auto-hide:', { hoverZone, topNav });
+                return;
+            }
             
             // Show nav when hovering the top zone
             hoverZone.addEventListener('mouseenter', () => {
@@ -7071,11 +7073,22 @@ ${historyText}`;
             window.handlePublicProfileTab = handlePublicProfileTab;
             window.handleNetworkingTab = handleNetworkingTab;
 
+            // Setup admin features and nav auto-hide FIRST (before other listeners that might fail)
+            setupAdminFeatures();
+            setupDesktopNavAutoHide();
+            
             // Attach listeners to static buttons
-            document.getElementById('ai-generate-btn').addEventListener('click', getAIAssist);
-            document.getElementById('create-market-btn').addEventListener('click', createMarket);
-            document.getElementById('ai-explain-btn').addEventListener('click', getAIExplanation); 
-            document.getElementById('ai-profile-summary-btn').addEventListener('click', getAIProfileSummary); 
+            const aiGenerateBtn = document.getElementById('ai-generate-btn');
+            if (aiGenerateBtn) aiGenerateBtn.addEventListener('click', getAIAssist);
+            
+            const createMarketBtn = document.getElementById('create-market-btn');
+            if (createMarketBtn) createMarketBtn.addEventListener('click', createMarket);
+            
+            const aiExplainBtn = document.getElementById('ai-explain-btn');
+            if (aiExplainBtn) aiExplainBtn.addEventListener('click', getAIExplanation);
+            
+            const aiProfileSummaryBtn = document.getElementById('ai-profile-summary-btn');
+            if (aiProfileSummaryBtn) aiProfileSummaryBtn.addEventListener('click', getAIProfileSummary); 
 
             dom.showTickerBtn.addEventListener('click', showTickerModal);
 
@@ -7098,13 +7111,9 @@ dom.searchBarInput.addEventListener('input', handleSearch);
 
             dom.stakeAllPledgesBtn.addEventListener('click', stakeAllPledges);
 
-            // Setup admin features (like the secret tap)
-            setupAdminFeatures();
+            const runOracleBtn = document.getElementById('run-oracle-btn');
+            if (runOracleBtn) runOracleBtn.addEventListener('click', runOracleJobs);
             
-            // Setup desktop nav auto-hide with hover zone
-            setupDesktopNavAutoHide();
-            
-            document.getElementById('run-oracle-btn').addEventListener('click', runOracleJobs);
             // Setup create market listeners (like the odds calculator)
             setupCreateMarketListeners();
 
