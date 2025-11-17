@@ -1160,9 +1160,9 @@
                             <svg class="w-4 h-4 inline-block mr-0.5 md:mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                             <span class="hidden sm:inline">Leaders</span>
                         </button>
-                        <button data-screen="pledge-pool-screen" class="top-nav-btn px-2 md:px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-300">
-                            <svg class="w-4 h-4 inline-block mr-0.5 md:mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                            <span class="hidden sm:inline">Pledges</span>
+                        <button data-screen="quick-polls-screen" class="top-nav-btn px-2 md:px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-300">
+                            <svg class="w-4 h-4 inline-block mr-0.5 md:mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                            <span class="hidden sm:inline">Polls</span>
                         </button>
                         <button data-screen="create-market-screen" class="top-nav-btn px-2 md:px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-300">
                             <svg class="w-4 h-4 inline-block mr-0.5 md:mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
@@ -1290,25 +1290,6 @@
                 <div class="lg:grid lg:grid-cols-3 lg:gap-6 space-y-6 lg:space-y-0">
                     <div class="lg:col-span-2 space-y-6">
 
-                <!-- Quick Polls Section -->
-                <div class="ui-panel p-4 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-base font-semibold text-sky-300">🗳 Quick Polls</h3>
-                        <span class="text-xs text-gray-400">No stakes required!</span>
-                    </div>
-                    <p class="text-sm text-gray-400">Create casual yes/no polls for your community. No liquidity or stakes needed - just predictions!</p>
-                    
-                    <button onclick="openPollCreator()" class="btn btn-secondary w-full text-sm">
-                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
-                        Create Quick Poll
-                    </button>
-                    
-                    <div id="quick-polls-container" class="space-y-2 max-h-60 overflow-y-auto">
-                        <!-- Recent polls will be loaded here -->
-                        <div class="text-center text-gray-500 py-2 text-xs">Loading recent polls...</div>
-                    </div>
-                </div>
-
                 <div class="ui-panel p-4 space-y-3">
                     <h3 class="text-base font-semibold text-sky-300">AI Assistant (LIVE)</h3>
                     <p class="text-sm text-gray-400">Stuck? Get AI suggestions for your market.</p>
@@ -1395,21 +1376,6 @@
                         </div>
                     </div>
 
-                <!--  CATEGORY BLOCK -->
-                <div class="space-y-2">
-                    <label for="market-category-select" class="text-sm font-medium text-gray-300">Category</label>
-                    <select id="market-category-select" class="ui-select">
-                        <option value="Other" selected>Select a category...</option>
-                        <option value="Crypto">Crypto</option>
-                        <option value="Sports">Sports</option>
-                        <option value="Politics">Politics</option>
-                        <option value="Entertainment">Entertainment</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Tech">Tech</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <!-- END OF  BLOCK -->
 
                 <div class="space-y-4">
                     <h3 class="text-base font-semibold text-gray-200">Initial Liquidity</h3>
@@ -1706,6 +1672,13 @@
 
             <div id="leaderboard-screen" class="screen screen-inactive space-y-6">
                 <h1 class="text-2xl lg:text-3xl font-bold gradient-text">Leaderboard</h1>
+                
+                <!-- Timeframe Tabs -->
+                <div class="flex gap-2 border-b border-white/10">
+                    <button class="leaderboard-tab px-4 py-2 font-medium border-b-2 border-sky-400 text-sky-400" data-timeframe="all" onclick="switchLeaderboardTimeframe('all')">All-Time</button>
+                    <button class="leaderboard-tab px-4 py-2 font-medium border-b-2 border-transparent text-gray-400 hover:text-white" data-timeframe="weekly" onclick="switchLeaderboardTimeframe('weekly')">Weekly</button>
+                    <button class="leaderboard-tab px-4 py-2 font-medium border-b-2 border-transparent text-gray-400 hover:text-white" data-timeframe="daily" onclick="switchLeaderboardTimeframe('daily')">Daily</button>
+                </div>
                 <div id="user-rank-panel" class="ui-panel text-center p-6 lg:p-8 border-l-4 border-sky-400">
                     <p class="text-gray-400 lg:text-lg">Loading your rank...</p>
                 </div>
@@ -2075,7 +2048,33 @@
                 </div>
             </div>
 
+            <!-- Quick Polls Screen -->
+            <div id="quick-polls-screen" class="screen screen-inactive space-y-6">
+                <div class="flex items-center justify-between">
+                    <h1 class="text-2xl lg:text-3xl font-bold gradient-text">🗳 Quick Polls</h1>
+                    <button onclick="openPollCreator()" class="btn btn-primary">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+                        Create Poll
+                    </button>
+                </div>
 
+                <div class="ui-panel p-4 space-y-3">
+                    <h3 class="text-base font-semibold text-sky-300">What are Quick Polls?</h3>
+                    <ul class="text-sm text-gray-400 space-y-2">
+                        <li>✓ <span class="text-white">Zero-stake predictions</span> - No money or tokens required</li>
+                        <li>✓ <span class="text-white">Earn +2 XP per vote</span> - Build your profile without risk</li>
+                        <li>✓ <span class="text-white">Test market interest</span> - See if ideas are worth creating full markets</li>
+                        <li>✓ <span class="text-white">Community engagement</span> - Quick way to share predictions</li>
+                    </ul>
+                </div>
+
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-white">All Polls</h2>
+                    <div id="quick-polls-container" class="space-y-3">
+                        <div class="text-center text-gray-500 py-4">Loading polls...</div>
+                    </div>
+                </div>
+            </div>
 
 
         </main>
@@ -2093,9 +2092,9 @@
             <button onclick="showScreen('create-market-screen')" class="nav-button flex flex-col items-center text-gray-400 -mt-2 bg-gradient-to-br from-indigo-600 to-blue-600 p-3 rounded-full shadow-lg shadow-blue-500/30 border-2 border-sky-400">
                 <svg class="w-5 h-5" fill="none" stroke="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
             </button>
-            <button onclick="showScreen('pledge-pool-screen')" class="nav-button flex flex-col items-center text-gray-400">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                <span class="text-xs mt-1">Pledges</span>
+            <button onclick="showScreen('quick-polls-screen')" class="nav-button flex flex-col items-center text-gray-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                <span class="text-xs mt-1">Polls</span>
             </button>
             <button onclick="showScreen('profile-screen')" class="nav-button flex flex-col items-center text-gray-400">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
@@ -3277,9 +3276,11 @@
                 case 'home-screen':
                     if (!standardMarketsUnsubscribe) attachStandardMarketsListener();
                     break;
+                case 'quick-polls-screen':
+                    loadQuickPolls(); // Load quick polls
+                    break;
                 case 'create-market-screen':
                     populateAssetSelector();
-                    loadQuickPolls(); // Load quick polls
                     break;
                 case 'quick-play-screen':
                     // Re-attach listener every time to refresh the "already staked" list
