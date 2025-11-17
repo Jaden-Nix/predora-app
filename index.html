@@ -1053,6 +1053,25 @@
             color: white;
             box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
         }
+        
+        /* Notification Tab Styles */
+        .notif-tab.active {
+            color: #38BDF8;
+            border-bottom-color: #38BDF8;
+        }
+        :root.light-mode .notif-tab,
+        body.light-mode .notif-tab {
+            color: #6B7280;
+        }
+        :root.light-mode .notif-tab:hover,
+        body.light-mode .notif-tab:hover {
+            color: #0369A1;
+        }
+        :root.light-mode .notif-tab.active,
+        body.light-mode .notif-tab.active {
+            color: #0369A1;
+            border-bottom-color: #0369A1;
+        }
     </style>
 </head>
 <body class="text-gray-100">
@@ -1085,13 +1104,22 @@
                         </button>
                     </div>
 
-                    <!-- Right Side: Live Counter + Theme + Profile -->
+                    <!-- Right Side: Live Counter + Notifications + Theme + Profile -->
                     <div class="flex items-center space-x-2 md:space-x-3">
                         <div id="live-user-counter" class="hidden sm:flex items-center text-xs md:text-sm text-gray-300">
                             <span class="w-2 h-2 bg-green-400 rounded-full mr-2 live-dot"></span>
                             <span id="live-user-count-text">147</span>
                             <span class="ml-1">online</span>
                         </div>
+
+                        <!-- Notification Bell -->
+                        <button id="notification-bell" onclick="toggleNotifications()" class="relative w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-gray-400 hover:text-sky-400 transition-all duration-300 hover:scale-110 active:scale-95 hover:bg-gray-800/30" title="Notifications">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            </svg>
+                            <!-- Notification Badge -->
+                            <span id="notification-badge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-rose-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">0</span>
+                        </button>
 
                         <!-- Theme Toggle -->
                         <button id="theme-toggle" onclick="toggleTheme()" class="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-gray-400 hover:text-sky-400 transition-all duration-300 hover:scale-110 active:scale-95 hover:bg-gray-800/30" title="Toggle theme">
@@ -1110,6 +1138,45 @@
                 </div>
             </div>
         </nav>
+
+        <!-- Notification Dropdown Panel -->
+        <div id="notification-panel" class="hidden fixed top-16 right-4 md:right-8 lg:right-12 w-80 md:w-96 max-h-[600px] overflow-y-auto ui-panel z-50 shadow-2xl">
+            <div class="sticky top-0 bg-[#161B22] dark:bg-[#161B22] light:bg-white border-b border-[#30363D] dark:border-[#30363D] light:border-gray-200 p-4 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-white dark:text-white light:text-gray-900">Notifications</h3>
+                <div class="flex items-center space-x-2">
+                    <button onclick="markAllNotificationsRead()" class="text-xs text-sky-400 hover:text-sky-300 font-medium">Mark all read</button>
+                    <button onclick="toggleNotifications()" class="text-gray-400 hover:text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Notification Filter Tabs -->
+            <div class="flex border-b border-[#30363D] dark:border-[#30363D] light:border-gray-200 bg-[#0D1117] dark:bg-[#0D1117] light:bg-gray-50">
+                <button onclick="filterNotifications('all')" class="notif-tab flex-1 px-4 py-2 text-sm font-medium text-gray-400 hover:text-white border-b-2 border-transparent hover:border-sky-400 transition-all active" data-filter="all">
+                    All
+                </button>
+                <button onclick="filterNotifications('markets')" class="notif-tab flex-1 px-4 py-2 text-sm font-medium text-gray-400 hover:text-white border-b-2 border-transparent hover:border-sky-400 transition-all" data-filter="markets">
+                    Markets
+                </button>
+                <button onclick="filterNotifications('social')" class="notif-tab flex-1 px-4 py-2 text-sm font-medium text-gray-400 hover:text-white border-b-2 border-transparent hover:border-sky-400 transition-all" data-filter="social">
+                    Social
+                </button>
+            </div>
+
+            <!-- Notifications Feed -->
+            <div id="notifications-feed" class="divide-y divide-[#30363D] dark:divide-[#30363D] light:divide-gray-200">
+                <p class="text-gray-400 text-center py-8 text-sm">No notifications yet</p>
+            </div>
+            
+            <!-- Notification Preferences Link -->
+            <div class="sticky bottom-0 bg-[#161B22] dark:bg-[#161B22] light:bg-white border-t border-[#30363D] dark:border-[#30363D] light:border-gray-200 p-3">
+                <button onclick="showNotificationPreferences()" class="w-full text-center text-sm text-sky-400 hover:text-sky-300 font-medium">
+                    <svg class="w-4 h-4 inline-block mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Notification Preferences
+                </button>
+            </div>
+        </div>
 
         <div class="min-h-screen relative">
 
@@ -2534,6 +2601,9 @@
 
                     // Attach all data listeners
                     attachDataListeners();
+                    
+                    // Setup notification listener
+                    setupNotificationListener();
 
                     // Go to the app
                     showScreen('home-screen');
@@ -2574,6 +2644,265 @@
         // =====================================================================
         // --- UI / NAVIGATION ---
         // =====================================================================
+
+        /* === NOTIFICATION SYSTEM === */
+        
+        let currentNotificationFilter = 'all';
+        
+        /**
+         * Toggle notification panel visibility
+         */
+        window.toggleNotifications = () => {
+            const panel = document.getElementById('notification-panel');
+            const isHidden = panel.classList.contains('hidden');
+            
+            if (isHidden) {
+                panel.classList.remove('hidden');
+                loadNotifications();
+            } else {
+                panel.classList.add('hidden');
+            }
+        };
+        
+        /**
+         * Filter notifications by type
+         */
+        window.filterNotifications = (filter) => {
+            currentNotificationFilter = filter;
+            
+            // Update active tab
+            document.querySelectorAll('.notif-tab').forEach(tab => {
+                if (tab.dataset.filter === filter) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Re-render notifications with filter
+            loadNotifications();
+        };
+        
+        /**
+         * Mark all notifications as read
+         */
+        window.markAllNotificationsRead = async () => {
+            if (!currentUser) return;
+            
+            const { collection, query, where, getDocs, updateDoc, doc } = window.firebase.firestore;
+            const db = window.firebase.db;
+            
+            try {
+                const notificationsRef = collection(db, 'users', currentUser.uid, 'notifications');
+                const unreadQuery = query(notificationsRef, where('read', '==', false));
+                const snapshot = await getDocs(unreadQuery);
+                
+                const updatePromises = snapshot.docs.map(docSnap => 
+                    updateDoc(doc(db, 'users', currentUser.uid, 'notifications', docSnap.id), { read: true })
+                );
+                
+                await Promise.all(updatePromises);
+                
+                // Update UI
+                updateNotificationBadge(0);
+                loadNotifications();
+                showToast('All notifications marked as read');
+            } catch (error) {
+                console.error('Error marking notifications as read:', error);
+            }
+        };
+        
+        /**
+         * Show notification preferences modal
+         */
+        window.showNotificationPreferences = () => {
+            // TODO: Implement preferences modal
+            showToast('Notification preferences coming soon!');
+        };
+        
+        /**
+         * Load notifications from Firestore
+         */
+        async function loadNotifications() {
+            if (!currentUser) return;
+            
+            const { collection, query, orderBy, limit, getDocs, where } = window.firebase.firestore;
+            const db = window.firebase.db;
+            
+            try {
+                let notificationsRef = collection(db, 'users', currentUser.uid, 'notifications');
+                let q = query(notificationsRef, orderBy('timestamp', 'desc'), limit(50));
+                
+                // Apply filter
+                if (currentNotificationFilter === 'markets') {
+                    q = query(notificationsRef, where('type', 'in', ['market_resolved', 'market_disputed']), orderBy('timestamp', 'desc'), limit(50));
+                } else if (currentNotificationFilter === 'social') {
+                    q = query(notificationsRef, where('type', 'in', ['new_follower', 'comment_reply']), orderBy('timestamp', 'desc'), limit(50));
+                }
+                
+                const snapshot = await getDocs(q);
+                
+                const feed = document.getElementById('notifications-feed');
+                feed.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    feed.innerHTML = '<p class="text-gray-400 text-center py-8 text-sm">No notifications yet</p>';
+                    return;
+                }
+                
+                snapshot.docs.forEach(docSnap => {
+                    const notification = { id: docSnap.id, ...docSnap.data() };
+                    feed.appendChild(renderNotificationItem(notification));
+                });
+                
+                // Update badge with unread count
+                const unreadCount = snapshot.docs.filter(d => !d.data().read).length;
+                updateNotificationBadge(unreadCount);
+                
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+            }
+        }
+        
+        /**
+         * Render a single notification item
+         */
+        function renderNotificationItem(notification) {
+            const div = document.createElement('div');
+            div.className = `p-4 hover:bg-gray-800/30 dark:hover:bg-gray-800/30 light:hover:bg-gray-50 transition-colors cursor-pointer ${!notification.read ? 'bg-sky-900/10' : ''}`;
+            
+            // Safe icon/title/message defaults
+            let icon = '<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>';
+            let title = 'Notification';
+            let message = notification.message || 'You have a new notification';
+            let actionText = 'View';
+            
+            switch (notification.type) {
+                case 'market_resolved':
+                    icon = '<svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+                    title = 'Market Resolved';
+                    message = notification.message || 'A market you staked in has been resolved';
+                    actionText = 'View Results';
+                    break;
+                case 'market_disputed':
+                    icon = '<svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>';
+                    title = 'Market Disputed';
+                    message = notification.message || 'A market resolution has been disputed';
+                    actionText = 'Vote as Jury';
+                    break;
+                case 'new_follower':
+                    icon = '<svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>';
+                    title = 'New Follower';
+                    message = notification.message || 'Someone started following you';
+                    actionText = 'View Profile';
+                    break;
+                case 'comment_reply':
+                    icon = '<svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>';
+                    title = 'New Reply';
+                    message = notification.message || 'Someone replied to your comment';
+                    actionText = 'View Reply';
+                    break;
+            }
+            
+            const timeAgo = getTimeAgo(notification.timestamp?.toDate?.() || new Date());
+            
+            div.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0 mt-1">
+                        ${icon}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm font-semibold text-gray-200 dark:text-gray-200 light:text-gray-900">${title}</p>
+                            <span class="text-xs text-gray-500">${timeAgo}</span>
+                        </div>
+                        <p class="text-sm text-gray-400 dark:text-gray-400 light:text-gray-600 mt-1">${message}</p>
+                        ${notification.actionUrl ? `<button onclick="handleNotificationAction('${notification.actionUrl}')" class="text-xs text-sky-400 hover:text-sky-300 font-medium mt-2">${actionText}</button>` : ''}
+                    </div>
+                    ${!notification.read ? '<div class="flex-shrink-0"><div class="w-2 h-2 bg-sky-400 rounded-full"></div></div>' : ''}
+                </div>
+            `;
+            
+            // Mark as read when clicked
+            div.onclick = async () => {
+                if (!notification.read) {
+                    const { doc, updateDoc } = window.firebase.firestore;
+                    const db = window.firebase.db;
+                    try {
+                        await updateDoc(doc(db, 'users', currentUser.uid, 'notifications', notification.id), { read: true });
+                        loadNotifications();
+                    } catch (error) {
+                        console.error('Error marking notification as read:', error);
+                    }
+                }
+                if (notification.actionUrl) {
+                    handleNotificationAction(notification.actionUrl);
+                }
+            };
+            
+            return div;
+        }
+        
+        /**
+         * Handle notification action (navigation)
+         */
+        window.handleNotificationAction = (actionUrl) => {
+            if (!actionUrl) return;
+            
+            toggleNotifications(); // Close panel
+            // Parse actionUrl and navigate accordingly
+            // Format: screen:market-detail:marketId or screen:profile:userId
+            const parts = actionUrl.split(':');
+            if (parts.length >= 2 && parts[0] === 'screen') {
+                showScreen(parts[1] + '-screen');
+                // Additional logic for screen parameters can go here
+            }
+        };
+        
+        /**
+         * Update notification badge count
+         */
+        function updateNotificationBadge(count) {
+            const badge = document.getElementById('notification-badge');
+            if (count > 0) {
+                badge.textContent = count > 99 ? '99+' : count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+        
+        /**
+         * Listen for new notifications in realtime
+         */
+        function setupNotificationListener() {
+            if (!currentUser) return;
+            
+            const { collection, query, onSnapshot, orderBy } = window.firebase.firestore;
+            const db = window.firebase.db;
+            
+            const notificationsRef = collection(db, 'users', currentUser.uid, 'notifications');
+            const allQuery = query(notificationsRef, orderBy('timestamp', 'desc'));
+            
+            onSnapshot(allQuery, (snapshot) => {
+                // Count unread notifications
+                const unreadCount = snapshot.docs.filter(d => !d.data().read).length;
+                updateNotificationBadge(unreadCount);
+                
+                // Refresh feed if panel is open
+                const panel = document.getElementById('notification-panel');
+                if (panel && !panel.classList.contains('hidden')) {
+                    loadNotifications();
+                }
+                
+                // Play sound or show toast for new notifications (optional)
+                if (!snapshot.metadata.fromCache && snapshot.docChanges().some(change => change.type === 'added')) {
+                    console.log('New notification received');
+                }
+            });
+        }
+        
+        /* === END NOTIFICATION SYSTEM === */
 
         /**
          * Main navigation function. Hides all screens and shows the one with the matching ID.
