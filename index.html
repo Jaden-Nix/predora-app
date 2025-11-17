@@ -1160,9 +1160,9 @@
                             <svg class="w-4 h-4 inline-block mr-0.5 md:mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                             <span class="hidden sm:inline">Leaders</span>
                         </button>
-                        <button data-screen="quick-polls-screen" class="top-nav-btn px-2 md:px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-300">
-                            <svg class="w-4 h-4 inline-block mr-0.5 md:mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                            <span class="hidden sm:inline">Polls</span>
+                        <button data-screen="pledge-pool-screen" class="top-nav-btn px-2 md:px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-300">
+                            <svg class="w-4 h-4 inline-block mr-0.5 md:mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            <span class="hidden sm:inline">Quick</span>
                         </button>
                         <button data-screen="create-market-screen" class="top-nav-btn px-2 md:px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-300">
                             <svg class="w-4 h-4 inline-block mr-0.5 md:mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
@@ -1688,12 +1688,21 @@
             </div>
 
             <div id="pledge-pool-screen" class="screen screen-inactive space-y-6">
-                <div class="flex justify-between items-center">
-                    <h1 class="text-2xl lg:text-3xl font-bold gradient-text">Pledge Pool (Quick Plays)</h1>
-                </div>
+                <h1 class="text-2xl lg:text-3xl font-bold gradient-text text-center">Quick Predictions</h1>
+                <p class="text-gray-400 text-center text-sm">Fast predictions with real money (left) or XP only (right)</p>
+                
+                <!-- Side-by-side layout for desktop, stacked for mobile -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                    <!-- LEFT COLUMN: Pledge Pool (Quick Play with Money) -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-bold text-white">💰 Quick Play</h2>
+                            <span class="text-xs text-gray-400">Real money stakes</span>
+                        </div>
                 
                 <!-- Empty State -->
-                <div id="pledge-pool-empty" class="hidden max-w-2xl mx-auto text-center py-16 lg:py-24">
+                <div id="pledge-pool-empty" class="hidden max-w-2xl mx-auto text-center py-8">
                     <div class="ui-panel p-8 lg:p-12">
                         <svg class="w-20 h-20 lg:w-24 lg:h-24 mx-auto mb-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
@@ -1707,7 +1716,7 @@
                 </div>
                 
                 <!-- Pledges Grid -->
-                <div id="pledge-pool-content" class="space-y-4 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0 xl:grid-cols-3 2xl:grid-cols-4">
+                <div id="pledge-pool-content" class="space-y-3">
                 </div>
 
                 <div id="pledge-pool-footer" class="ui-panel p-4 space-y-4 hidden">
@@ -1738,6 +1747,39 @@
                         Confirm Pledges
                     </button>
                 </div>
+                    </div>
+                    <!-- END LEFT COLUMN -->
+                    
+                    <!-- RIGHT COLUMN: Quick Polls (XP Staking) -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-bold text-white">🗳 Quick Polls</h2>
+                            <span class="text-xs text-gray-400">Stake XP only</span>
+                        </div>
+                        
+                        <div class="ui-panel p-4 space-y-3 text-sm">
+                            <p class="text-gray-300">
+                                <strong class="text-sky-400">Stake XP, win XP!</strong> Vote on community polls using your XP. Winners split the pot.
+                            </p>
+                            <ul class="text-xs text-gray-400 space-y-1">
+                                <li>✓ No real money risk</li>
+                                <li>✓ Build XP for future airdrops</li>
+                                <li>✓ Auto-resolves like all markets</li>
+                            </ul>
+                            <button onclick="openPollCreator()" class="btn btn-secondary w-full text-sm">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+                                Create Poll
+                            </button>
+                        </div>
+                        
+                        <div id="quick-polls-container" class="space-y-3">
+                            <div class="text-center text-gray-500 py-4 text-sm">Loading polls...</div>
+                        </div>
+                    </div>
+                    <!-- END RIGHT COLUMN -->
+                    
+                </div>
+                <!-- END GRID -->
             </div>
 
             <div id="profile-screen" class="screen screen-inactive space-y-6">
@@ -2043,35 +2085,6 @@
                 </div>
             </div>
 
-            <!-- Quick Polls Screen -->
-            <div id="quick-polls-screen" class="screen screen-inactive space-y-6">
-                <div class="flex items-center justify-between">
-                    <h1 class="text-2xl lg:text-3xl font-bold gradient-text">🗳 Quick Polls</h1>
-                    <button onclick="openPollCreator()" class="btn btn-primary">
-                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
-                        Create Poll
-                    </button>
-                </div>
-
-                <div class="ui-panel p-4 space-y-3">
-                    <h3 class="text-base font-semibold text-sky-300">What are Quick Polls?</h3>
-                    <ul class="text-sm text-gray-400 space-y-2">
-                        <li>✓ <span class="text-white">Zero-stake predictions</span> - No money or tokens required</li>
-                        <li>✓ <span class="text-white">Earn +2 XP per vote</span> - Build your profile without risk</li>
-                        <li>✓ <span class="text-white">Test market interest</span> - See if ideas are worth creating full markets</li>
-                        <li>✓ <span class="text-white">Community engagement</span> - Quick way to share predictions</li>
-                    </ul>
-                </div>
-
-                <div class="space-y-4">
-                    <h2 class="text-lg font-semibold text-white">All Polls</h2>
-                    <div id="quick-polls-container" class="space-y-3">
-                        <div class="text-center text-gray-500 py-4">Loading polls...</div>
-                    </div>
-                </div>
-            </div>
-
-
         </main>
 
                 <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 z-50 max-w-md mx-auto px-1 py-3 flex justify-around items-center md:hidden">
@@ -2087,9 +2100,9 @@
             <button onclick="showScreen('create-market-screen')" class="nav-button flex flex-col items-center text-gray-400 -mt-2 bg-gradient-to-br from-indigo-600 to-blue-600 p-3 rounded-full shadow-lg shadow-blue-500/30 border-2 border-sky-400">
                 <svg class="w-5 h-5" fill="none" stroke="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
             </button>
-            <button onclick="showScreen('quick-polls-screen')" class="nav-button flex flex-col items-center text-gray-400">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                <span class="text-xs mt-1">Polls</span>
+            <button onclick="showScreen('pledge-pool-screen')" class="nav-button flex flex-col items-center text-gray-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <span class="text-xs mt-1">Quick</span>
             </button>
             <button onclick="showScreen('profile-screen')" class="nav-button flex flex-col items-center text-gray-400">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
@@ -3271,8 +3284,9 @@
                 case 'home-screen':
                     if (!standardMarketsUnsubscribe) attachStandardMarketsListener();
                     break;
-                case 'quick-polls-screen':
-                    loadQuickPolls(); // Load quick polls
+                case 'pledge-pool-screen': 
+                    renderPledgePool();
+                    loadQuickPolls(); // Load quick polls in right column
                     break;
                 case 'create-market-screen':
                     populateAssetSelector();
@@ -7777,22 +7791,37 @@ ${historyText}`;
                 const yesPercent = total > 0 ? (yesVotes / total * 100).toFixed(0) : 50;
                 const noPercent = total > 0 ? (noVotes / total * 100).toFixed(0) : 50;
                 
+                const xpStakedYES = poll.xpStakedYES || 0;
+                const xpStakedNO = poll.xpStakedNO || 0;
+                const totalXPPot = xpStakedYES + xpStakedNO;
+                
                 html += `
                     <div class="p-3 bg-white/5 rounded-lg border border-white/10 space-y-2">
                         <p class="text-sm text-white font-medium">${poll.question}</p>
-                        <div class="flex gap-2">
-                            <button onclick="voteOnPoll('${poll.id}', 'YES')" 
-                                    class="flex-1 px-3 py-2 rounded ${userVoted === 'YES' ? 'bg-green-500 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'} text-xs font-medium"
-                                    ${userVoted ? 'disabled' : ''}>
-                                YES ${yesPercent}%
-                            </button>
-                            <button onclick="voteOnPoll('${poll.id}', 'NO')" 
-                                    class="flex-1 px-3 py-2 rounded ${userVoted === 'NO' ? 'bg-red-500 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'} text-xs font-medium"
-                                    ${userVoted ? 'disabled' : ''}>
-                                NO ${noPercent}%
-                            </button>
-                        </div>
-                        <p class="text-xs text-gray-500">${total} votes • ${poll.createdBy || 'Anonymous'}</p>
+                        ${!userVoted ? `
+                            <div class="flex gap-2">
+                                <button onclick="voteOnPoll('${poll.id}', 'YES', 10)" 
+                                        class="flex-1 px-3 py-2 rounded bg-green-600/20 hover:bg-green-600/40 text-green-400 text-xs font-medium border border-green-500/30">
+                                    YES ${yesPercent}%
+                                </button>
+                                <button onclick="voteOnPoll('${poll.id}', 'NO', 10)" 
+                                        class="flex-1 px-3 py-2 rounded bg-red-600/20 hover:bg-red-600/40 text-red-400 text-xs font-medium border border-red-500/30">
+                                    NO ${noPercent}%
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-500 text-center">Stake 10 XP to vote</p>
+                        ` : `
+                            <div class="flex gap-2">
+                                <div class="flex-1 px-3 py-2 rounded ${userVoted === 'YES' ? 'bg-green-500 text-white' : 'bg-white/10 text-gray-400'} text-xs font-medium text-center">
+                                    YES ${yesPercent}%
+                                </div>
+                                <div class="flex-1 px-3 py-2 rounded ${userVoted === 'NO' ? 'bg-red-500 text-white' : 'bg-white/10 text-gray-400'} text-xs font-medium text-center">
+                                    NO ${noPercent}%
+                                </div>
+                            </div>
+                            <p class="text-xs text-green-400 text-center">You voted ${userVoted}!</p>
+                        `}
+                        <p class="text-xs text-gray-500">${total} votes • ${totalXPPot} XP pot • ${poll.createdBy || 'Anonymous'}</p>
                     </div>
                 `;
             });
@@ -7800,28 +7829,53 @@ ${historyText}`;
             container.innerHTML = html;
         }
         
-        window.voteOnPoll = async (pollId, vote) => {
+        window.voteOnPoll = async (pollId, vote, stakeXP = 10) => {
+            if (!currentUserId) {
+                showToast("Please log in to vote.", "error");
+                return;
+            }
+            
+            // Check if user has enough XP
+            if (!userProfile.xp || userProfile.xp < stakeXP) {
+                showToast(`You need at least ${stakeXP} XP to vote.`, "error");
+                return;
+            }
+            
             try {
-                const { doc, updateDoc, increment } = window.firebase.firestore;
+                const { doc, updateDoc, increment, getDoc } = window.firebase.firestore;
                 const pollRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'quick_polls', pollId);
                 
+                // Check if user already voted
+                const pollSnap = await getDoc(pollRef);
+                if (pollSnap.exists()) {
+                    const pollData = pollSnap.data();
+                    if (pollData.voters && pollData.voters[currentUserId]) {
+                        showToast("You've already voted on this poll.", "warning");
+                        return;
+                    }
+                }
+                
                 const updateData = {
-                    [`voters.${currentUserId}`]: vote
+                    [`voters.${currentUserId}`]: { vote, xpStaked: stakeXP, timestamp: new Date().toISOString() }
                 };
                 
                 if (vote === 'YES') {
                     updateData.yesVotes = increment(1);
+                    updateData.xpStakedYES = increment(stakeXP);
                 } else {
                     updateData.noVotes = increment(1);
+                    updateData.xpStakedNO = increment(stakeXP);
                 }
                 
                 await updateDoc(pollRef, updateData);
                 
-                // Award mini XP
+                // Deduct XP from user
                 const profileRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'profile', currentUserId);
-                await updateDoc(profileRef, { xp: increment(2) });
+                await updateDoc(profileRef, { xp: increment(-stakeXP) });
+                userProfile.xp = (userProfile.xp || 0) - stakeXP;
+                updateProfileBadges();
                 
-                showToast('Vote recorded! +2 XP', 'success');
+                showToast(`${stakeXP} XP staked on ${vote}!`, 'success');
                 loadQuickPolls(); // Reload to show updated results
                 
             } catch (error) {
