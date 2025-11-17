@@ -174,3 +174,34 @@ Implemented comprehensive light mode styling with "Luminous & Airy" aesthetic to
 - Implemented isFirstLoad flag to skip initial Firestore snapshot
 - Prevents false-positive "user followed you" toasts on every login
 - Only shows notifications for new followers after authentication completes
+
+### Follower Count Display & Navigation (November 17, 2025)
+- Added clickable follower count badges to personal and public profile panels
+- Follower counts fetched from Firestore and displayed with people icon
+- Clicking follower count navigates to profile with Followers tab open
+- Public profiles now have 3 tabs: Active, History, and Followers
+- Followers tab shows list of users with avatars, XP, and "View Profile" buttons
+- Fixed tab navigation to support initialTab parameter for deep linking
+
+### Live Ticker Chat Improvements (November 17, 2025)
+- Fixed white text readability issue in light mode:
+  - User names now use `text-gray-900 dark:text-white`
+  - Comment text uses `text-gray-700 dark:text-gray-300`
+  - Hover states properly styled for both themes
+- Added timestamp display ("2m ago", "5h ago") to all comments
+- Improved visual hierarchy with borders between comments
+
+### Reply Threading System (November 17, 2025)
+- Implemented full reply functionality for live ticker chat
+- Architecture uses Firestore subcollections (comments/{commentId}/replies)
+- Features:
+  - Reply button under each comment with reply count display
+  - Replying mode with visual feedback (placeholder updates to "Replying to @username...")
+  - Threaded replies display with smaller avatars and indentation
+  - Timestamp formatting for replies
+  - Replies stored in subcollections for efficient querying
+- UI updates:
+  - Reply button shows count when replies exist ("Reply (3)")
+  - Nested reply display with reduced styling
+  - Cancel reply mode when posting
+- Helper function `getTimeAgo()` converts timestamps to human-readable format
