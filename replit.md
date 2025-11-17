@@ -74,6 +74,34 @@ Preferred communication style: Simple, everyday language.
 - **Social Sentiment Heatmap**: Visual breakdown showing which side your network is betting on vs. everyone else. Network percentage displays follower betting patterns with intelligent messaging (bullish/bearish/crowd-aligned). Helps users leverage social proof in prediction decisions.
 - **Quick Polls System**: Zero-stake casual predictions for low-commitment engagement. Users vote YES/NO on quick poll questions, earn mini XP rewards (+2 XP per vote), and see live percentage breakdowns. Anyone can create polls with one-click. Designed for viral growth and converting casual users to real market participants.
 
+## Multi-Option Markets (Polymarket-Style) - Not Yet Implemented
+
+**Concept**: Instead of binary YES/NO predictions, users can choose from multiple price ranges or outcomes.
+
+**Example - Bitcoin Price Prediction**:
+- Option A: BTC below $90k → 15% odds
+- Option B: BTC $90k-$95k → 35% odds
+- Option C: BTC $95k-$100k → 30% odds
+- Option D: BTC above $100k → 20% odds
+
+**How It Works**:
+1. **Market Creator** defines 3-6 possible outcomes with initial odds that sum to 100%
+2. **Users stake** on any option(s) they believe will happen
+3. **AMM distributes odds** based on where money flows (like Polymarket)
+4. **Only ONE option wins** when market resolves
+5. **Winners split the entire pot** proportionally
+
+**Benefits**:
+- More granular predictions than YES/NO
+- Better for price ranges, election candidates, multiple teams
+- Higher engagement (users can pick their confidence level)
+
+**Technical Implementation** (when built):
+- Each option has its own liquidity pool
+- Odds automatically adjust based on stake distribution
+- Resolution requires selecting exactly one winning option
+- Compatible with both Fixed Pot Yield and Traditional AMM market types
+
 ## External Dependencies
 
 ### Third-Party Services

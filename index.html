@@ -1682,11 +1682,6 @@
                 <div id="user-rank-panel" class="ui-panel text-center p-6 lg:p-8 border-l-4 border-sky-400">
                     <p class="text-gray-400 lg:text-lg">Loading your rank...</p>
                 </div>
-                <div class="flex justify-around border-b border-white/10 max-w-2xl mx-auto">
-                    <button class="profile-tab active lg:text-lg" data-filter="all-time">All-Time</button>
-                    <button class="profile-tab lg:text-lg" data-filter="weekly">Weekly</button>
-                    <button class="profile-tab lg:text-lg" data-filter="daily">Daily</button>
-                </div>
                 <div id="ranking-list" class="space-y-2 lg:space-y-3 max-w-3xl mx-auto">
                     <p class="text-gray-400 text-center pt-8 lg:text-lg">Fetching top players...</p>
                 </div>
@@ -3921,10 +3916,19 @@
         /**
          * Renders the leaderboard screen with ranked users.
          */
-        function renderLeaderboard() {
+        let currentLeaderboardTimeframe = 'all';
+        
+        function renderLeaderboard(timeframe = 'all') {
             const { collection, query, onSnapshot } = window.firebase.firestore;
             dom.userRankPanel.innerHTML = '<p class="text-gray-400">Loading your rank...</p>';
             dom.rankingList.innerHTML = '<p class="text-gray-400 text-center pt-8">Fetching top players...</p>';
+            
+            currentLeaderboardTimeframe = timeframe;
+            
+            // Calculate time cutoffs
+            const now = Date.now();
+            const oneDayAgo = now - (24 * 60 * 60 * 1000);
+            const oneWeekAgo = now - (7 * 24 * 60 * 60 * 1000);
 
             // Query the public leaderboard collection
             const q = query(collection(db, 'artifacts', APP_ID, 'public', 'data', PUBLIC_LEADERBOARD_COLLECTION));
@@ -3935,10 +3939,18 @@
                 snapshot.forEach(doc => profiles.push(doc.data()));
                 // Sort by XP, descending
                 profiles.sort((a, b) => b.xp - a.xp);
+                
+                // Filter based on timeframe (using lastActivity as proxy)
+                if (timeframe === 'daily') {
+                    profiles = profiles.filter(p => (p.lastActivity || 0) >= oneDayAgo);
+                } else if (timeframe === 'weekly') {
+                    profiles = profiles.filter(p => (p.lastActivity || 0) >= oneWeekAgo);
+                }
 
                 let userRank = -1;
                 let rankHtml = '';
                 const userProfileData = profiles.find(p => p.userId === currentUserId) || userProfile;
+                const timeframeText = timeframe === 'daily' ? 'Today' : timeframe === 'weekly' ? 'This Week' : 'All-Time';
 
                 profiles.forEach((profile, index) => {
                     const rank = index + 1;
@@ -3975,13 +3987,39 @@
 
                 // Update the user's personal rank panel
                 dom.userRankPanel.innerHTML = `
-                    <p class="text-xs text-gray-400 mb-2">Your Current Rank (All-Time)</p>
+                    <p class="text-xs text-gray-400 mb-2">Your Current Rank (${timeframeText})</p>
                     <div class="text-5xl font-extrabold ${userRank === 1 ? 'gradient-text' : 'text-white'}">${userRank > 0 ? `#${userRank}` : 'N/A'}</div>
                     <p class="text-sm text-gray-300 mt-2">Score: ${userProfileData.xp.toLocaleString()} XP</p>
                 `;
                 // Update the full ranking list
-                dom.rankingList.innerHTML = rankHtml;
+                if (rankHtml === '') {
+                    dom.rankingList.innerHTML = `<p class="text-gray-400 text-center lg:text-lg">No ${timeframe === 'all' ? '' : timeframe} leaderboard data yet.</p>`;
+                } else {
+                    dom.rankingList.innerHTML = rankHtml;
+                }
             });
+        }
+
+        function switchLeaderboardTimeframe(timeframe) {
+            // Update tab styles
+            document.querySelectorAll('.leaderboard-tab').forEach(tab => {
+                if (tab.dataset.timeframe === timeframe) {
+                    tab.classList.add('border-sky-400', 'text-sky-400');
+                    tab.classList.remove('border-transparent', 'text-gray-400');
+                } else {
+                    tab.classList.remove('border-sky-400', 'text-sky-400');
+                    tab.classList.add('border-transparent', 'text-gray-400');
+                }
+            });
+            
+            // Unsubscribe from old listener
+            if (leaderboardUnsubscribe) {
+                leaderboardUnsubscribe();
+                leaderboardUnsubscribe = null;
+            }
+            
+            // Reload leaderboard with new timeframe
+            renderLeaderboard(timeframe);
         }
 
         // =====================================================================
