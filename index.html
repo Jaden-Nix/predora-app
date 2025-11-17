@@ -4297,6 +4297,24 @@
                 });
                 // --- END OF TRANSACTION ---
 
+                // Optimistically update the UI balance immediately
+                const balanceField = getBalanceField(selectedAsset);
+                if (userProfile && userProfile[balanceField] !== undefined) {
+                    userProfile[balanceField] -= amount;
+                    userProfile.xp += xpToAward;
+                    
+                    // Update UI elements
+                    if (dom.mockBalance) {
+                        dom.mockBalance.innerText = `$${userProfile.balance.toFixed(2)}`;
+                    }
+                    if (dom.profileXpBadge) {
+                        dom.profileXpBadge.innerText = `${userProfile.xp.toLocaleString()} XP`;
+                    }
+                    
+                    // Repopulate asset selector with new balances
+                    populateAssetSelector();
+                }
+
                 showLoadingOverlay(false);
                 showToast(`Stake Confirmed!`, "success");
 
