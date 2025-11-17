@@ -1577,7 +1577,14 @@
                     <svg class="w-5 h-5 mr-1 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                     Back to Home
                 </button>
-                <h1 id="detail-title" class="text-2xl lg:text-3xl font-bold text-white">...</h1>
+                <div class="flex justify-between items-center gap-3">
+                    <h1 id="detail-title" class="text-2xl lg:text-3xl font-bold text-white flex-1">...</h1>
+                    <button id="share-market-btn" onclick="shareMarket()" class="text-sky-400 hover:text-sky-300 transition-colors" title="Share Market">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+                        </svg>
+                    </button>
+                </div>
 
                 <div class="lg:grid lg:grid-cols-3 lg:gap-6 space-y-6 lg:space-y-0">
                     <div class="lg:col-span-2 space-y-6">
@@ -2504,6 +2511,7 @@
         let leaderboardUnsubscribe = null;
         let detailMarketUnsubscribe = null; // --- RACE CONDITION FIX (NEW) ---
         let userHistoryData = []; // To store history for AI summary
+        let userActiveStakesData = []; // To store active stakes for sharing
 
         // --- DOM ELEMENTS (Cached for performance) ---
         let dom = {};
@@ -3975,6 +3983,7 @@
             activeStakesUnsubscribe = onSnapshot(q, (snapshot) => {
                 let html = '';
                 let totalPrincipal = 0;
+                userActiveStakesData = []; // Clear cache
 
                 if (snapshot.empty) {
                     dom.activeStakesContent.innerHTML = '<div class="ui-panel text-center"><p class="text-gray-400">You have no active stakes.</p></div>';
@@ -3984,6 +3993,7 @@
 
                 snapshot.forEach(doc => {
                     const pledge = doc.data();
+                    userActiveStakesData.push({ ...pledge, docId: doc.id }); // Add to cache with doc ID
                     totalPrincipal += pledge.amountUsd; 
                     const pickClass = pledge.pick === 'YES' ? 'text-green-400' : 'text-red-400';
 
@@ -3996,7 +4006,14 @@
 
                     html += `
                         <div class="ui-panel p-4 mb-3">
-                            <h3 class="theme-text-primary font-semibold text-base mb-3">${pledge.marketTitle || 'Market'}</h3>
+                            <div class="flex justify-between items-start mb-3">
+                                <h3 class="theme-text-primary font-semibold text-base flex-1">${pledge.marketTitle || 'Market'}</h3>
+                                <button onclick="shareActiveStake(event, '${doc.id}')" class="text-sky-400 hover:text-sky-300 transition-colors ml-2" title="Share">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+                                    </svg>
+                                </button>
+                            </div>
                             <div class="mb-3">
                                 <span class="theme-text-secondary text-xs">Your Pick:</span>
                                 <p class="${pickClass} font-bold text-2xl">${pledge.pick}</p>
@@ -7755,6 +7772,66 @@ ${historyText}`;
             
             // Show share modal
             showShareModal(canvas, type, stake.marketTitle);
+        };
+        
+        /**
+         * Share active stake
+         */
+        window.shareActiveStake = async (event, docId) => {
+            event.stopPropagation();
+            
+            // Find the stake data
+            const stake = userActiveStakesData.find(s => s.docId === docId);
+            if (!stake) {
+                showToast('Could not find stake data', 'error');
+                return;
+            }
+            
+            // Get current market data to get odds
+            const { doc, getDoc } = window.firebase.firestore;
+            try {
+                const marketRef = doc(db, 'artifacts', APP_ID, 'public', 'data', MARKETS_COLLECTION, stake.marketId);
+                const marketSnap = await getDoc(marketRef);
+                const market = marketSnap.exists() ? marketSnap.data() : null;
+                
+                const odds = market ? (stake.pick === 'YES' ? market.yesPercent : market.noPercent) : 50;
+                
+                const data = {
+                    marketTitle: stake.marketTitle,
+                    stake: stake.amountUsd,
+                    pick: stake.pick,
+                    odds: odds
+                };
+                
+                const canvas = await generateShareImage('stake', data);
+                
+                // Show share modal
+                showShareModal(canvas, 'stake', stake.marketTitle);
+            } catch (error) {
+                console.error('Error getting market data:', error);
+                showToast('Could not load market data', 'error');
+            }
+        };
+        
+        /**
+         * Share market from detail page
+         */
+        window.shareMarket = async () => {
+            if (!currentMarket) {
+                showToast('Market data not loaded', 'error');
+                return;
+            }
+            
+            const data = {
+                title: currentMarket.question,
+                isNoLoss: currentMarket.isNoLoss || false,
+                creator: currentMarket.creator || currentUserId
+            };
+            
+            const canvas = await generateShareImage('market', data);
+            
+            // Show share modal
+            showShareModal(canvas, 'market', currentMarket.question);
         };
         
         /**
