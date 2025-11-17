@@ -9033,11 +9033,14 @@ ${historyText}`;
                 updateProfileBadges();
                 
                 showToast(`${stakeXP} XP staked on ${vote}!`, 'success');
-                loadQuickPolls(); // Reload to show updated results
+                
+                // Reload polls to show updated results
+                await loadQuickPolls();
                 
             } catch (error) {
                 console.error('Error voting:', error);
-                showToast('Vote failed', 'error');
+                console.error('Error details:', error.message, error.code, error.stack);
+                showToast(`Vote failed: ${error.message || 'Unknown error'}`, 'error');
             }
         };
         
