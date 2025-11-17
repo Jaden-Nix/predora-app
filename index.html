@@ -3159,6 +3159,33 @@
         };
         
         /**
+         * Timer to update notification timestamps every minute
+         */
+        let notificationTimestampInterval = null;
+        
+        function startNotificationTimestampUpdates() {
+            // Clear any existing interval
+            if (notificationTimestampInterval) {
+                clearInterval(notificationTimestampInterval);
+            }
+            
+            // Update timestamps every 30 seconds
+            notificationTimestampInterval = setInterval(() => {
+                const feed = document.getElementById('notifications-feed-profile');
+                if (!feed) return;
+                
+                // Find all timestamp elements and update them
+                const timestampElements = feed.querySelectorAll('[data-notification-timestamp]');
+                timestampElements.forEach(el => {
+                    const timestamp = parseInt(el.dataset.notificationTimestamp);
+                    if (timestamp) {
+                        el.textContent = getTimeAgo(timestamp);
+                    }
+                });
+            }, 30000); // Update every 30 seconds
+        }
+        
+        /**
          * Load notifications from Firestore
          */
         async function loadNotifications() {
@@ -3212,6 +3239,9 @@
                 const unreadCount = snapshot.docs.filter(d => !d.data().read).length;
                 updateNotificationBadge(unreadCount);
                 
+                // Start updating timestamps
+                startNotificationTimestampUpdates();
+                
             } catch (error) {
                 console.error('Error loading notifications:', error);
             }
@@ -3257,7 +3287,9 @@
                     break;
             }
             
-            const timeAgo = getTimeAgo(notification.timestamp?.toDate?.() || new Date());
+            const notifDate = notification.timestamp?.toDate?.() || new Date();
+            const timestampSeconds = Math.floor(notifDate.getTime() / 1000);
+            const timeAgo = getTimeAgo(timestampSeconds);
             
             div.innerHTML = `
                 <div class="flex items-start space-x-3">
@@ -3267,7 +3299,7 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between">
                             <p class="text-sm font-semibold text-gray-200 dark:text-gray-200 light:text-gray-900">${title}</p>
-                            <span class="text-xs text-gray-500">${timeAgo}</span>
+                            <span class="text-xs text-gray-500" data-notification-timestamp="${timestampSeconds}">${timeAgo}</span>
                         </div>
                         <p class="text-sm text-gray-400 dark:text-gray-400 light:text-gray-600 mt-1">${message}</p>
                         ${notification.actionUrl ? `<button onclick="handleNotificationAction('${notification.actionUrl}')" class="text-xs text-sky-400 hover:text-sky-300 font-medium mt-2">${actionText}</button>` : ''}
