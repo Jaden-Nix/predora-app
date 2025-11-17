@@ -1440,39 +1440,21 @@
 
                 <div id="fixed-pot-options" class="space-y-4">
                     <h3 class="text-base font-semibold text-gray-200">Yield Protocol</h3>
-                    <div class="ui-panel p-4 space-y-2">
-                        <div id="yield-protocol-aave" class="flex justify-between items-center p-3 rounded-lg border border-sky-400 bg-sky-500/10 cursor-pointer" onclick="selectYield('aave')">
-                            <span class="font-medium text-white dark:text-white">Aave</span>
-                            <span class="font-bold text-green-400">4.12% APY</span>
-                        </div>
-                        <div id="yield-protocol-compound" class="flex justify-between items-center p-3 rounded-lg border border-transparent cursor-pointer text-gray-400 hover:border-gray-600" onclick="selectYield('compound')">
-                            <span class="font-medium">Compound</span>
-                            <span class="font-bold text-green-400">3.88% APY</span>
-                        </div>
-                        <div id="yield-protocol-lido" class="flex justify-between items-center p-3 rounded-lg border border-transparent cursor-pointer text-gray-400 hover:border-gray-600" onclick="selectYield('lido')">
-                            <span class="font-medium">Lido</span>
-                            <span class="font-bold text-green-400">3.2% APY</span>
-                        </div>
-                        <div id="yield-protocol-yearn" class="flex justify-between items-center p-3 rounded-lg border border-transparent cursor-pointer text-gray-400 hover:border-gray-600" onclick="selectYield('yearn')">
-                            <span class="font-medium">Yearn Finance</span>
-                            <span class="font-bold text-green-400">5.8% APY</span>
-                        </div>
-                        <div id="yield-protocol-curve" class="flex justify-between items-center p-3 rounded-lg border border-transparent cursor-pointer text-gray-400 hover:border-gray-600" onclick="selectYield('curve')">
-                            <span class="font-medium">Curve</span>
-                            <span class="font-bold text-green-400">2.9% APY</span>
-                        </div>
-                        <div id="yield-protocol-convex" class="flex justify-between items-center p-3 rounded-lg border border-transparent cursor-pointer text-gray-400 hover:border-gray-600" onclick="selectYield('convex')">
-                            <span class="font-medium">Convex</span>
-                            <span class="font-bold text-green-400">4.5% APY</span>
-                        </div>
-                    </div>
+                    <select id="yield-protocol-select" class="ui-input" onchange="updateYieldSelection()">
+                        <option value="aave">Aave (4.12% APY)</option>
+                        <option value="compound">Compound (3.88% APY)</option>
+                        <option value="lido">Lido (3.2% APY)</option>
+                        <option value="yearn">Yearn Finance (5.8% APY)</option>
+                        <option value="curve">Curve (2.9% APY)</option>
+                        <option value="convex">Convex (4.5% APY)</option>
+                    </select>
                     <input type="hidden" id="selected-yield-protocol" value="aave">
                 </div>
 
                 <div id="market-timing-section" class="form-section space-y-4">
                     <h3 class="text-base font-semibold text-gray-200">Market Timing</h3>
                     
-                    <div class="space-y-2">
+                    <div id="staking-deadline-section" class="space-y-2">
                         <div class="flex items-center justify-between">
                             <label for="staking-deadline-input" class="text-sm font-medium text-gray-300">Staking Deadline</label>
                             <span class="text-xs text-gray-400">Market locks after this</span>
@@ -4781,7 +4763,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         prompt: `Analyze this prediction market question and suggest when it should be resolved:\n\n"${title}"\n\nProvide ONLY the date in YYYY-MM-DD format. If the event has a specific date (like "Super Bowl 2025"), use that exact date. If it's an ongoing question (like "Will BTC hit $100k in 2025?"), suggest December 31 of the current/relevant year. Return ONLY the date, nothing else.`,
-                        model: 'gemini-2.0-flash-exp'
+                        model: 'gemini-2.5-flash-preview-04-2025'
                     })
                 });
                 
@@ -4818,26 +4800,6 @@
             }
         }
 
-        /**
-         * Handles yield protocol selection.
-         */
-        window.selectYield = (protocol) => {
-            document.getElementById('selected-yield-protocol').value = protocol;
-            
-            const protocols = ['aave', 'compound', 'lido', 'yearn', 'curve', 'convex'];
-            
-            protocols.forEach(p => {
-                const btn = document.getElementById(`yield-protocol-${p}`);
-                if (btn) {
-                    const isSelected = p === protocol;
-                    btn.classList.toggle('border-sky-400', isSelected);
-                    btn.classList.toggle('bg-sky-500/10', isSelected);
-                    btn.classList.toggle('text-gray-400', !isSelected);
-                    btn.classList.toggle('text-white', isSelected);
-                    btn.classList.toggle('border-transparent', !isSelected);
-                }
-            });
-        }
 
         /**
          * Updates the "Live Preview" panel on the Create Market screen.
@@ -4861,6 +4823,7 @@
             const fixedPotBtn = document.getElementById('btn-market-fixed-pot');
             const traditionalBtn = document.getElementById('btn-market-traditional');
             const fixedPotOptions = document.getElementById('fixed-pot-options');
+            const stakingDeadlineSection = document.getElementById('staking-deadline-section');
             const typeInput = document.getElementById('market-type-input');
             const traditionalInfo = document.getElementById('traditional-liquidity-info');
             const fixedPotInfo = document.getElementById('fixed-pot-liquidity-info');
@@ -4870,6 +4833,7 @@
                 fixedPotBtn.classList.replace('btn-secondary', 'btn-stake-yes');
                 traditionalBtn.classList.replace('btn-stake-no', 'btn-secondary');
                 fixedPotOptions.classList.remove('hidden');
+                if (stakingDeadlineSection) stakingDeadlineSection.classList.remove('hidden');
                 if (traditionalInfo) traditionalInfo.classList.add('hidden');
                 if (fixedPotInfo) fixedPotInfo.classList.remove('hidden');
             } else {
@@ -4877,8 +4841,18 @@
                 fixedPotBtn.classList.replace('btn-stake-yes', 'btn-secondary');
                 traditionalBtn.classList.replace('btn-secondary', 'btn-stake-no');
                 fixedPotOptions.classList.add('hidden');
+                if (stakingDeadlineSection) stakingDeadlineSection.classList.add('hidden');
                 if (traditionalInfo) traditionalInfo.classList.remove('hidden');
                 if (fixedPotInfo) fixedPotInfo.classList.add('hidden');
+            }
+        }
+        
+        // Update yield selection from dropdown
+        window.updateYieldSelection = () => {
+            const dropdown = document.getElementById('yield-protocol-select');
+            const hiddenInput = document.getElementById('selected-yield-protocol');
+            if (dropdown && hiddenInput) {
+                hiddenInput.value = dropdown.value;
             }
         }
         
@@ -4910,7 +4884,7 @@
 
             const selectedMarketType = document.getElementById('market-type-input').value;
             const isFixedPotFinal = selectedMarketType === 'fixed-pot';
-            const yieldProtocolFinal = isFixedPotFinal ? document.getElementById('selected-yield-protocol').value : null;
+            const yieldProtocolFinal = isFixedPotFinal ? (document.getElementById('yield-protocol-select')?.value || document.getElementById('selected-yield-protocol').value) : null;
 
             // 3. --- NEW, STRICTER VALIDATION ---
             if (!title || !insight || !resolutionDate || isNaN(yesPercent) || isNaN(noPercent) || !liquidityAmount || liquidityAmount <= 0) {
