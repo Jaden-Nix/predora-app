@@ -1681,13 +1681,19 @@
                                     <label for="stake-amount-input" class="text-sm font-medium text-gray-300">Amount</label>
                                     <input type="number" id="stake-amount-input" class="ui-input" placeholder="0.00" oninput="updateYieldCalculator()">
                                 </div>
-                                <div id="stake-section" class="grid grid-cols-2 gap-4">
-                                    <button id="stake-yes-btn" class="btn btn-stake-yes">
+                                <!-- Binary YES/NO Buttons -->
+                                <div id="binary-stake-section" class="grid grid-cols-2 gap-4">
+                                    <button id="stake-yes-btn" onclick="stakeMarket('YES')" class="btn btn-stake-yes">
                                         Stake YES
                                     </button>
-                                    <button id="stake-no-btn" class="btn btn-stake-no">
+                                    <button id="stake-no-btn" onclick="stakeMarket('NO')" class="btn btn-stake-no">
                                         Stake NO
                                     </button>
+                                </div>
+                                
+                                <!-- Multi-Option Buttons -->
+                                <div id="multi-option-stake-section" class="hidden space-y-2">
+                                    <!-- Dynamically populated -->
                                 </div>
                             </div>
                         </div>
@@ -4209,8 +4215,12 @@
                             currentMarket = { id: docSnap.id, ...newData, createdAt: creationDate };
 
                             // 3. Update the UI elements IN REAL TIME
-                            dom.detailYesPercent.innerText = `${currentMarket.yesPercent.toFixed(1)}%`;
-                            dom.detailNoPercent.innerText = `${currentMarket.noPercent.toFixed(1)}%`;
+                            if (currentMarket.marketStructure === 'multi-option' && currentMarket.options) {
+                                renderMultiOptionDisplay(currentMarket.options);
+                            } else {
+                                dom.detailYesPercent.innerText = `${currentMarket.yesPercent.toFixed(1)}%`;
+                                dom.detailNoPercent.innerText = `${currentMarket.noPercent.toFixed(1)}%`;
+                            }
                             dom.marketTvlText.innerText = `$${(currentMarket.totalStakeVolume || 0).toFixed(2)}`;
 
                             // 4. Reload and draw the chart
@@ -4293,6 +4303,10 @@
             // 2. Get Form Values
             const amount = parseFloat(dom.stakeAmountInput.value);
             const selectedAsset = dom.stakeAssetSelect.value;
+            
+            // Determine if this is a multi-option pick
+            const isMultiOption = currentMarket.marketStructure === 'multi-option';
+            const optionLabel = isMultiOption ? currentMarket.options.find(o => o.id === pick)?.label : null;
 
             // 3. --- VALIDATION ---
             if (!amount || amount <= 0) {
@@ -4391,7 +4405,7 @@
 
                     // 6. TRANSACTION WRITE 2: Create the Pledge
                     const newPledgeRef = doc(pledgeCollection);
-                    transaction.set(newPledgeRef, {
+                    const pledgeData = {
                         marketId: currentMarketId,
                         marketTitle: market.title,
                         userId: currentUserId,
@@ -4404,8 +4418,16 @@
                         isResolved: false,
                         isWinner: null,
                         payout: 0,
-                        createdAt: new Date().toISOString()
-                    });
+                        createdAt: new Date().toISOString(),
+                        marketStructure: market.marketStructure || 'binary'
+                    };
+                    
+                    // Add option label for multi-option markets
+                    if (isMultiOption && optionLabel) {
+                        pledgeData.optionLabel = optionLabel;
+                    }
+                    
+                    transaction.set(newPledgeRef, pledgeData);
 
                     // 7. TRANSACTION WRITE 3: Log for the chart
                     if (!currentMarket.isMock) {
@@ -5195,6 +5217,49 @@
                 }
             });
             return options;
+        }
+        
+        // Render multi-option display in market detail
+        window.renderMultiOptionDisplay = (options) => {
+            const binaryDisplay = document.getElementById('binary-odds-display');
+            const multiDisplay = document.getElementById('multi-option-display');
+            const binaryStakeSection = document.getElementById('binary-stake-section');
+            const multiStakeSection = document.getElementById('multi-option-stake-section');
+            
+            if (!options || options.length === 0) return;
+            
+            // Hide binary, show multi-option
+            if (binaryDisplay) binaryDisplay.classList.add('hidden');
+            if (multiDisplay) multiDisplay.classList.remove('hidden');
+            if (binaryStakeSection) binaryStakeSection.classList.add('hidden');
+            if (multiStakeSection) multiStakeSection.classList.remove('hidden');
+            
+            // Build multi-option display HTML
+            let displayHtml = '<div class="space-y-2">';
+            options.forEach(opt => {
+                displayHtml += `
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
+                        <span class="text-white font-medium text-sm">${opt.label}</span>
+                        <span class="text-sky-400 font-bold text-lg">${opt.odds}%</span>
+                    </div>
+                `;
+            });
+            displayHtml += '</div>';
+            
+            if (multiDisplay) multiDisplay.innerHTML = displayHtml;
+            
+            // Build stake buttons
+            let stakeHtml = '';
+            options.forEach(opt => {
+                const colorClass = opt.odds > 50 ? 'btn-stake-yes' : opt.odds > 30 ? 'bg-blue-600 hover:bg-blue-700' : 'btn-stake-no';
+                stakeHtml += `
+                    <button onclick="stakeMarket('${opt.id}')" class="btn ${colorClass} text-sm">
+                        Stake: ${opt.label}
+                    </button>
+                `;
+            });
+            
+            if (multiStakeSection) multiStakeSection.innerHTML = stakeHtml;
         }
         
         /**
