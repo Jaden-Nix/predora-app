@@ -3110,14 +3110,7 @@
             
             try {
                 const notificationsRef = collection(db, 'artifacts', APP_ID, 'public', 'data', USER_PROFILE_COLLECTION, userProfile.userId, 'notifications');
-                let q = query(notificationsRef, orderBy('timestamp', 'desc'), limit(50));
-                
-                // Apply filter
-                if (currentNotificationFilter === 'markets') {
-                    q = query(notificationsRef, where('type', 'in', ['market_resolved', 'market_disputed']), orderBy('timestamp', 'desc'), limit(50));
-                } else if (currentNotificationFilter === 'social') {
-                    q = query(notificationsRef, where('type', 'in', ['new_follower', 'comment_reply']), orderBy('timestamp', 'desc'), limit(50));
-                }
+                const q = query(notificationsRef, orderBy('timestamp', 'desc'), limit(100));
                 
                 const snapshot = await getDocs(q);
                 
@@ -3131,12 +3124,26 @@
                     return;
                 }
                 
-                snapshot.docs.forEach(docSnap => {
+                // Filter notifications in JavaScript based on selected tab
+                let filteredDocs = snapshot.docs;
+                if (currentNotificationFilter === 'markets') {
+                    filteredDocs = snapshot.docs.filter(doc => doc.data().type === 'market_resolved');
+                } else if (currentNotificationFilter === 'social') {
+                    filteredDocs = snapshot.docs.filter(doc => doc.data().type === 'social');
+                }
+                
+                // Display filtered notifications
+                if (filteredDocs.length === 0) {
+                    feed.innerHTML = '<p class="text-gray-400 text-center py-8 text-sm">No notifications in this category</p>';
+                    return;
+                }
+                
+                filteredDocs.forEach(docSnap => {
                     const notification = { id: docSnap.id, ...docSnap.data() };
                     feed.appendChild(renderNotificationItem(notification));
                 });
                 
-                // Update badge with unread count
+                // Update badge with unread count (from ALL notifications, not filtered)
                 const unreadCount = snapshot.docs.filter(d => !d.data().read).length;
                 updateNotificationBadge(unreadCount);
                 
@@ -7480,7 +7487,7 @@ ${historyText}`;
                     if (replyingTo.userId !== currentUserId) {
                         const notificationsRef = collection(db, 'artifacts', APP_ID, 'public', 'data', USER_PROFILE_COLLECTION, replyingTo.userId, 'notifications');
                         await addDoc(notificationsRef, {
-                            type: 'comment_reply',
+                            type: 'social',
                             message: `${userProfile.displayName} replied to your comment`,
                             fromUserId: currentUserId,
                             fromUserName: userProfile.displayName,
@@ -8013,7 +8020,7 @@ ${historyText}`;
                     const { addDoc, collection } = window.firebase.firestore;
                     const notificationsRef = collection(db, 'artifacts', APP_ID, 'public', 'data', USER_PROFILE_COLLECTION, targetUserId, 'notifications');
                     await addDoc(notificationsRef, {
-                        type: 'new_follower',
+                        type: 'social',
                         message: `${userProfile.displayName} unfollowed you`,
                         fromUserId: currentUserId,
                         fromUserName: userProfile.displayName,
@@ -8057,7 +8064,7 @@ ${historyText}`;
                     const { addDoc, collection } = window.firebase.firestore;
                     const notificationsRef = collection(db, 'artifacts', APP_ID, 'public', 'data', USER_PROFILE_COLLECTION, targetUserId, 'notifications');
                     await addDoc(notificationsRef, {
-                        type: 'new_follower',
+                        type: 'social',
                         message: `${userProfile.displayName} started following you`,
                         fromUserId: currentUserId,
                         fromUserName: userProfile.displayName,
