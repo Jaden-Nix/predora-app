@@ -1270,9 +1270,9 @@
                 <p class="text-center text-gray-300 lg:text-lg">Select a demo account to get started.</p>
 
                 <div class="space-y-3 lg:space-y-4">
-                    <button onclick="mockLogin('judge-123', '@Judge')" class="btn btn-primary lg:text-lg">Sign in as @Judge</button>
-                    <button onclick="mockLogin('alice-456', '@Alice')" class="btn btn-secondary lg:text-lg">Sign in as @Alice</button>
-                    <button onclick="mockLogin('bob-789', '@Bob')" class="btn btn-secondary lg:text-lg">Sign in as @Bob</button>
+                    <button onclick="mockLogin('judge-123', 'Judge')" class="btn btn-primary lg:text-lg">Sign in as Judge</button>
+                    <button onclick="mockLogin('alice-456', 'Alice')" class="btn btn-secondary lg:text-lg">Sign in as Alice</button>
+                    <button onclick="mockLogin('bob-789', 'Bob')" class="btn btn-secondary lg:text-lg">Sign in as Bob</button>
                 </div>
 
                 <div class="ui-panel space-y-4 lg:space-y-5">
@@ -7296,15 +7296,15 @@ ${historyText}`;
                             const reply = replyDoc.data();
                             const replyTimeAgo = reply.timestamp ? getTimeAgo(reply.timestamp.seconds) : 'just now';
                             
-                            // Show who this reply is to (if it's a reply to another reply)
-                            const replyingToTag = reply.replyingTo ? `<span class="text-sky-500 dark:text-sky-400">@${reply.replyingTo}</span> ` : '';
+                            // Show who this reply is to (if it's a reply to another reply) - WITH @
+                            const replyingToTag = reply.replyingTo ? `<span class="text-sky-500 dark:text-sky-400">${addAt(reply.replyingTo)}</span> ` : '';
                             
                             repliesHtml += `
                                 <div class="flex space-x-2 text-sm">
                                     <img src="${reply.avatarUrl || YOUR_LOGO_URL}" class="w-6 h-6 rounded-full" alt="Avatar">
                                     <div class="flex-grow">
                                         <div class="flex items-center space-x-2">
-                                            <span class="font-semibold text-gray-900 dark:text-gray-200 text-xs">${reply.displayName}</span>
+                                            <span class="font-semibold text-gray-900 dark:text-gray-200 text-xs">${stripAt(reply.displayName)}</span>
                                             <span class="text-xs text-gray-500 dark:text-gray-400">${replyTimeAgo}</span>
                                         </div>
                                         <p class="text-gray-700 dark:text-gray-300 text-xs mt-0.5">${replyingToTag}${reply.commentText}</p>
@@ -7326,10 +7326,10 @@ ${historyText}`;
                             <div class="flex-grow">
                                 <div class="flex items-center space-x-2">
                                     ${comment.userId === currentUserId ? `
-    <span class="font-semibold text-gray-900 dark:text-white">${displayName}</span>
+    <span class="font-semibold text-gray-900 dark:text-white">${stripAt(displayName)}</span>
 ` : `
     <button onclick=" closeTickerModal(); viewUserProfile('${comment.userId}')" class="font-semibold text-gray-900 dark:text-white hover:text-sky-500 dark:hover:text-sky-400 transition-colors">
-        ${displayName}
+        ${stripAt(displayName)}
     </button>
 `}
                                     ${comment.pick ? `<span class="badge ${pickClass}">${comment.pick}</span>` : ''}
@@ -7408,6 +7408,22 @@ ${historyText}`;
             if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
             return `${Math.floor(diff / 86400)}d ago`;
         }
+
+        /**
+         * Helper to strip @ from username for display
+         */
+        function stripAt(username) {
+            if (!username) return 'Anonymous';
+            return username.startsWith('@') ? username.substring(1) : username;
+        }
+
+        /**
+         * Helper to add @ to username for mentions
+         */
+        function addAt(username) {
+            if (!username) return '@Anonymous';
+            return username.startsWith('@') ? username : `@${username}`;
+        }
         
         // Track current reply state
         let replyingTo = null;
@@ -7417,7 +7433,7 @@ ${historyText}`;
          */
         window.startReply = (commentId, displayName, userId) => {
             replyingTo = { commentId, displayName, userId };
-            dom.tickerCommentInput.placeholder = `Replying to ${displayName}...`;
+            dom.tickerCommentInput.placeholder = `Replying to ${addAt(displayName)}...`;
             dom.tickerCommentInput.focus();
             
             // Update button text
