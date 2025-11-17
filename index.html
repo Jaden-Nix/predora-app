@@ -7628,76 +7628,164 @@ ${historyText}`;
             canvas.height = 675;
             const ctx = canvas.getContext('2d');
             
-            // Background gradient
+            // VIBRANT MULTI-COLOR GRADIENT BACKGROUND
             const gradient = ctx.createLinearGradient(0, 0, 1200, 675);
             if (type === 'win') {
-                gradient.addColorStop(0, '#10b981'); // Green
-                gradient.addColorStop(1, '#059669');
+                gradient.addColorStop(0, '#10b981');
+                gradient.addColorStop(0.3, '#059669');
+                gradient.addColorStop(0.6, '#0891b2');
+                gradient.addColorStop(1, '#0e7490');
             } else if (type === 'loss') {
-                gradient.addColorStop(0, '#ef4444'); // Red
-                gradient.addColorStop(1, '#dc2626');
-            } else {
-                gradient.addColorStop(0, '#3b82f6'); // Blue
+                gradient.addColorStop(0, '#f43f5e');
+                gradient.addColorStop(0.5, '#e11d48');
+                gradient.addColorStop(1, '#9f1239');
+            } else if (type === 'stake') {
+                gradient.addColorStop(0, '#8b5cf6');
+                gradient.addColorStop(0.3, '#7c3aed');
+                gradient.addColorStop(0.6, '#3b82f6');
                 gradient.addColorStop(1, '#2563eb');
+            } else {
+                gradient.addColorStop(0, '#f59e0b');
+                gradient.addColorStop(0.5, '#d97706');
+                gradient.addColorStop(1, '#ea580c');
             }
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, 1200, 675);
             
-            // Add glassmorphism effect
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-            ctx.fillRect(60, 60, 1080, 555);
-            
-            // Title emoji and text
+            // ABSTRACT BACKGROUND SHAPES
+            ctx.globalAlpha = 0.1;
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 72px Inter, Arial, sans-serif';
-            const titleText = type === 'win' ? '🎉 I WON!' : type === 'loss' ? '😔 Better luck next time' : type === 'stake' ? '📈 I\'m betting!' : '🔮 New Market';
-            ctx.fillText(titleText, 100, 160);
+            ctx.beginPath();
+            ctx.arc(200, 150, 180, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(1000, 500, 220, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(600, 600, 150, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1;
             
-            // Market title
-            ctx.font = '48px Inter, Arial, sans-serif';
+            // MAIN GLASSMORPHISM CARD
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 40;
+            ctx.shadowOffsetY = 20;
+            roundRect(ctx, 80, 80, 1040, 515, 30);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetY = 0;
+            
+            // BORDER GLOW
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 3;
+            roundRect(ctx, 80, 80, 1040, 515, 30);
+            ctx.stroke();
+            
+            // EMOJI BLAST
+            ctx.font = 'bold 100px Arial, sans-serif';
+            const emoji = type === 'win' ? '🎉' : type === 'loss' ? '💔' : type === 'stake' ? '🚀' : '🔮';
+            ctx.fillText(emoji, 950, 180);
+            
+            // TITLE WITH GLOW
+            ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+            ctx.shadowBlur = 20;
             ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 80px Inter, Arial, sans-serif';
+            const titleText = type === 'win' ? 'I WON!' : type === 'loss' ? 'TOOK THE L' : type === 'stake' ? 'I\'M IN!' : 'NEW DROP';
+            ctx.fillText(titleText, 120, 180);
+            ctx.shadowBlur = 0;
+            
+            // MARKET TITLE WITH DYNAMIC SIZING
+            ctx.font = '600 44px Inter, Arial, sans-serif';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
             const marketTitle = data.marketTitle || data.title || 'Prediction Market';
-            const wrappedTitle = wrapText(ctx, marketTitle, 1000);
-            let yPos = 260;
-            wrappedTitle.forEach(line => {
-                ctx.fillText(line, 100, yPos);
-                yPos += 60;
+            const wrappedTitle = wrapText(ctx, marketTitle, 900);
+            let yPos = 280;
+            wrappedTitle.slice(0, 3).forEach(line => {
+                ctx.fillText(line, 120, yPos);
+                yPos += 55;
             });
             
-            // Stats section
-            yPos += 40;
-            ctx.font = 'bold 42px Inter, Arial, sans-serif';
+            // STATS CARD WITH GLASSMORPHISM
+            yPos += 30;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            roundRect(ctx, 120, yPos - 20, 960, 140, 20);
+            ctx.fill();
+            
+            // STATS CONTENT
+            yPos += 35;
+            ctx.font = 'bold 52px Inter, Arial, sans-serif';
             
             if (type === 'win' || type === 'loss') {
-                // Show stake and payout
-                ctx.fillText(`Stake: $${data.stake.toFixed(2)}`, 100, yPos);
-                yPos += 60;
+                // STAKE AMOUNT
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                ctx.font = '600 32px Inter, Arial, sans-serif';
+                ctx.fillText('STAKED', 150, yPos);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 56px Inter, Arial, sans-serif';
+                ctx.fillText(`$${data.stake.toFixed(0)}`, 150, yPos + 55);
+                
+                // P&L
                 const pnl = type === 'win' ? (data.payout - data.stake) : -data.stake;
-                const pnlText = pnl >= 0 ? `+$${pnl.toFixed(2)}` : `-$${Math.abs(pnl).toFixed(2)}`;
+                const pnlText = pnl >= 0 ? `+$${pnl.toFixed(0)}` : `-$${Math.abs(pnl).toFixed(0)}`;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                ctx.font = '600 32px Inter, Arial, sans-serif';
+                ctx.fillText(type === 'win' ? 'PROFIT' : 'LOSS', 550, yPos);
                 ctx.fillStyle = type === 'win' ? '#4ade80' : '#fca5a5';
-                ctx.fillText(`${type === 'win' ? 'Profit' : 'Loss'}: ${pnlText}`, 100, yPos);
+                ctx.font = 'bold 56px Inter, Arial, sans-serif';
+                ctx.fillText(pnlText, 550, yPos + 55);
             } else if (type === 'stake') {
-                // Show current stake
-                ctx.fillText(`My bet: $${data.stake.toFixed(2)} on ${data.pick}`, 100, yPos);
-                yPos += 60;
+                // BET INFO
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                ctx.font = '600 32px Inter, Arial, sans-serif';
+                ctx.fillText('BETTING', 150, yPos);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 56px Inter, Arial, sans-serif';
+                ctx.fillText(`$${data.stake.toFixed(0)} on ${data.pick}`, 150, yPos + 55);
+                
+                // ODDS
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                ctx.font = '600 32px Inter, Arial, sans-serif';
+                ctx.fillText('ODDS', 700, yPos);
                 ctx.fillStyle = '#a5f3fc';
-                ctx.fillText(`Current odds: ${data.odds}%`, 100, yPos);
+                ctx.font = 'bold 56px Inter, Arial, sans-serif';
+                ctx.fillText(`${Math.round(data.odds)}%`, 700, yPos + 55);
             } else if (type === 'market') {
-                // Show market type
-                const marketType = data.isNoLoss ? 'No-Loss Market' : 'Classic Market';
-                ctx.fillText(marketType, 100, yPos);
-                yPos += 60;
-                ctx.fillStyle = '#a5f3fc';
-                ctx.fillText(`Created by ${stripAt(data.creator)}`, 100, yPos);
+                // MARKET TYPE
+                const marketType = data.isNoLoss ? '🛡️ NO-LOSS' : '⚡ CLASSIC';
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 48px Inter, Arial, sans-serif';
+                ctx.fillText(marketType, 150, yPos + 35);
             }
             
-            // Footer
+            // FOOTER BADGE
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            roundRect(ctx, 420, 590, 360, 50, 25);
+            ctx.fill();
             ctx.fillStyle = '#ffffff';
-            ctx.font = '36px Inter, Arial, sans-serif';
-            ctx.fillText('predora-app.vercel.app', 100, 600);
+            ctx.font = 'bold 28px Inter, Arial, sans-serif';
+            ctx.fillText('🔮 predora-app.vercel.app', 450, 625);
             
             return canvas;
         };
+        
+        /**
+         * Helper to draw rounded rectangles
+         */
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
         
         /**
          * Wrap text to fit within width
@@ -7800,7 +7888,7 @@ ${historyText}`;
                 
                 // Try to get market data for current odds
                 if (stake.marketId) {
-                    const marketRef = doc(db, 'artifacts', APP_ID, 'public', 'data', MARKETS_COLLECTION, stake.marketId);
+                    const marketRef = doc(db, 'artifacts', APP_ID, 'public', 'data', STANDARD_MARKETS_COLLECTION, stake.marketId);
                     const marketSnap = await getDoc(marketRef);
                     if (marketSnap.exists()) {
                         const market = marketSnap.data();
