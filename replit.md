@@ -77,7 +77,9 @@ Preferred communication style: Simple, everyday language.
   - **Quick Polls** (Right): XP staking system where users stake minimum 10 XP per vote, winners split the total XP pot proportionally. Creates XP demand and practice ground for real markets, building XP economy for future airdrops. No real money risk.
 - **XP Economy**: Users earn XP from tasks (creating markets, voting, winning predictions), can stake it on polls, and build toward future airdrop. XP is both a reward and a stakeable asset.
 
-## Multi-Option Markets (Polymarket-Style) - Not Yet Implemented
+## Multi-Option Markets (Polymarket-Style) - In Development
+
+**Current Status**: Creation UI completed, display and resolution in progress.
 
 **Concept**: Instead of binary YES/NO predictions, users can choose from multiple price ranges or outcomes.
 

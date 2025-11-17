@@ -4137,8 +4137,20 @@
                     // Populate the UI
                     dom.detailTitle.innerText = currentMarket.title;
                     dom.detailInsight.innerText = currentMarket.insight;
-                    dom.detailYesPercent.innerText = `${currentMarket.yesPercent.toFixed(1)}%`; // Added rounding
-                    dom.detailNoPercent.innerText = `${currentMarket.noPercent.toFixed(1)}%`; // Added rounding
+                    
+                    // Check if multi-option market
+                    if (currentMarket.marketStructure === 'multi-option' && currentMarket.options) {
+                        // Hide binary odds, show multi-option display
+                        document.getElementById('binary-odds-display').classList.add('hidden');
+                        renderMultiOptionDisplay(currentMarket.options);
+                    } else {
+                        // Show binary odds, hide multi-option
+                        document.getElementById('binary-odds-display').classList.remove('hidden');
+                        document.getElementById('multi-option-display')?.classList.add('hidden');
+                        dom.detailYesPercent.innerText = `${currentMarket.yesPercent.toFixed(1)}%`;
+                        dom.detailNoPercent.innerText = `${currentMarket.noPercent.toFixed(1)}%`;
+                    }
+                    
                     dom.aiExplainPanel.classList.add('hidden'); 
                     dom.aiExplainPanel.innerHTML = ''; 
                     // Legacy yield panel (keeping for backward compat)
