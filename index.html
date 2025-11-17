@@ -6039,6 +6039,23 @@ ${historyText}`;
                             <div class="ui-panel p-4 border-l-4 border-yellow-500">
                                 <p class="text-white font-semibold mb-3">${market.title}</p>
                                 <p class="text-xs text-gray-400 mb-3">By: @${market.createdByDisplayName || 'N/A'}</p>
+                        `;
+                        
+                        // Multi-option markets: show button for each option
+                        if (market.marketStructure === 'multi-option' && market.options && market.options.length > 0) {
+                            html += '<div class="space-y-2">';
+                            market.options.forEach(opt => {
+                                const optionLabelEscaped = opt.label.replace(/'/g, "\\'");
+                                html += `
+                                    <button onclick="resolveMarket('${market.id}', '${opt.id}', '${optionLabelEscaped}')" class="btn bg-purple-600 hover:bg-purple-700 w-full text-sm">
+                                        Resolve: ${opt.label}
+                                    </button>
+                                `;
+                            });
+                            html += '</div>';
+                        } else {
+                            // Binary markets: YES/NO buttons
+                            html += `
                                 <div class="grid grid-cols-2 gap-3">
                                     <button onclick="resolveMarket('${market.id}', 'YES')" class="btn btn-stake-yes flex-1">
                                         Resolve YES
@@ -6047,10 +6064,10 @@ ${historyText}`;
                                         Resolve NO
                                     </button>
                                 </div>
-
-
-                            </div>
-                        `;
+                            `;
+                        }
+                        
+                        html += `</div>`;;
                     } else {
                         // --- B: Market is RESOLVED (Gray Bar) ---
                         const outcomeColor = market.winningOutcome === 'YES' ? 'text-green-400' : 'text-red-400';
@@ -6210,10 +6227,19 @@ ${historyText}`;
                 for (const pledgeDoc of snapshot.docs) {
                     const pledge = pledgeDoc.data();
                     const pledgeRef = pledgeDoc.ref;
+                    
+                    // Multi-option or binary check
                     const isWinner = pledge.pick === winningOutcome;
+                    
+                    // For multi-option markets, get the winning option's odds
+                    let winningOddsForPayout = winningOdds;
+                    if (market.marketStructure === 'multi-option' && market.options && isWinner) {
+                        const winningOption = market.options.find(opt => opt.id === winningOutcome);
+                        winningOddsForPayout = winningOption ? winningOption.odds : 100;
+                    }
 
                     // Calculate base payout based on the market's odds
-                    const payoutUsd = isWinner ? (pledge.amountUsd / (winningOdds / 100)) : 0;
+                    const payoutUsd = isWinner ? (pledge.amountUsd / (winningOddsForPayout / 100)) : 0;
 
                     // For No-Loss, losers get principal back. For Classic, they get 0.
                     const principalReturn = market.isNoLoss ? pledge.amountUsd : 0;
