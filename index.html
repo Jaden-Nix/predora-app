@@ -9052,7 +9052,6 @@ ${historyText}`;
                 await updateDoc(leaderboardRef, { xp: increment(-stakeXP) });
                 
                 userProfile.xp = (userProfile.xp || 0) - stakeXP;
-                updateProfileBadges();
                 
                 showToast(`${stakeXP} XP staked on ${vote}!`, 'success');
                 
