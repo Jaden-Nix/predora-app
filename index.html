@@ -4488,6 +4488,7 @@
                                 isWinner: null,
                                 payout: 0,
                                 createdAt: new Date().toISOString(),
+                                stakeTimestamp: serverTimestamp(),
                                 isQuickPlay: true 
                             });
 
@@ -4544,6 +4545,7 @@
                                 isWinner: null,
                                 payout: 0,
                                 createdAt: new Date().toISOString(),
+                                stakeTimestamp: serverTimestamp(),
                                 isQuickPlay: true
                             });
                         }
@@ -4739,6 +4741,7 @@
 
                     // 3. TRANSACTION WRITE 1: Create the new market
                     const newMarketRef = doc(marketCollectionRef); // Create ref for the new doc
+                    const protocolApy = yieldProtocolFinal === 'aave' ? 4.12 : (yieldProtocolFinal === 'compound' ? 3.88 : 0);
                     transaction.set(newMarketRef, {
                         title,
                         insight,
@@ -4760,7 +4763,15 @@
                         winningOutcome: null,
                         createdAt: serverTimestamp(),
                         createdBy: currentUserId,
-                        createdByDisplayName: userProfile.displayName
+                        createdByDisplayName: userProfile.displayName,
+                        // Yield system fields
+                        totalPrincipalUsd: isNoLossFinal ? liquidityAmountInUsd : 0,
+                        lastAccrualAt: serverTimestamp(),
+                        accruedYieldUsd: 0,
+                        protocolApy: protocolApy,
+                        disputes: [],
+                        resolutionSource: null,
+                        adminEvents: []
                     });
 
                     // 4. TRANSACTION WRITE 2: Deduct liquidity AND award XP
@@ -5485,19 +5496,56 @@ ${historyText}`;
                     ? (market.yesPercent || 60) 
                     : (market.noPercent || 40);
 
-
+                // --- YIELD SYSTEM LOGIC ---
+                // Calculate total accrued yield for this market (if no-loss)
+                let totalYieldUsd = 0;
+                let winningPledges = [];
+                let totalWinningStake = 0;
+                
+                if (market.isNoLoss && market.protocolApy && market.lastAccrualAt) {
+                    // Calculate yield from market creation to now
+                    totalYieldUsd = calculateYield(
+                        market.totalPrincipalUsd || market.totalStakeVolume || 0,
+                        market.protocolApy,
+                        market.lastAccrualAt,
+                        new Date()
+                    );
+                    
+                    // First pass: identify winners and calculate total winning stake
+                    for (const pledgeDoc of snapshot.docs) {
+                        const pledge = pledgeDoc.data();
+                        if (pledge.pick === winningOutcome) {
+                            winningPledges.push({ doc: pledgeDoc, data: pledge });
+                            totalWinningStake += pledge.amountUsd;
+                        }
+                    }
+                    
+                    // Edge case: No winners means yield goes to treasury (not distributed)
+                    if (winningPledges.length === 0) {
+                        console.log("YIELD: No winners - yield not distributed");
+                        totalYieldUsd = 0;
+                    }
+                }
 
                 for (const pledgeDoc of snapshot.docs) {
                     const pledge = pledgeDoc.data();
                     const pledgeRef = pledgeDoc.ref;
                     const isWinner = pledge.pick === winningOutcome;
 
-                    // Calculate payout based on the market's odds
+                    // Calculate base payout based on the market's odds
                     const payoutUsd = isWinner ? (pledge.amountUsd / (winningOdds / 100)) : 0;
 
                     // For No-Loss, losers get principal back. For Classic, they get 0.
                     const principalReturn = market.isNoLoss ? pledge.amountUsd : 0;
-                    const totalReturnUsd = isWinner ? payoutUsd : principalReturn;
+                    
+                    // Calculate proportional yield share for winners
+                    let yieldShare = 0;
+                    if (market.isNoLoss && isWinner && totalWinningStake > 0) {
+                        yieldShare = (pledge.amountUsd / totalWinningStake) * totalYieldUsd;
+                    }
+                    
+                    // Total return = base payout + yield share (for winners) or just principal (for losers in no-loss)
+                    const totalReturnUsd = isWinner ? (payoutUsd + yieldShare) : principalReturn;
 
                     // Convert USD payout back to the original asset
                     const payoutAmount = totalReturnUsd / getMockPrice(pledge.asset);
@@ -5567,6 +5615,33 @@ ${historyText}`;
         // =====================================================================
         // --- UTILITIES ---
         // =====================================================================
+
+        /**
+         * Calculates accrued yield for a market based on time and APY
+         * @param {number} principalUsd - Total principal staked
+         * @param {number} apyPercent - Annual percentage yield (e.g., 4.12)
+         * @param {Date|Timestamp} startTime - When staking began
+         * @param {Date|Timestamp} endTime - When to calculate yield until
+         * @returns {number} - Accrued yield in USD
+         */
+        function calculateYield(principalUsd, apyPercent, startTime, endTime) {
+            if (!principalUsd || !apyPercent || !startTime || !endTime) return 0;
+            
+            // Convert Firestore timestamps to Date objects if needed
+            const start = startTime.toDate ? startTime.toDate() : new Date(startTime);
+            const end = endTime.toDate ? endTime.toDate() : new Date(endTime);
+            
+            // Calculate time difference in days
+            const timeDiffMs = end - start;
+            const daysDiff = timeDiffMs / (1000 * 60 * 60 * 24);
+            
+            // Simple interest calculation: principal * APY * (days / 365)
+            // Cap APY at 50% to prevent exploits
+            const cappedApy = Math.min(apyPercent, 50);
+            const yieldUsd = principalUsd * (cappedApy / 100) * (daysDiff / 365);
+            
+            return Math.max(0, yieldUsd); // Never return negative yield
+        }
 
         /**
          * Generates random XP within a +/- 20% range of the base amount.
@@ -5691,17 +5766,86 @@ ${historyText}`;
         }
 
         /**
-         * Handles the (mock) dispute logic.
+         * Handles the LIVE dispute logic with real balance withdrawal.
          */
-        window.handleDispute = () => {
-            // This is the anti-collusion fix.
-            alert(
-                "Dispute Submitted (Mock)\n\n" +
-                "A jury of Top 10 users will now be summoned.\n\n" +
-                "To vote, jurors must stake 25 BUSD. Honest jurors are paid; dishonest jurors will have their stake slashed."
-            );
-            // In a real app, this would trigger a smart contract or backend process.
-            closeVerdictModal();
+        window.handleDispute = async () => {
+            if (!currentMarketId) {
+                showToast("No market selected", "error");
+                return;
+            }
+            
+            const { doc, getDoc, updateDoc, arrayUnion, increment, runTransaction } = window.firebase.firestore;
+            const DISPUTE_COST = 10; // 10 BUSD
+            
+            try {
+                showLoadingOverlay(true, "Processing dispute...");
+                
+                await runTransaction(db, async (transaction) => {
+                    // Get user profile
+                    const profileRef = doc(db, 'artifacts', APP_ID, 'public', 'data', USER_PROFILE_COLLECTION, currentUserId);
+                    const profileSnap = await transaction.get(profileRef);
+                    
+                    if (!profileSnap.exists()) {
+                        throw new Error("User profile not found");
+                    }
+                    
+                    const userBalance = profileSnap.data().balance || 0;
+                    
+                    // Validation: Check if user has enough balance
+                    if (userBalance < DISPUTE_COST) {
+                        throw new Error(`Insufficient balance. You need ${DISPUTE_COST} BUSD but only have ${userBalance.toFixed(2)} BUSD.`);
+                    }
+                    
+                    // Get market document
+                    const marketRef = doc(db, 'artifacts', APP_ID, 'public', 'data', STANDARD_MARKETS_COLLECTION, currentMarketId);
+                    const marketSnap = await transaction.get(marketRef);
+                    
+                    if (!marketSnap.exists()) {
+                        throw new Error("Market not found");
+                    }
+                    
+                    const marketData = marketSnap.data();
+                    
+                    // Validation: Market must be resolved
+                    if (!marketData.isResolved) {
+                        throw new Error("Cannot dispute an unresolved market");
+                    }
+                    
+                    // Validation: Check for duplicate disputes from same user
+                    const existingDisputes = marketData.disputes || [];
+                    if (existingDisputes.some(d => d.disputerId === currentUserId)) {
+                        throw new Error("You have already disputed this market");
+                    }
+                    
+                    // Deduct 10 BUSD from user balance
+                    transaction.update(profileRef, {
+                        balance: increment(-DISPUTE_COST)
+                    });
+                    
+                    // Add dispute to market
+                    transaction.update(marketRef, {
+                        disputes: arrayUnion({
+                            disputerId: currentUserId,
+                            disputerName: userProfile.displayName || 'Unknown',
+                            timestamp: new Date().toISOString(),
+                            escrowAmount: DISPUTE_COST,
+                            status: 'pending'
+                        })
+                    });
+                });
+                
+                showLoadingOverlay(false);
+                closeVerdictModal();
+                showToast(`Dispute submitted! 10 BUSD has been escrowed. A jury will review this market.`, "success");
+                
+                // Refresh user balance
+                await loadUserProfile();
+                
+            } catch (error) {
+                console.error("Dispute failed:", error);
+                showLoadingOverlay(false);
+                showToast(`Dispute failed: ${error.message}`, "error");
+            }
         }
         // ---- END OF NEW FUNCTIONS ----
 
@@ -5939,24 +6083,38 @@ ${historyText}`;
          */
         async function adminReOpenMarket(marketId) {
             // Use confirm() since it's in your file for the wipe button
-            if (!confirm("ARE YOU SURE?\n\nThis will re-open the market and reset all pledges. It will NOT refund any user payouts. This is for correcting an AI mistake.")) {
+            if (!confirm("⚠️ ADMIN: RE-OPEN MARKET\n\nThis will:\n1. Reset market to unresolved\n2. Reset all pledges\n3. Add audit trail\n\nNote: Does NOT refund payouts.\n\nContinue?")) {
                 return;
             }
 
             showLoadingOverlay(true, "Re-opening market...");
 
-            const { writeBatch, doc, collection, query, where, getDocs } = window.firebase.firestore;
+            const { writeBatch, doc, collection, query, where, getDocs, arrayUnion, getDoc } = window.firebase.firestore;
 
             try {
+                // Get current market data for audit
+                const marketRef = doc(db, 'artifacts', APP_ID, 'public', 'data', STANDARD_MARKETS_COLLECTION, marketId);
+                const marketSnap = await getDoc(marketRef);
+                
+                if (!marketSnap.exists()) {
+                    throw new Error("Market not found");
+                }
+                
+                const marketData = marketSnap.data();
                 const batch = writeBatch(db);
 
-                // 1. Reset the Market itself
-                const marketRef = doc(db, 'artifacts', APP_ID, 'public', 'data', STANDARD_MARKETS_COLLECTION, marketId);
+                // 1. Reset the Market with audit trail
                 batch.update(marketRef, {
                     isResolved: false,
                     winningOutcome: null,
-                    // We can also clear the resolution timestamp if it exists
-                    // resolutionTimestamp: null 
+                    adminEvents: arrayUnion({
+                        type: 'market_reopened',
+                        adminId: currentUserId,
+                        adminName: userProfile.displayName || 'Admin',
+                        timestamp: new Date().toISOString(),
+                        previousOutcome: marketData.winningOutcome || null,
+                        reason: 'Admin reopened for re-resolution'
+                    })
                 });
 
                 // 2. Find and reset all pledges for this market
@@ -5980,7 +6138,7 @@ ${historyText}`;
                 await batch.commit();
 
                 showLoadingOverlay(false);
-                showToast("Market has been re-opened.");
+                showToast("✅ Market reopened! You can now re-resolve it.", "success");
 
                 // 4. Refresh the admin panel to show the changes
                 renderResolutionPanel();
@@ -5988,7 +6146,7 @@ ${historyText}`;
             } catch (error) {
                 console.error("Failed to re-open market:", error);
                 showLoadingOverlay(false);
-                showToast(`Failed to re-open: ${error.message}`);
+                showToast(`Failed to re-open: ${error.message}`, "error");
             }
         }
 
