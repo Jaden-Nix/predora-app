@@ -91,6 +91,25 @@
         body.light-mode #bottom-nav {
             box-shadow: 0 -6px 30px var(--shadow-ambient), 0 12px 40px var(--shadow-drop);
         }
+        
+        /* Theme-aware text classes */
+        .theme-text-primary {
+            color: #ffffff;
+        }
+        
+        .theme-text-secondary {
+            color: #9CA3AF;
+        }
+        
+        :root.light-mode .theme-text-primary,
+        body.light-mode .theme-text-primary {
+            color: #111827;
+        }
+        
+        :root.light-mode .theme-text-secondary,
+        body.light-mode .theme-text-secondary {
+            color: #6B7280;
+        }
 
         /* ---  UI PANEL  --- */
             .ui-panel {
@@ -1321,238 +1340,215 @@
                 </div>
             </div>
 
-            <div id="create-market-screen" class="screen screen-inactive space-y-6">
-                <h1 class="text-2xl lg:text-3xl font-bold gradient-text">Create Standard Market</h1>
+            <div id="create-market-screen" class="screen screen-inactive space-y-4 lg:space-y-5">
+                <h1 class="text-2xl lg:text-3xl font-bold gradient-text">Create Market</h1>
 
-                <div class="lg:grid lg:grid-cols-3 lg:gap-6 space-y-6 lg:space-y-0">
-                    <div class="lg:col-span-2 space-y-6">
+                <div class="lg:grid lg:grid-cols-3 lg:gap-6 space-y-5 lg:space-y-0">
+                    <div class="lg:col-span-2 space-y-5">
 
-                <div class="ui-panel p-4 space-y-3">
-                    <h3 class="text-base font-semibold text-sky-300">AI Assistant (LIVE)</h3>
-                    <p class="text-sm text-gray-400">Stuck? Get AI suggestions for your market.</p>
-                    <textarea id="ai-helper-prompt" rows="2" class="ui-input" placeholder="e.g., 'Grammys' or 'Russia' or 'SOL'"></textarea>
-                    <button id="ai-generate-btn" class="btn btn-secondary w-full">
-                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                        Get AI Suggestions
+                <!-- AI Assistant - Collapsible -->
+                <div class="border rounded-lg overflow-hidden transition-all duration-200" style="border-color: rgba(56, 189, 248, 0.3);">
+                    <button onclick="toggleAiAssistant()" class="w-full p-3 flex items-center justify-between hover:bg-white/5 transition-colors">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-sky-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                            <span class="text-sm font-medium theme-text-primary">AI Assistant</span>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-green-500/20 text-green-400">LIVE</span>
+                        </div>
+                        <svg id="ai-chevron" class="w-5 h-5 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
-                    <div id="ai-spinner" class="hidden flex justify-center items-center py-4">
-                        <div class="spinner w-6 h-6 border-2 border-transparent rounded-full"></div>
-                        <span class="ml-3 text-gray-300">Generating market details...</span>
+                    <div id="ai-assistant-content" class="hidden px-3 pb-3 space-y-3">
+                        <p class="text-xs theme-text-secondary">Need help? AI will auto-fill the entire form for you</p>
+                        <textarea id="ai-helper-prompt" rows="2" class="ui-input text-sm" placeholder="e.g., 'Grammys' or 'Bitcoin price' or 'Trump speech'"></textarea>
+                        <button id="ai-generate-btn" class="btn btn-secondary w-full text-sm py-2">
+                            ✨ Generate Market
+                        </button>
+                        <div id="ai-spinner" class="hidden flex justify-center items-center py-3">
+                            <div class="spinner w-5 h-5 border-2 border-transparent rounded-full"></div>
+                            <span class="ml-2 text-sm theme-text-secondary">Generating...</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="space-y-4">
-                    <h3 class="text-base font-semibold text-gray-200">Market Details (Manual Entry)</h3>
+                <!-- Market Details -->
+                <div class="ui-panel p-4 space-y-4">
+                    <h3 class="text-sm font-semibold theme-text-primary">Basic Details</h3>
                     
-                    <div class="space-y-2">
-                        <label for="market-category-select" class="text-sm font-medium text-gray-300">Category</label>
-                        <select id="market-category-select" class="ui-input">
-                            <option value="">Select a category...</option>
-                            <optgroup label="Popular">
-                                <option value="Crypto">Crypto</option>
-                                <option value="Sports">Sports</option>
-                                <option value="Politics">Politics</option>
-                                <option value="Entertainment">Entertainment</option>
-                                <option value="Finance">Finance</option>
-                                <option value="Tech">Tech</option>
-                            </optgroup>
-                            <optgroup label="Creator & Social">
-                                <option value="Micro-Influencer">Micro-Influencer Predictions</option>
-                                <option value="Creator Milestones">Creator Personal Milestones</option>
-                                <option value="Gossip">Gossip Predictions</option>
-                            </optgroup>
-                            <optgroup label="Local & Campus">
-                                <option value="Campus">Campus Predictions</option>
-                                <option value="Local Sports">Local Football Predictions</option>
-                            </optgroup>
-                            <optgroup label="Gaming">
-                                <option value="Gaming">Gaming/E-sports Round Predictions</option>
-                            </optgroup>
-                            <option value="Other">Other</option>
-                        </select>
+                    <div class="space-y-1.5">
+                        <label for="market-title-input" class="text-xs font-medium theme-text-secondary">Market Question</label>
+                        <textarea id="market-title-input" rows="2" class="ui-input text-sm" placeholder="e.g., Will ETH reach $5,000 by EOY?"></textarea>
                     </div>
                     
-                    <div class="space-y-2">
-                        <label for="market-title-input" class="text-sm font-medium text-gray-300">Title</label>
-                        <textarea id="market-title-input" rows="3" class="ui-input" placeholder="e.g., Will ETH reach $5,000 by EOY?"></textarea>
-                    </div>
-                    <div class="space-y-2">
-                        <label for="market-insight-input" class="text-sm font-medium text-gray-300">Insight / Summary</label>
-                        <textarea id="market-insight-input" rows="4" class="ui-input" placeholder="A brief context or analysis of the event."></textarea>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1.5">
+                            <label for="market-category-select" class="text-xs font-medium theme-text-secondary">Category</label>
+                            <select id="market-category-select" class="ui-input text-sm">
+                                <option value="">Select...</option>
+                                <optgroup label="Popular">
+                                    <option value="Crypto">Crypto</option>
+                                    <option value="Sports">Sports</option>
+                                    <option value="Politics">Politics</option>
+                                    <option value="Finance">Finance</option>
+                                    <option value="Tech">Tech</option>
+                                </optgroup>
+                                <optgroup label="GenZ">
+                                    <option value="Micro-Influencer">Influencers</option>
+                                    <option value="Creator Milestones">Creators</option>
+                                    <option value="Gossip">Gossip</option>
+                                    <option value="Campus">Campus</option>
+                                    <option value="Gaming">Gaming</option>
+                                </optgroup>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label for="market-resolution-date" class="text-xs font-medium theme-text-secondary">Resolution Date</label>
+                            <input type="date" id="market-resolution-date" class="ui-input text-sm" style="color-scheme: dark;">
+                        </div>
                     </div>
                     
-                    <!-- Event Image Section -->
-                    <div class="space-y-3">
-                        <label class="text-sm font-medium text-gray-300">Event Image (Optional)</label>
-                        <div class="ui-panel p-4 space-y-3">
-                            <!-- Image Preview -->
+                    <div class="space-y-1.5">
+                        <label for="market-insight-input" class="text-xs font-medium theme-text-secondary">Context (Optional)</label>
+                        <textarea id="market-insight-input" rows="2" class="ui-input text-sm" placeholder="Brief background or analysis"></textarea>
+                    </div>
+                    
+                    <!-- Event Image - Collapsible -->
+                    <details class="group">
+                        <summary class="cursor-pointer text-xs font-medium theme-text-secondary hover:text-sky-400 transition-colors flex items-center gap-1">
+                            <svg class="w-4 h-4 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            Add Event Image
+                        </summary>
+                        <div class="mt-3 space-y-2">
                             <div id="market-image-preview" class="hidden">
-                                <img id="market-image-preview-img" src="" class="w-full h-48 object-cover rounded-lg mb-3">
-                                <button onclick="clearMarketImage()" class="text-xs text-red-400 hover:text-red-300">Remove Image</button>
+                                <img id="market-image-preview-img" src="" class="w-full h-32 object-cover rounded-lg mb-2">
+                                <button onclick="clearMarketImage()" class="text-xs text-red-400 hover:text-red-300">Remove</button>
                             </div>
-                            
-                            <!-- Upload & Generate Buttons -->
-                            <div class="grid grid-cols-2 gap-3">
-                                <label for="market-image-upload" class="btn btn-secondary cursor-pointer text-center flex items-center justify-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                    Upload Image
+                            <div class="grid grid-cols-2 gap-2">
+                                <label for="market-image-upload" class="btn btn-secondary cursor-pointer text-center text-xs py-2">
+                                    📸 Upload
                                 </label>
                                 <input type="file" id="market-image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
-                                
-                                <button id="ai-generate-image-btn" onclick="generateMarketImage()" class="btn bg-purple-600 hover:bg-purple-700 flex items-center justify-center gap-2">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                                    AI Generate
+                                <button id="ai-generate-image-btn" onclick="generateMarketImage()" class="btn bg-purple-600 hover:bg-purple-700 text-xs py-2">
+                                    ✨ AI Generate
                                 </button>
                             </div>
-                            <p class="text-xs text-gray-400 text-center">Add a visual to make your market stand out</p>
                         </div>
-                        <input type="hidden" id="market-image-url" value="">
-                    </div>
+                    </details>
+                    <input type="hidden" id="market-image-url" value="">
                 </div>
 
-                <div id="binary-odds-section" class="space-y-4">
-                    <h3 class="text-base font-semibold text-gray-200">Initial Odds</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                            <label for="market-yes-input" class="text-sm font-medium text-gray-300">YES %</label>
-                            <input type="number" id="market-yes-input" class="ui-input" placeholder="e.g., 60" min="1" max="99">
-                        </div>
-                        <div class="space-y-2">
-                            <label for="market-no-input" class="text-sm font-medium text-gray-300">NO %</label>
-                            <input type="number" id="market-no-input" class="ui-input" placeholder="e.g., 40" min="1" max="99">
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="multi-option-section" class="space-y-4 hidden">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-base font-semibold text-gray-200">Options (3-6 choices)</h3>
-                        <button type="button" onclick="addMultiOption()" class="text-xs text-sky-400 hover:text-sky-300 font-medium flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
-                            Add Option
-                        </button>
-                    </div>
-                    <div id="multi-options-container" class="space-y-2">
-                    </div>
-                    <p class="text-xs text-gray-400">All odds must add up to 100%. Only ONE option will win when the market resolves.</p>
-                </div>
-
-                    <div class="space-y-4">
-                        <h3 class="text-base font-semibold text-gray-200">Market Structure</h3>
+                <!-- Market Structure & Type -->
+                <div class="ui-panel p-4 space-y-4">
+                    <h3 class="text-sm font-semibold theme-text-primary">Market Configuration</h3>
+                    
+                    <div class="space-y-3">
+                        <label class="text-xs font-medium theme-text-secondary">Market Structure</label>
                         <input type="hidden" id="market-structure-input" value="binary">
-                        
-                        <div class="grid grid-cols-2 gap-3 mb-3">
-                            <button id="btn-structure-binary" onclick="selectMarketStructure('binary')" class="btn btn-stake-yes">
-                                Binary (YES/NO)
-                                <span class="block text-xs font-light">(Standard)</span>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button id="btn-structure-binary" onclick="selectMarketStructure('binary')" class="btn btn-stake-yes text-sm py-2.5">
+                                YES/NO
                             </button>
-
-                            <button id="btn-structure-multi" onclick="selectMarketStructure('multi-option')" class="btn btn-secondary">
+                            <button id="btn-structure-multi" onclick="selectMarketStructure('multi-option')" class="btn btn-secondary text-sm py-2.5">
                                 Multi-Option
-                                <span class="block text-xs font-light">(3-6 choices)</span>
-                            </button>
-                        </div>
-                        
-                        <h3 class="text-base font-semibold text-gray-200">Market Type</h3>
-                        <input type="hidden" id="market-type-input" value="fixed-pot"> 
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <button id="btn-market-fixed-pot" onclick="selectMarketType('fixed-pot')" class="btn btn-stake-yes">
-                                Fixed Pot Yield
-                                <span class="block text-xs font-light">(Principal Safe)</span>
-                            </button>
-
-                            <button id="btn-market-traditional" onclick="selectMarketType('traditional')" class="btn btn-secondary">
-                                Traditional AMM
-                                <span class="block text-xs font-light">(Liquidity Pool)</span>
                             </button>
                         </div>
                     </div>
-
-
-                <div class="space-y-4">
-                    <h3 class="text-base font-semibold text-gray-200">Initial Liquidity</h3>
-                    <div id="liquidity-info-panel" class="ui-panel p-4 space-y-4">
-                        <div id="traditional-liquidity-info">
-                            <p class="text-sm text-yellow-400 font-medium mb-2">
-                                ⚠️ Traditional markets require initial liquidity
-                            </p>
-                            <p class="text-sm text-gray-400">
-                                You must provide liquidity to seed the AMM pool. This creates the starting odds and enables trading.
-                            </p>
+                    
+                    <div class="space-y-3">
+                        <label class="text-xs font-medium theme-text-secondary">Market Type</label>
+                        <input type="hidden" id="market-type-input" value="fixed-pot">
+                        <div class="grid grid-cols-2 gap-2">
+                            <button id="btn-market-fixed-pot" onclick="selectMarketType('fixed-pot')" class="btn btn-stake-yes text-sm py-2.5">
+                                Fixed Pot
+                            </button>
+                            <button id="btn-market-traditional" onclick="selectMarketType('traditional')" class="btn btn-secondary text-sm py-2.5">
+                                Traditional
+                            </button>
                         </div>
-                        
-                        <div id="fixed-pot-liquidity-info" class="hidden">
-                            <p class="text-sm text-green-400 font-medium mb-2">
-                                ✓ Fixed Pot Yield markets use DeFi protocols
-                            </p>
-                            <p class="text-sm text-gray-400">
-                                All stakes go into a yield vault. Principal is returned to everyone. Only the yield is distributed to winners.
-                            </p>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-2">
-                            <div class="col-span-2 space-y-1">
-                                <label for="market-liquidity-input" class="text-xs font-medium text-gray-300">Amount</label>
-                                <input type="number" id="market-liquidity-input" class="ui-input" placeholder="100.00">
+                        <p class="text-xs theme-text-secondary">Fixed Pot = principal safe, Traditional = liquidity pool</p>
+                    </div>
+                    
+                    <!-- Binary Odds -->
+                    <div id="binary-odds-section" class="space-y-2">
+                        <label class="text-xs font-medium theme-text-secondary">Initial Odds</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <input type="number" id="market-yes-input" class="ui-input text-sm" placeholder="YES %" min="1" max="99">
                             </div>
-                            <div class="col-span-1 space-y-1">
-                                <label for="market-liquidity-asset" class="text-xs font-medium text-gray-300">Asset</label>
-                                <select id="market-liquidity-asset" class="ui-select">
+                            <div>
+                                <input type="number" id="market-no-input" class="ui-input text-sm" placeholder="NO %" min="1" max="99">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Multi-Option -->
+                    <div id="multi-option-section" class="space-y-2 hidden">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-medium theme-text-secondary">Options (3-6)</label>
+                            <button type="button" onclick="addMultiOption()" class="text-xs text-sky-400 hover:text-sky-300 font-medium">
+                                + Add
+                            </button>
+                        </div>
+                        <div id="multi-options-container" class="space-y-1.5">
+                        </div>
+                        <p class="text-xs theme-text-secondary">Must total 100%. Only ONE wins.</p>
+                    </div>
+                </div>
+
+                <!-- Advanced Options - Collapsible -->
+                <details class="group">
+                    <summary class="cursor-pointer px-4 py-3 rounded-lg border transition-all hover:bg-white/5" style="border-color: rgba(156, 163, 175, 0.3);">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium theme-text-primary">Advanced Options</span>
+                            <svg class="w-5 h-5 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </summary>
+                    
+                    <div class="mt-3 ui-panel p-4 space-y-4">
+                        <!-- Initial Liquidity -->
+                        <div class="space-y-2">
+                            <label class="text-xs font-medium theme-text-secondary">Initial Liquidity</label>
+                            <div id="traditional-liquidity-info" class="text-xs theme-text-secondary mb-2">
+                                ⚠️ Traditional markets need liquidity to seed the pool
+                            </div>
+                            <div id="fixed-pot-liquidity-info" class="hidden text-xs theme-text-secondary mb-2">
+                                ✓ Fixed Pot uses DeFi yield vaults
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div class="col-span-2">
+                                    <input type="number" id="market-liquidity-input" class="ui-input text-sm" placeholder="Amount">
+                                </div>
+                                <div class="col-span-1">
+                                    <select id="market-liquidity-asset" class="ui-select text-sm">
                                     </select>
+                                </div>
                             </div>
+                            <p class="text-xs text-green-400">💰 100% refund at $100 volume from 10+ stakers</p>
                         </div>
-                        <div class="text-center p-3 mt-2 rounded-lg bg-green-500/10 border border-green-400">
-                            <p class="font-semibold text-green-300">
-                                Get a 100% Refund!
-                            </p>
-                            <p class="text-xs text-gray-300">
-                                Your initial liquidity is refunded if your market hits
-                                <span class="font-bold">$100 in Stake Volume</span> from at least
-                                <span class="font-bold">10 different stakers.</span>
-                            </p>
+                        
+                        <!-- Yield Protocol (Fixed Pot only) -->
+                        <div id="fixed-pot-options" class="space-y-2">
+                            <label for="yield-protocol-select" class="text-xs font-medium theme-text-secondary">Yield Protocol</label>
+                            <select id="yield-protocol-select" class="ui-input text-sm" onchange="updateYieldSelection()">
+                                <option value="aave">Aave (4.12% APY)</option>
+                                <option value="compound">Compound (3.88% APY)</option>
+                                <option value="lido">Lido (3.2% APY)</option>
+                                <option value="yearn">Yearn Finance (5.8% APY)</option>
+                                <option value="curve">Curve (2.9% APY)</option>
+                                <option value="convex">Convex (4.5% APY)</option>
+                            </select>
+                            <input type="hidden" id="selected-yield-protocol" value="aave">
+                        </div>
+                        
+                        <!-- Staking Deadline (Fixed Pot only) -->
+                        <div id="staking-deadline-section" class="space-y-2">
+                            <label for="staking-deadline-input" class="text-xs font-medium theme-text-secondary">Staking Deadline (Fixed Pot)</label>
+                            <input type="date" id="staking-deadline-input" class="ui-input text-sm" style="color-scheme: dark;">
+                            <p class="text-xs theme-text-secondary">Market locks after this. Set 1-7 days before resolution.</p>
                         </div>
                     </div>
-                </div>
+                </details>
 
-                <div id="fixed-pot-options" class="space-y-4">
-                    <h3 class="text-base font-semibold text-gray-200">Yield Protocol</h3>
-                    <select id="yield-protocol-select" class="ui-input" onchange="updateYieldSelection()">
-                        <option value="aave">Aave (4.12% APY)</option>
-                        <option value="compound">Compound (3.88% APY)</option>
-                        <option value="lido">Lido (3.2% APY)</option>
-                        <option value="yearn">Yearn Finance (5.8% APY)</option>
-                        <option value="curve">Curve (2.9% APY)</option>
-                        <option value="convex">Convex (4.5% APY)</option>
-                    </select>
-                    <input type="hidden" id="selected-yield-protocol" value="aave">
-                </div>
-
-                <div id="market-timing-section" class="form-section space-y-4">
-                    <h3 class="text-base font-semibold text-gray-200">Market Timing</h3>
-                    
-                    <div id="staking-deadline-section" class="space-y-2">
-                        <div class="flex items-center justify-between">
-                            <label for="staking-deadline-input" class="text-sm font-medium text-gray-300">Staking Deadline</label>
-                            <span class="text-xs text-gray-400">Market locks after this</span>
-                        </div>
-                        <input type="date" id="staking-deadline-input" class="ui-input" style="color-scheme: dark;">
-                        <p class="text-xs text-gray-400">Users can only stake until this deadline. Set 1-7 days before resolution.</p>
-                    </div>
-                    
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between">
-                            <label for="market-resolution-date" class="text-sm font-medium text-gray-300">Resolution Date</label>
-                            <button type="button" onclick="suggestResolutionDate()" class="text-xs text-sky-400 hover:text-sky-300 font-medium flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                                AI Suggest
-                            </button>
-                        </div>
-                        <input type="date" id="market-resolution-date" class="ui-input" style="color-scheme: dark;">
-                    </div>
-                </div>
-
-                <button id="create-market-btn" class="btn btn-primary lg:text-lg">Create Market</button>
+                <button id="create-market-btn" class="btn btn-primary text-sm lg:text-base py-3">Create Market</button>
                     </div>
 
                     <div class="lg:col-span-1">
@@ -2645,6 +2641,14 @@
         // Initialize theme on load
         window.toggleTheme = toggleTheme;
         window.toggleThemeWithFlip = toggleThemeWithFlip;
+        
+        // Toggle AI Assistant collapsible
+        window.toggleAiAssistant = () => {
+            const content = document.getElementById('ai-assistant-content');
+            const chevron = document.getElementById('ai-chevron');
+            content.classList.toggle('hidden');
+            chevron.classList.toggle('rotate-180');
+        };
 
         // --- INITIALIZATION ---
         document.addEventListener("DOMContentLoaded", () => {

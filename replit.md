@@ -15,13 +15,14 @@ Preferred communication style: Simple, everyday language.
 **Technology Stack**: Pure HTML/CSS/JavaScript, Tailwind CSS (CDN), Chart.js, Google Fonts (Inter).
 
 **Design Decisions**:
-- **Dual-theme system**: Comprehensive dark and light modes ("Luminous & Airy") with theme persistence via localStorage and smooth transitions.
+- **Dual-theme system**: Comprehensive dark and light modes ("Luminous & Airy") with theme persistence via localStorage and smooth transitions. Theme-aware text classes (`.theme-text-primary`, `.theme-text-secondary`) ensure optimal readability in both modes.
 - **Responsive Design**: Mobile-first approach.
 - **Modern UI**: CDN-based dependencies, glow-pulse animations, GenZ-friendly design.
 - **Enhanced Navigation**:
   - Desktop: Always-visible top nav with glassmorphism (backdrop blur, gradient background, glowing sky-blue border), improved spacing and pill-style buttons.
   - Mobile: Minimalist centered header with just the "Predora" logo, gradient background with blur effects, and subtle glow accents. Clean, distraction-free design.
 - **Toast Notifications**: Redesigned, animated toast notification system with four types (Success, Error, Warning, Info), glassmorphism effects, auto-dismissal, and stacking support.
+- **Create Market Screen Redesign (November 2025)**: Completely redesigned for less clutter and better UX. Features collapsible AI Assistant, consolidated market configuration panel, compact form fields, collapsible advanced options, and theme-aware labels. Optimized for both dark and light modes with improved spacing and visual hierarchy.
 
 ### Backend Architecture
 
