@@ -837,7 +837,23 @@
             border-bottom: 1px solid rgba(3, 105, 161, 0.2);
         }
 
-        /* Mobile header visibility handled by Tailwind md:hidden class */
+        /* --- Enhanced Mobile Header --- */
+        #mobile-header {
+            position: relative;
+        }
+        
+        #mobile-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.05), transparent);
+            pointer-events: none;
+        }
+        
+        /* Mobile app title hover glow */
+        #mobile-app-title:active {
+            transform: scale(0.97);
+        }
 
         /* --- Profile Page Tabs --- */
         .profile-tab {
@@ -1113,26 +1129,14 @@
 </head>
 <body class="text-gray-100">
     <!-- Mobile Header (visible on mobile only) -->
-    <header id="mobile-header" class="sticky top-0 z-50 bg-[#0D1117] dark:bg-[#0D1117] light:bg-white border-b border-[#30363D] dark:border-[#30363D] light:border-gray-200 px-4 py-3 md:hidden">
-        <div class="flex items-center justify-between">
-            <h1 id="mobile-app-title" class="text-xl font-extrabold gradient-text tracking-tight cursor-pointer">Predora</h1>
-            <div class="flex items-center space-x-2">
-                <!-- Notification Bell Mobile -->
-                <button onclick="toggleNotifications()" class="relative w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-sky-400 transition-all">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                    </svg>
-                    <span id="notification-badge-mobile-header" class="hidden absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-xs font-bold rounded-full flex items-center justify-center">0</span>
-                </button>
-                <!-- Theme Toggle Mobile -->
-                <button onclick="toggleTheme()" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-sky-400 transition-all">
-                    <svg id="mobile-theme-icon-sun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                    </svg>
-                    <svg id="mobile-theme-icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-                    </svg>
-                </button>
+    <header id="mobile-header" class="sticky top-0 z-50 md:hidden backdrop-blur-xl bg-gradient-to-r from-[#0D1117]/95 to-[#161B22]/95 dark:from-[#0D1117]/95 dark:to-[#161B22]/95 light:from-white/98 light:to-gray-50/98 border-b border-[#30363D]/30 dark:border-[#30363D]/30 light:border-gray-200/50 shadow-lg shadow-black/5">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-center relative">
+                <!-- Centered Logo with Glow Effect -->
+                <h1 id="mobile-app-title" class="text-2xl font-black gradient-text tracking-tight cursor-pointer transition-transform duration-200 active:scale-95 relative">
+                    Predora
+                    <div class="absolute -inset-2 bg-gradient-to-r from-sky-400/20 to-indigo-400/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                </h1>
             </div>
         </div>
     </header>
@@ -2230,8 +2234,6 @@
             const body = document.body;
             const sunIcon = document.getElementById('theme-icon-sun');
             const moonIcon = document.getElementById('theme-icon-moon');
-            const mobileSunIcon = document.getElementById('mobile-theme-icon-sun');
-            const mobileMoonIcon = document.getElementById('mobile-theme-icon-moon');
             const profileSunIcon = document.getElementById('profile-theme-icon-sun');
             const profileMoonIcon = document.getElementById('profile-theme-icon-moon');
             
@@ -2247,17 +2249,6 @@
                 } else {
                     sunIcon.classList.add('hidden');
                     moonIcon.classList.remove('hidden');
-                }
-            }
-            
-            // Toggle mobile header icons
-            if (mobileSunIcon && mobileMoonIcon) {
-                if (isLightMode) {
-                    mobileSunIcon.classList.remove('hidden');
-                    mobileMoonIcon.classList.add('hidden');
-                } else {
-                    mobileSunIcon.classList.add('hidden');
-                    mobileMoonIcon.classList.remove('hidden');
                 }
             }
             
@@ -2919,7 +2910,6 @@
         function updateNotificationBadge(count) {
             const badge = document.getElementById('notification-badge');
             const badgeProfile = document.getElementById('notification-badge-profile');
-            const badgeMobileHeader = document.getElementById('notification-badge-mobile-header');
             
             if (count > 0) {
                 const displayCount = count > 99 ? '99+' : count;
@@ -2931,14 +2921,9 @@
                     badgeProfile.textContent = displayCount;
                     badgeProfile.classList.remove('hidden');
                 }
-                if (badgeMobileHeader) {
-                    badgeMobileHeader.textContent = displayCount;
-                    badgeMobileHeader.classList.remove('hidden');
-                }
             } else {
                 if (badge) badge.classList.add('hidden');
                 if (badgeProfile) badgeProfile.classList.add('hidden');
-                if (badgeMobileHeader) badgeMobileHeader.classList.add('hidden');
             }
         }
         

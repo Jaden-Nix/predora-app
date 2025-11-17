@@ -17,7 +17,10 @@ Preferred communication style: Simple, everyday language.
 **Design Decisions**:
 - **Dual-theme system**: Comprehensive dark and light modes ("Luminous & Airy") with theme persistence via localStorage and smooth transitions.
 - **Responsive Design**: Mobile-first approach.
-- **Modern UI**: CDN-based dependencies, glow-pulse animations, GenZ-friendly top navigation bar (desktop) and bottom navigation bar (mobile) with pill-style buttons and smooth transitions.
+- **Modern UI**: CDN-based dependencies, glow-pulse animations, GenZ-friendly design.
+- **Enhanced Navigation**:
+  - Desktop: Always-visible top nav with glassmorphism (backdrop blur, gradient background, glowing sky-blue border), improved spacing and pill-style buttons.
+  - Mobile: Minimalist centered header with just the "Predora" logo, gradient background with blur effects, and subtle glow accents. Clean, distraction-free design.
 - **Toast Notifications**: Redesigned, animated toast notification system with four types (Success, Error, Warning, Info), glassmorphism effects, auto-dismissal, and stacking support.
 
 ### Backend Architecture
@@ -55,7 +58,8 @@ Preferred communication style: Simple, everyday language.
 - **Live Ticker Chat Improvements**: Enhanced readability for text in both themes, timestamp display, and improved visual hierarchy.
 - **Reply Threading System**: Full reply functionality for chat using Firestore subcollections, with visual feedback, nested display, and `getTimeAgo()` utility.
 - **Expanded Market Categories**: Six new GenZ/niche categories added (Creator & Social, Local & Campus, Gaming) with organized dropdowns and integrated filtering.
-- **Notification System**: Comprehensive infrastructure with UI components (bell icon, Alerts tab in profile), multiple notification types (`market_resolved`, `market_disputed`, `new_follower`, `comment_reply`), real-time updates via Firestore, and "Mark all read" functionality.
+- **Notification System**: Comprehensive infrastructure with UI components (bell icon in desktop nav and bottom nav, Alerts tab in profile), multiple notification types (`market_resolved`, `market_disputed`, `new_follower`, `comment_reply`), real-time updates via Firestore, and "Mark all read" functionality.
+- **Admin Panel Access**: Hidden 5-tap gesture on both desktop and mobile "Predora" titles to access admin features (secure, non-obvious entry point).
 
 ## External Dependencies
 
