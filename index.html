@@ -2687,18 +2687,18 @@
          * Mark all notifications as read
          */
         window.markAllNotificationsRead = async () => {
-            if (!currentUser) return;
+            if (!auth.currentUser) return;
             
             const { collection, query, where, getDocs, updateDoc, doc } = window.firebase.firestore;
             const db = window.firebase.db;
             
             try {
-                const notificationsRef = collection(db, 'users', currentUser.uid, 'notifications');
+                const notificationsRef = collection(db, 'users', auth.currentUser.uid, 'notifications');
                 const unreadQuery = query(notificationsRef, where('read', '==', false));
                 const snapshot = await getDocs(unreadQuery);
                 
                 const updatePromises = snapshot.docs.map(docSnap => 
-                    updateDoc(doc(db, 'users', currentUser.uid, 'notifications', docSnap.id), { read: true })
+                    updateDoc(doc(db, 'users', auth.currentUser.uid, 'notifications', docSnap.id), { read: true })
                 );
                 
                 await Promise.all(updatePromises);
@@ -2724,13 +2724,13 @@
          * Load notifications from Firestore
          */
         async function loadNotifications() {
-            if (!currentUser) return;
+            if (!auth.currentUser) return;
             
             const { collection, query, orderBy, limit, getDocs, where } = window.firebase.firestore;
             const db = window.firebase.db;
             
             try {
-                let notificationsRef = collection(db, 'users', currentUser.uid, 'notifications');
+                let notificationsRef = collection(db, 'users', auth.currentUser.uid, 'notifications');
                 let q = query(notificationsRef, orderBy('timestamp', 'desc'), limit(50));
                 
                 // Apply filter
@@ -2825,11 +2825,11 @@
             
             // Mark as read when clicked
             div.onclick = async () => {
-                if (!notification.read) {
+                if (!notification.read && auth.currentUser) {
                     const { doc, updateDoc } = window.firebase.firestore;
                     const db = window.firebase.db;
                     try {
-                        await updateDoc(doc(db, 'users', currentUser.uid, 'notifications', notification.id), { read: true });
+                        await updateDoc(doc(db, 'users', auth.currentUser.uid, 'notifications', notification.id), { read: true });
                         loadNotifications();
                     } catch (error) {
                         console.error('Error marking notification as read:', error);
@@ -2876,12 +2876,12 @@
          * Listen for new notifications in realtime
          */
         function setupNotificationListener() {
-            if (!currentUser) return;
+            if (!auth.currentUser) return;
             
             const { collection, query, onSnapshot, orderBy } = window.firebase.firestore;
             const db = window.firebase.db;
             
-            const notificationsRef = collection(db, 'users', currentUser.uid, 'notifications');
+            const notificationsRef = collection(db, 'users', auth.currentUser.uid, 'notifications');
             const allQuery = query(notificationsRef, orderBy('timestamp', 'desc'));
             
             onSnapshot(allQuery, (snapshot) => {
