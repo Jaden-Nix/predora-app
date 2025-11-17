@@ -2,7 +2,7 @@
 
 ## Overview
 
-Predora is a web application designed to integrate AI capabilities using Google's Gemini API. It features a dark-themed UI (with a comprehensive light mode) built with Tailwind CSS and Chart.js for data visualization. The application's backend, powered by Node.js/Express, securely handles API communications and leverages Firebase for data persistence and authentication. Predora aims to provide a modern, engaging user experience with features like market predictions, social interactions, and a robust notification system, targeting GenZ users with its contemporary design choices.
+Predora is a GenZ-friendly prediction market platform featuring dual market types (Fixed Pot Yield with principal protection + Traditional AMM), comprehensive gamification (prediction streaks, time machine, social sentiment), AI-powered market creation, and real-time dispute resolution. Built with Node.js/Express backend, Firebase/Firestore for data persistence, Google Gemini API for AI capabilities, and modern frontend using Tailwind CSS and Chart.js. Includes admin controls, notification system, follower networking, and Quick Polls for casual engagement.
 
 ## User Preferences
 
@@ -69,6 +69,10 @@ Preferred communication style: Simple, everyday language.
 - **Light Mode UI Improvements**: Enhanced text readability in light mode across all profile tabs (Active Stakes, History, Networking) with proper color contrast (text-gray-900 for light mode, text-white for dark mode).
 - **Live Dispute System**: Real-time balance withdrawal (10 BUSD) when disputing markets, with transactional validation (balance checks, duplicate prevention, resolved-market requirement). Disputes recorded in market.disputes array. Fixed logout bug during dispute submission.
 - **Verifiable Resolution Sources**: Replaced mock informant data with real market resolution sources from Firestore. Verdict modal now shows actual AI Oracle rationale and verifiable source links when available.
+- **Gamification: Prediction Streaks**: Win streak tracking with visual badges (5-win 🌟, 10-win 💎, 20-win 👑), XP multipliers (1.2×, 1.5×, 2×), and dedicated streak modal with progress visualization. Streaks reset on losses and award bonus XP for maintaining winning runs.
+- **Time Machine (Historical Odds)**: View how market odds changed over time with snapshots of 1-day-ago, 1-week-ago, and creation odds. Includes "hindsight score" showing early advantage for users who bet before odds shifted significantly.
+- **Social Sentiment Heatmap**: Visual breakdown showing which side your network is betting on vs. everyone else. Network percentage displays follower betting patterns with intelligent messaging (bullish/bearish/crowd-aligned). Helps users leverage social proof in prediction decisions.
+- **Quick Polls System**: Zero-stake casual predictions for low-commitment engagement. Users vote YES/NO on quick poll questions, earn mini XP rewards (+2 XP per vote), and see live percentage breakdowns. Anyone can create polls with one-click. Designed for viral growth and converting casual users to real market participants.
 
 ## External Dependencies
 
