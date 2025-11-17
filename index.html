@@ -2057,7 +2057,9 @@
             increment, addDoc, 
             serverTimestamp, writeBatch, getDocs, 
             runTransaction, 
-            setLogLevel 
+            setLogLevel,
+            orderBy,
+            limit
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         // --- Pass all imports to a global window object for convenience ---
         window.firebase = {
@@ -2067,7 +2069,7 @@
                 getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, 
                 onSnapshot, collection, query, where, increment, addDoc, 
                 serverTimestamp, writeBatch, setLogLevel, getDocs,
-                runTransaction 
+                runTransaction, orderBy, limit
             }
         };
 
