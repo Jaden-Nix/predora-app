@@ -28,7 +28,7 @@ Preferred communication style: Simple, everyday language.
 - Glow-pulse animations for interactive feedback in both themes
 - Modern GenZ-friendly navigation: Sleek top navigation bar with pill-style buttons instead of traditional sidebar
   - Desktop: Centered glassmorphic pill container with rounded navigation buttons
-  - Mobile: Bottom navigation bar with 6 buttons (Home, Leaders, Pledges, Create, Theme, Profile) for full feature access including theme toggle
+  - Mobile: Bottom navigation bar with 6 buttons (Home, Leaders, Create, Alerts, Pledges, Profile) for full feature access with easy thumb reach
   - Smooth transitions and hover effects with gradient active states
   - Navigation automatically hidden on login/OTP screens for clean authentication UX
 
@@ -154,7 +154,6 @@ Implemented comprehensive light mode styling with "Luminous & Airy" aesthetic to
 
 ### Theme Toggle in Profile Panel
 - Moved theme toggle to top-right of profile panel (removed from mobile bottom nav)
-- Mobile bottom nav now has 5 buttons (Home, Leaders, Pledges, Create, Profile)
 - Theme toggle features smooth flip animation when clicked
   - Panel flips left (rotateY animation) with cubic-bezier easing
   - Theme change happens at animation midpoint for smooth visual transition
@@ -218,7 +217,8 @@ Implemented comprehensive light mode styling with "Luminous & Airy" aesthetic to
 ### Notification System (November 17, 2025)
 - Implemented comprehensive notification infrastructure for user engagement
 - **UI Components**:
-  - Notification bell icon in top nav with pulsing red badge showing unread count
+  - Notification bell icon in top nav (desktop) with pulsing red badge showing unread count
+  - "Alerts" button in mobile bottom nav for easy thumb access with synced badge
   - Dropdown panel (fixed positioning) with header, filters, feed, and preferences link
   - 3 filter tabs: All, Markets, Social for categorizing notifications
 - **Notification Types Supported**:
