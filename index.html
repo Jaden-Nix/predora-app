@@ -3949,21 +3949,19 @@
 
                     html += `
                         <div class="ui-panel p-4 mb-3">
-                            <h3 class="theme-text-primary font-semibold text-base mb-3">${pledge.marketTitle || 'Market'}</h3>
-                            <div class="grid grid-cols-2 gap-3 text-sm">
-                                <div>
-                                    <span class="theme-text-secondary text-xs">Your Pick:</span>
-                                    <p class="${pickClass} font-bold text-lg">${pledge.pick}</p>
-                                </div>
+                            <div class="mb-3">
+                                <span class="theme-text-secondary text-xs">Your Pick:</span>
+                                <p class="${pickClass} font-bold text-2xl">${pledge.pick}</p>
+                            </div>
+                            <div class="border-t border-white/10 pt-3 mt-3 grid grid-cols-2 gap-3">
                                 <div>
                                     <span class="theme-text-secondary text-xs">Stake:</span>
                                     <p class="theme-text-primary font-bold">${pledge.amount.toFixed(2)} ${pledge.asset}</p>
-                                    <p class="text-xs theme-text-secondary">$${pledge.amountUsd.toFixed(2)}</p>
                                 </div>
-                            </div>
-                            <div class="mt-3 pt-3 border-t border-white/10">
-                                <span class="theme-text-secondary text-xs">Potential Return:</span>
-                                <p class="text-green-400 font-bold">$${pledge.potentialReturn.toFixed(2)}</p>
+                                <div>
+                                    <span class="theme-text-secondary text-xs">Potential Return:</span>
+                                    <p class="text-green-400 font-bold">$${pledge.potentialReturn.toFixed(2)}</p>
+                                </div>
                             </div>
                             ${txHashHtml}
                         </div>
@@ -4013,21 +4011,19 @@
 
                     html += `
                       <button onclick="showVerdictModal('${doc.id}')" class="ui-panel p-4 mb-3 w-full text-left ${isWinner ? 'border-l-4 border-green-400' : 'border-l-4 border-red-400'}">
-                            <h3 class="theme-text-primary font-semibold text-base mb-3">${pledge.marketTitle || 'Market'}</h3>
-                            <div class="grid grid-cols-2 gap-3 text-sm">
-                                <div>
-                                    <span class="theme-text-secondary text-xs">Result:</span>
-                                    <p class="${resultClass} font-bold text-lg">${result}</p>
-                                </div>
-                                <div>
-                                    <span class="theme-text-secondary text-xs">Original Stake:</span>
-                                    <p class="theme-text-primary font-bold">${pledge.amount.toFixed(2)} ${pledge.asset}</p>
-                                    <p class="text-xs theme-text-secondary">$${pledge.amountUsd.toFixed(2)}</p>
-                                </div>
+                            <div class="mb-3">
+                                <span class="theme-text-secondary text-xs">Result:</span>
+                                <p class="${resultClass} font-bold text-2xl">${result}</p>
                             </div>
-                            <div class="mt-3 pt-3 border-t border-white/10">
-                                <span class="theme-text-secondary text-xs">Net P&L:</span>
-                                <p class="${resultClass} font-bold text-lg">${payoutText}</p>
+                            <div class="border-t border-white/10 pt-3 mt-3 grid grid-cols-2 gap-3">
+                                <div>
+                                    <span class="theme-text-secondary text-xs">Stake:</span>
+                                    <p class="theme-text-primary font-bold">${pledge.amount.toFixed(2)} ${pledge.asset}</p>
+                                </div>
+                                <div>
+                                    <span class="theme-text-secondary text-xs">Net P&L:</span>
+                                    <p class="${resultClass} font-bold">${payoutText}</p>
+                                </div>
                             </div>
                             ${txHashHtml}
                         </button>
