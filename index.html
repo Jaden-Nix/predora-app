@@ -1395,10 +1395,24 @@
 
                 <div class="space-y-4">
                     <h3 class="text-base font-semibold text-gray-200">Initial Liquidity</h3>
-                    <div class="ui-panel p-4 space-y-4">
-                        <p class="text-sm text-gray-400">
-                            You must provide the initial liquidity for this market. This amount is locked and used to create the starting odds.
-                        </p>
+                    <div id="liquidity-info-panel" class="ui-panel p-4 space-y-4">
+                        <div id="traditional-liquidity-info">
+                            <p class="text-sm text-yellow-400 font-medium mb-2">
+                                ⚠️ Traditional markets require initial liquidity
+                            </p>
+                            <p class="text-sm text-gray-400">
+                                You must provide liquidity to seed the AMM pool. This creates the starting odds and enables trading.
+                            </p>
+                        </div>
+                        
+                        <div id="no-loss-liquidity-info" class="hidden">
+                            <p class="text-sm text-green-400 font-medium mb-2">
+                                ✓ No-loss markets use yield protocols
+                            </p>
+                            <p class="text-sm text-gray-400">
+                                User stakes earn yield from DeFi. You still need initial liquidity to bootstrap the market.
+                            </p>
+                        </div>
 
                         <div class="grid grid-cols-3 gap-2">
                             <div class="col-span-2 space-y-1">
@@ -1462,7 +1476,13 @@
                         <input type="text" id="market-stake-duration" class="ui-input" placeholder="e.g., 24h, 3d, 1 week">
                     </div>
                     <div class="space-y-2">
-                        <label for="market-resolution-date" class="text-sm font-medium text-gray-300">Resolution Date</label>
+                        <div class="flex items-center justify-between">
+                            <label for="market-resolution-date" class="text-sm font-medium text-gray-300">Resolution Date</label>
+                            <button type="button" onclick="suggestResolutionDate()" class="text-xs text-sky-400 hover:text-sky-300 font-medium flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                AI Suggest
+                            </button>
+                        </div>
                         <input type="date" id="market-resolution-date" class="ui-input" style="color-scheme: dark;">
                     </div>
                 </div>
@@ -1552,7 +1572,40 @@
                     </div>
 
                     <div class="lg:col-span-1">
-                        <div class="lg:sticky lg:top-4">
+                        <div class="lg:sticky lg:top-4 space-y-4">
+                            
+                            <!-- Yield Calculator (No-Loss Markets Only) -->
+                            <div id="yield-calculator-panel" class="ui-panel p-4 space-y-3 hidden">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-semibold text-green-400">💰 Yield Calculator</h3>
+                                    <span id="calc-protocol-badge" class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">Aave</span>
+                                </div>
+                                <p class="text-xs text-gray-400">Estimate your potential yield earnings (if you win)</p>
+                                
+                                <div class="space-y-2 p-3 bg-black/30 rounded-lg">
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-gray-400">Your Stake:</span>
+                                        <span id="calc-stake" class="text-white font-medium">$0.00</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-gray-400">Protocol APY:</span>
+                                        <span id="calc-apy" class="text-green-400 font-medium">0%</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-gray-400">Time Staked:</span>
+                                        <span id="calc-duration" class="text-white font-medium">~30 days</span>
+                                    </div>
+                                    <div class="border-t border-gray-700 pt-2 mt-2 flex justify-between">
+                                        <span class="text-gray-300 font-medium">Estimated Yield:</span>
+                                        <span id="calc-yield" class="text-2xl font-bold text-green-400">$0.00</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-xs text-gray-500 text-center">
+                                    ✓ Win: Get base payout + yield | Lose: Get principal back (no-loss)
+                                </div>
+                            </div>
+                            
                             <div class="ui-panel space-y-4">
                                 <h2 class="text-base font-semibold text-gray-200">Place Your Stake</h2>
 
@@ -1564,7 +1617,7 @@
 
                                 <div class="space-y-2">
                                     <label for="stake-amount-input" class="text-sm font-medium text-gray-300">Amount</label>
-                                    <input type="number" id="stake-amount-input" class="ui-input" placeholder="0.00">
+                                    <input type="number" id="stake-amount-input" class="ui-input" placeholder="0.00" oninput="updateYieldCalculator()">
                                 </div>
                                 <div id="stake-section" class="grid grid-cols-2 gap-4">
                                     <button id="stake-yes-btn" class="btn btn-stake-yes">
@@ -3850,6 +3903,7 @@
                     dom.detailNoPercent.innerText = `${currentMarket.noPercent.toFixed(1)}%`; // Added rounding
                     dom.aiExplainPanel.classList.add('hidden'); 
                     dom.aiExplainPanel.innerHTML = ''; 
+                    // Legacy yield panel (keeping for backward compat)
                     dom.detailYieldPanel.classList.toggle('hidden', !currentMarket.isNoLoss);
                     if (currentMarket.isNoLoss) {
                         startMockYieldCounter(dom.detailYieldCounter);
@@ -3863,6 +3917,9 @@
 
                     populateAssetSelector();
                     showScreen('market-detail-screen');
+                    
+                    // Setup yield calculator for no-loss markets
+                    setupYieldCalculator(currentMarket);
 
                     // --- ADDED FOR CHART & TVL ---
                     // 1. Update the TVL Text
@@ -4649,6 +4706,113 @@
         }
 
         /**
+         * Shows/hides yield calculator based on market type
+         */
+        window.setupYieldCalculator = (marketData) => {
+            const calcPanel = document.getElementById('yield-calculator-panel');
+            if (!calcPanel) return;
+            
+            // Store market data globally for calculator
+            window.currentMarketData = marketData;
+            
+            // Show calculator only for no-loss markets
+            if (marketData.isNoLoss) {
+                calcPanel.classList.remove('hidden');
+                updateYieldCalculator();
+            } else {
+                calcPanel.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Updates the yield calculator in real-time
+         */
+        window.updateYieldCalculator = () => {
+            const stakeInput = document.getElementById('stake-amount-input');
+            const calcPanel = document.getElementById('yield-calculator-panel');
+            
+            if (!calcPanel || calcPanel.classList.contains('hidden')) return;
+            
+            const stakeAmount = parseFloat(stakeInput.value) || 0;
+            const currentMarketData = window.currentMarketData || {};
+            const protocol = currentMarketData.yieldProtocol || 'aave';
+            const apy = getProtocolApy(protocol);
+            
+            // Calculate estimated days (from now until resolution)
+            const resolutionDate = currentMarketData.resolutionDate;
+            const daysToResolution = resolutionDate ? 
+                Math.max(1, Math.ceil((new Date(resolutionDate) - new Date()) / (1000 * 60 * 60 * 24))) : 30;
+            
+            // Calculate yield: stake * APY * (days / 365)
+            const estimatedYield = stakeAmount * (apy / 100) * (daysToResolution / 365);
+            
+            // Update UI
+            document.getElementById('calc-stake').innerText = `$${stakeAmount.toFixed(2)}`;
+            document.getElementById('calc-apy').innerText = `${apy.toFixed(2)}%`;
+            document.getElementById('calc-duration').innerText = `~${daysToResolution} days`;
+            document.getElementById('calc-yield').innerText = `$${estimatedYield.toFixed(2)}`;
+            document.getElementById('calc-protocol-badge').innerText = protocol.charAt(0).toUpperCase() + protocol.slice(1);
+        }
+
+        /**
+         * AI auto-suggests resolution date based on market title
+         */
+        window.suggestResolutionDate = async () => {
+            const titleInput = document.getElementById('market-title-input');
+            const dateInput = document.getElementById('market-resolution-date');
+            const title = titleInput.value.trim();
+            
+            if (!title) {
+                showToast("Please enter a market title first", "warning");
+                return;
+            }
+            
+            try {
+                showLoadingOverlay(true, "AI analyzing event timing...");
+                
+                const response = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: `Analyze this prediction market question and suggest when it should be resolved:\n\n"${title}"\n\nProvide ONLY the date in YYYY-MM-DD format. If the event has a specific date (like "Super Bowl 2025"), use that exact date. If it's an ongoing question (like "Will BTC hit $100k in 2025?"), suggest December 31 of the current/relevant year. Return ONLY the date, nothing else.`,
+                        model: 'gemini-2.0-flash-exp'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API returned ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const suggestedDate = data.text ? data.text.trim() : '';
+                
+                // Validate date format (YYYY-MM-DD)
+                if (/^\d{4}-\d{2}-\d{2}$/.test(suggestedDate)) {
+                    dateInput.value = suggestedDate;
+                    showToast(`AI suggested: ${suggestedDate}`, "success");
+                } else {
+                    // Fallback: suggest 30 days from now
+                    const fallbackDate = new Date();
+                    fallbackDate.setDate(fallbackDate.getDate() + 30);
+                    const formatted = fallbackDate.toISOString().split('T')[0];
+                    dateInput.value = formatted;
+                    showToast(`AI fallback: ${formatted} (30 days from now)`, "info");
+                }
+                
+            } catch (error) {
+                console.error("AI suggest failed:", error);
+                // Fallback: suggest 30 days from now
+                const fallbackDate = new Date();
+                fallbackDate.setDate(fallbackDate.getDate() + 30);
+                const formatted = fallbackDate.toISOString().split('T')[0];
+                dateInput.value = formatted;
+                showToast(`Auto-filled: ${formatted} (30 days from now)`, "info");
+            } finally {
+                showLoadingOverlay(false);
+            }
+        }
+
+        /**
          * Handles yield protocol selection.
          */
         window.selectYield = (protocol) => {
@@ -4692,19 +4856,30 @@
             const traditionalBtn = document.getElementById('btn-market-traditional');
             const noLossOptions = document.getElementById('no-loss-options');
             const typeInput = document.getElementById('market-type-input');
+            const traditionalInfo = document.getElementById('traditional-liquidity-info');
+            const noLossInfo = document.getElementById('no-loss-liquidity-info');
 
             if (type === 'no-loss') {
                 typeInput.value = 'no-loss';
                 noLossBtn.classList.replace('btn-secondary', 'btn-stake-yes');
                 traditionalBtn.classList.replace('btn-stake-no', 'btn-secondary');
                 noLossOptions.classList.remove('hidden');
+                if (traditionalInfo) traditionalInfo.classList.add('hidden');
+                if (noLossInfo) noLossInfo.classList.remove('hidden');
             } else {
                 typeInput.value = 'traditional';
                 noLossBtn.classList.replace('btn-stake-yes', 'btn-secondary');
                 traditionalBtn.classList.replace('btn-secondary', 'btn-stake-no');
-                noLossOptions.classList.add('hidden'); // <-- This is the line that hides it
+                noLossOptions.classList.add('hidden');
+                if (traditionalInfo) traditionalInfo.classList.remove('hidden');
+                if (noLossInfo) noLossInfo.classList.add('hidden');
             }
         }
+        
+        // Initialize on page load (default is no-loss)
+        document.addEventListener('DOMContentLoaded', () => {
+            selectMarketType('no-loss');
+        });
         // ---- END OF NEW FUNCTION ----
 
 

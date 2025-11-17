@@ -62,8 +62,12 @@ Preferred communication style: Simple, everyday language.
 - **Admin Panel Access**: Hidden 5-tap gesture on both desktop and mobile "Predora" titles to access admin features (secure, non-obvious entry point).
 - **Admin Market Controls**: Admins can reopen and re-resolve already-resolved markets with full audit trail tracking (adminEvents array with admin ID, timestamp, previous outcome).
 - **Yield-Based Markets**: Time-weighted yield distribution system where users earn APY based on how long their funds are staked. Supports 6 yield protocols: Aave (4.12%), Compound (3.88%), Lido (3.2%), Yearn Finance (5.8%), Curve (2.9%), and Convex (4.5%). Yield calculated per-pledge using stakeTimestamp to prevent late-whale exploits. Winners receive base payout + their time-weighted yield; losers receive principal only.
+- **Yield Calculator UI**: Interactive calculator in market detail view shows real-time estimated yield earnings for no-loss markets based on stake amount, protocol APY, and days until resolution. Updates dynamically as user types stake amount.
+- **AI Auto-Suggest Resolution Date**: "AI Suggest" button in create market form uses Gemini API to analyze market title and suggest appropriate resolution date. Includes graceful fallback (30 days from now) if AI fails.
+- **Market Type Clarification**: Clear differentiation between Traditional (AMM-based, requires liquidity pool) and No-Loss (yield protocol-based, principal safe) markets with contextual help text that updates based on selection.
 - **Light Mode UI Improvements**: Enhanced text readability in light mode across all profile tabs (Active Stakes, History, Networking) with proper color contrast (text-gray-900 for light mode, text-white for dark mode).
-- **Live Dispute System**: Real-time balance withdrawal (10 BUSD) when disputing markets, with transactional validation (balance checks, duplicate prevention, resolved-market requirement). Disputes recorded in market.disputes array.
+- **Live Dispute System**: Real-time balance withdrawal (10 BUSD) when disputing markets, with transactional validation (balance checks, duplicate prevention, resolved-market requirement). Disputes recorded in market.disputes array. Fixed logout bug during dispute submission.
+- **Verifiable Resolution Sources**: Replaced mock informant data with real market resolution sources from Firestore. Verdict modal now shows actual AI Oracle rationale and verifiable source links when available.
 
 ## External Dependencies
 
