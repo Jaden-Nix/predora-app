@@ -7472,7 +7472,11 @@ ${historyText}`;
                     showToast('Reply posted!', "success");
                     cancelReply();
                     
-                    // Reload the ticker feed to show the new reply
+                    // Force reload the ticker feed to show the new reply immediately
+                    if (tickerUnsubscribe) {
+                        tickerUnsubscribe();
+                        tickerUnsubscribe = null;
+                    }
                     loadTickerFeed();
                 } else {
                     // Posting a top-level comment
@@ -7489,6 +7493,14 @@ ${historyText}`;
                     // Store the document ID as commentId
                     const commentId = docRef.id;
                     console.log('Comment posted with ID:', commentId);
+                    showToast('Comment posted!', "success");
+                    
+                    // Force reload the ticker feed
+                    if (tickerUnsubscribe) {
+                        tickerUnsubscribe();
+                        tickerUnsubscribe = null;
+                    }
+                    loadTickerFeed();
                 }
 
                 // Clear input
