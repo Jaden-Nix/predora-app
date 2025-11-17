@@ -5496,37 +5496,9 @@ ${historyText}`;
                     ? (market.yesPercent || 60) 
                     : (market.noPercent || 40);
 
-                // --- YIELD SYSTEM LOGIC ---
-                // Calculate total accrued yield for this market (if no-loss)
-                let totalYieldUsd = 0;
-                let winningPledges = [];
-                let totalWinningStake = 0;
+                // --- YIELD SYSTEM LOGIC (TIME-WEIGHTED PER PLEDGE) ---
+                const resolutionTime = new Date();
                 
-                if (market.isNoLoss && market.protocolApy && market.lastAccrualAt) {
-                    // Calculate yield from market creation to now
-                    totalYieldUsd = calculateYield(
-                        market.totalPrincipalUsd || market.totalStakeVolume || 0,
-                        market.protocolApy,
-                        market.lastAccrualAt,
-                        new Date()
-                    );
-                    
-                    // First pass: identify winners and calculate total winning stake
-                    for (const pledgeDoc of snapshot.docs) {
-                        const pledge = pledgeDoc.data();
-                        if (pledge.pick === winningOutcome) {
-                            winningPledges.push({ doc: pledgeDoc, data: pledge });
-                            totalWinningStake += pledge.amountUsd;
-                        }
-                    }
-                    
-                    // Edge case: No winners means yield goes to treasury (not distributed)
-                    if (winningPledges.length === 0) {
-                        console.log("YIELD: No winners - yield not distributed");
-                        totalYieldUsd = 0;
-                    }
-                }
-
                 for (const pledgeDoc of snapshot.docs) {
                     const pledge = pledgeDoc.data();
                     const pledgeRef = pledgeDoc.ref;
@@ -5538,14 +5510,21 @@ ${historyText}`;
                     // For No-Loss, losers get principal back. For Classic, they get 0.
                     const principalReturn = market.isNoLoss ? pledge.amountUsd : 0;
                     
-                    // Calculate proportional yield share for winners
-                    let yieldShare = 0;
-                    if (market.isNoLoss && isWinner && totalWinningStake > 0) {
-                        yieldShare = (pledge.amountUsd / totalWinningStake) * totalYieldUsd;
+                    // Calculate TIME-WEIGHTED yield for THIS specific pledge
+                    // Only winners earn yield, and only for the time THEIR funds were staked
+                    let pledgeYield = 0;
+                    if (market.isNoLoss && isWinner && market.protocolApy && pledge.stakeTimestamp) {
+                        pledgeYield = calculateYield(
+                            pledge.amountUsd,           // This pledge's principal
+                            market.protocolApy,         // Market's APY
+                            pledge.stakeTimestamp,      // When THIS pledge was staked
+                            resolutionTime              // When market resolved
+                        );
+                        console.log(`YIELD: Pledge earned $${pledgeYield.toFixed(4)} over time`);
                     }
                     
-                    // Total return = base payout + yield share (for winners) or just principal (for losers in no-loss)
-                    const totalReturnUsd = isWinner ? (payoutUsd + yieldShare) : principalReturn;
+                    // Total return = base payout + this pledge's time-weighted yield
+                    const totalReturnUsd = isWinner ? (payoutUsd + pledgeYield) : principalReturn;
 
                     // Convert USD payout back to the original asset
                     const payoutAmount = totalReturnUsd / getMockPrice(pledge.asset);
