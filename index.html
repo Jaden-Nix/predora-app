@@ -814,6 +814,38 @@
             cursor: not-allowed;
         }
 
+        /* --- Auto-hide Desktop Navigation --- */
+        @media (min-width: 768px) {
+            #top-nav {
+                transform: translateY(-100%);
+                transition: transform 0.3s ease-in-out;
+            }
+            #top-nav:hover,
+            #top-nav.nav-visible {
+                transform: translateY(0);
+            }
+            /* Hover zone at top of screen to reveal nav */
+            .nav-hover-zone {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 60px;
+                z-index: 48;
+                pointer-events: auto;
+            }
+        }
+
+        /* --- Mobile Header --- */
+        @media (max-width: 767px) {
+            #mobile-header {
+                display: flex;
+            }
+        }
+        #mobile-header {
+            display: none;
+        }
+
         /* --- Profile Page Tabs --- */
         .profile-tab {
             padding: 0.5rem 0;
@@ -1087,8 +1119,36 @@
     </style>
 </head>
 <body class="text-gray-100">
-    <!-- Modern Top Navigation Bar -->
-        <nav id="top-nav" class="sticky top-0 z-50 shadow-lg shadow-black/20">
+    <!-- Desktop hover zone to reveal navigation -->
+    <div class="nav-hover-zone hidden md:block"></div>
+
+    <!-- Mobile Header (visible on mobile only) -->
+    <header id="mobile-header" class="sticky top-0 z-50 bg-[#0D1117] dark:bg-[#0D1117] light:bg-white border-b border-[#30363D] dark:border-[#30363D] light:border-gray-200 px-4 py-3">
+        <div class="flex items-center justify-between">
+            <h1 id="mobile-app-title" class="text-xl font-extrabold gradient-text tracking-tight cursor-pointer">Predora</h1>
+            <div class="flex items-center space-x-2">
+                <!-- Notification Bell Mobile -->
+                <button onclick="toggleNotifications()" class="relative w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-sky-400 transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                    </svg>
+                    <span id="notification-badge-mobile-header" class="hidden absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-xs font-bold rounded-full flex items-center justify-center">0</span>
+                </button>
+                <!-- Theme Toggle Mobile -->
+                <button onclick="toggleTheme()" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-sky-400 transition-all">
+                    <svg id="mobile-theme-icon-sun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    <svg id="mobile-theme-icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Modern Top Navigation Bar (Desktop - Auto-hide with hover) -->
+        <nav id="top-nav" class="sticky top-0 z-50 shadow-lg shadow-black/20 hidden md:block">
             <div class="max-w-7xl mx-auto px-4 py-3 md:py-4">
                 <div class="flex justify-between items-center">
                     <!-- Logo -->
@@ -2180,6 +2240,8 @@
             const body = document.body;
             const sunIcon = document.getElementById('theme-icon-sun');
             const moonIcon = document.getElementById('theme-icon-moon');
+            const mobileSunIcon = document.getElementById('mobile-theme-icon-sun');
+            const mobileMoonIcon = document.getElementById('mobile-theme-icon-moon');
             const profileSunIcon = document.getElementById('profile-theme-icon-sun');
             const profileMoonIcon = document.getElementById('profile-theme-icon-moon');
             
@@ -2195,6 +2257,17 @@
                 } else {
                     sunIcon.classList.add('hidden');
                     moonIcon.classList.remove('hidden');
+                }
+            }
+            
+            // Toggle mobile header icons
+            if (mobileSunIcon && mobileMoonIcon) {
+                if (isLightMode) {
+                    mobileSunIcon.classList.remove('hidden');
+                    mobileMoonIcon.classList.add('hidden');
+                } else {
+                    mobileSunIcon.classList.add('hidden');
+                    mobileMoonIcon.classList.remove('hidden');
                 }
             }
             
@@ -2856,20 +2929,26 @@
         function updateNotificationBadge(count) {
             const badge = document.getElementById('notification-badge');
             const badgeProfile = document.getElementById('notification-badge-profile');
+            const badgeMobileHeader = document.getElementById('notification-badge-mobile-header');
             
             if (count > 0) {
                 const displayCount = count > 99 ? '99+' : count;
-                badge.textContent = displayCount;
-                badge.classList.remove('hidden');
+                if (badge) {
+                    badge.textContent = displayCount;
+                    badge.classList.remove('hidden');
+                }
                 if (badgeProfile) {
                     badgeProfile.textContent = displayCount;
                     badgeProfile.classList.remove('hidden');
                 }
-            } else {
-                badge.classList.add('hidden');
-                if (badgeProfile) {
-                    badgeProfile.classList.add('hidden');
+                if (badgeMobileHeader) {
+                    badgeMobileHeader.textContent = displayCount;
+                    badgeMobileHeader.classList.remove('hidden');
                 }
+            } else {
+                if (badge) badge.classList.add('hidden');
+                if (badgeProfile) badgeProfile.classList.add('hidden');
+                if (badgeMobileHeader) badgeMobileHeader.classList.add('hidden');
             }
         }
         
@@ -5053,6 +5132,40 @@ ${historyText}`;
         // --- ADMIN PANEL ---
         // =====================================================================
 
+        /**
+         * Setup desktop navigation auto-hide with hover reveal
+         */
+        function setupDesktopNavAutoHide() {
+            const hoverZone = document.querySelector('.nav-hover-zone');
+            const topNav = document.getElementById('top-nav');
+            
+            if (!hoverZone || !topNav) return;
+            
+            // Show nav when hovering the top zone
+            hoverZone.addEventListener('mouseenter', () => {
+                topNav.classList.add('nav-visible');
+            });
+            
+            // Keep nav visible while hovering it
+            topNav.addEventListener('mouseenter', () => {
+                topNav.classList.add('nav-visible');
+            });
+            
+            // Hide nav when leaving both zones
+            topNav.addEventListener('mouseleave', () => {
+                topNav.classList.remove('nav-visible');
+            });
+            
+            hoverZone.addEventListener('mouseleave', () => {
+                // Small delay to allow moving from zone to nav
+                setTimeout(() => {
+                    if (!topNav.matches(':hover')) {
+                        topNav.classList.remove('nav-visible');
+                    }
+                }, 100);
+            });
+        }
+
         let adminTapCount = 0;
         let adminTapTimer = null;
 
@@ -5060,8 +5173,8 @@ ${historyText}`;
          * Wires up all listeners for the Admin Panel.
          */
         function setupAdminFeatures() {
-            // Secret 5-tap gesture on the app title to open admin login
-            document.getElementById('app-title').addEventListener('click', () => {
+            // Secret 5-tap gesture on the app title (both desktop and mobile)
+            const handleAdminTap = () => {
                 adminTapCount++;
                 clearTimeout(adminTapTimer);
                 adminTapTimer = setTimeout(() => { adminTapCount = 0; }, 2000);
@@ -5069,7 +5182,10 @@ ${historyText}`;
                     adminTapCount = 0;
                     showScreen('admin-password-screen');
                 }
-            });
+            };
+            
+            document.getElementById('app-title').addEventListener('click', handleAdminTap);
+            document.getElementById('mobile-app-title').addEventListener('click', handleAdminTap);
 
             // Admin password check
             document.getElementById('admin-login-btn').addEventListener('click', () => {
@@ -6984,6 +7100,10 @@ dom.searchBarInput.addEventListener('input', handleSearch);
 
             // Setup admin features (like the secret tap)
             setupAdminFeatures();
+            
+            // Setup desktop nav auto-hide with hover zone
+            setupDesktopNavAutoHide();
+            
             document.getElementById('run-oracle-btn').addEventListener('click', runOracleJobs);
             // Setup create market listeners (like the odds calculator)
             setupCreateMarketListeners();
