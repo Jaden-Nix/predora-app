@@ -44,6 +44,15 @@ const app = express();
 // --- Express Middleware ---
 app.use(express.json());
 app.use(cors());
+
+// Add cache control headers for all static files
+app.use((req, res, next) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    next();
+});
+
 app.use(express.static(path.join(__dirname, '/')));
 
 // --- Main Route: Serve the App ---
