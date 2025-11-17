@@ -1239,25 +1239,6 @@
             </div>
 
                 <div id="home-screen" class="screen screen-inactive space-y-5">
-                
-                <!-- Quick Polls Section -->
-                <div class="ui-panel p-4 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-lg font-bold gradient-text">🗳 Quick Polls</h3>
-                        <span class="text-xs text-gray-400">No stakes, just predictions!</span>
-                    </div>
-                    <p class="text-sm text-gray-400">Cast your vote and see what everyone thinks. Earn mini XP without risking any tokens!</p>
-                    
-                    <div id="quick-polls-container" class="space-y-3">
-                        <!-- Polls will be loaded here -->
-                        <div class="text-center text-gray-500 py-4">Loading polls...</div>
-                    </div>
-                    
-                    <button onclick="createQuickPoll()" class="btn btn-secondary w-full text-sm">
-                        + Create Your Own Poll
-                    </button>
-                </div>
-
 
                 <div onclick="showScreen('quick-play-screen')" class="ui-panel glowing-card flex items-center justify-between p-4 lg:p-6 cursor-pointer transition-all duration-300 hover:scale-[1.02]">
                     <div>
@@ -1308,6 +1289,25 @@
 
                 <div class="lg:grid lg:grid-cols-3 lg:gap-6 space-y-6 lg:space-y-0">
                     <div class="lg:col-span-2 space-y-6">
+
+                <!-- Quick Polls Section -->
+                <div class="ui-panel p-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-semibold text-sky-300">🗳 Quick Polls</h3>
+                        <span class="text-xs text-gray-400">No stakes required!</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Create casual yes/no polls for your community. No liquidity or stakes needed - just predictions!</p>
+                    
+                    <button onclick="openPollCreator()" class="btn btn-secondary w-full text-sm">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+                        Create Quick Poll
+                    </button>
+                    
+                    <div id="quick-polls-container" class="space-y-2 max-h-60 overflow-y-auto">
+                        <!-- Recent polls will be loaded here -->
+                        <div class="text-center text-gray-500 py-2 text-xs">Loading recent polls...</div>
+                    </div>
+                </div>
 
                 <div class="ui-panel p-4 space-y-3">
                     <h3 class="text-base font-semibold text-sky-300">AI Assistant (LIVE)</h3>
@@ -2178,6 +2178,39 @@
             </button>
         </div>
         </div>
+        <!-- Quick Poll Creator Modal -->
+        <div id="poll-creator-modal" class="hidden fixed inset-0 z-[995] bg-black/70 backdrop-blur-sm flex justify-center items-center p-4">
+            <div class="ui-panel max-w-md w-full p-6 space-y-6 animate-scale-in">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold gradient-text">🗳 Create Quick Poll</h2>
+                    <button onclick="closePollCreator()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-medium text-gray-300 block mb-2">Poll Question</label>
+                        <textarea id="poll-question-input" rows="3" class="ui-input" placeholder="e.g., Will Taylor Swift drop a surprise album in 2025?"></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Must be a yes/no question. Keep it simple and clear!</p>
+                    </div>
+
+                    <div class="p-3 bg-sky-500/10 rounded-lg border border-sky-400/20">
+                        <h4 class="text-sm font-semibold text-sky-300 mb-1">Quick Poll Benefits</h4>
+                        <ul class="text-xs text-gray-400 space-y-1">
+                            <li>✓ No liquidity or stakes required</li>
+                            <li>✓ Instant community engagement</li>
+                            <li>✓ +2 XP for every vote</li>
+                            <li>✓ Test market interest before creating full markets</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="closePollCreator()" class="btn btn-secondary flex-1">Cancel</button>
+                    <button onclick="submitQuickPoll()" class="btn btn-primary flex-1">Create Poll</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Streak Modal -->
         <div id="streak-modal" class="hidden fixed inset-0 z-[995] bg-black/70 backdrop-blur-sm flex justify-center items-center p-4">
             <div class="ui-panel max-w-lg w-full p-6 space-y-6 animate-scale-in">
@@ -3243,6 +3276,9 @@
             switch(screenId) {
                 case 'home-screen':
                     if (!standardMarketsUnsubscribe) attachStandardMarketsListener();
+                    break;
+                case 'create-market-screen':
+                    populateAssetSelector();
                     loadQuickPolls(); // Load quick polls
                     break;
                 case 'quick-play-screen':
@@ -3262,9 +3298,6 @@
                 case 'admin-panel-screen':
                     renderResolutionPanel();
                     renderQuickPlayResolutionPanel();
-                    break;
-                    case 'create-market-screen':
-                    populateAssetSelector();
                     break;
             }
         }
@@ -7755,19 +7788,38 @@ ${historyText}`;
             }
         };
         
-        window.createQuickPoll = async () => {
-            const question = prompt('Enter your poll question (Yes/No format):');
-            if (!question || question.trim().length < 10) {
-                showToast('Poll question must be at least 10 characters', 'error');
+        window.openPollCreator = () => {
+            document.getElementById('poll-creator-modal').classList.remove('hidden');
+            document.getElementById('poll-question-input').value = '';
+            document.getElementById('poll-question-input').focus();
+        };
+        
+        window.closePollCreator = () => {
+            document.getElementById('poll-creator-modal').classList.add('hidden');
+        };
+        
+        window.submitQuickPoll = async () => {
+            const questionInput = document.getElementById('poll-question-input');
+            const question = questionInput.value.trim();
+            
+            if (question.length < 10) {
+                showToast('Poll question must be at least 10 characters', 'warning');
+                return;
+            }
+            
+            if (question.length > 200) {
+                showToast('Poll question must be less than 200 characters', 'warning');
                 return;
             }
             
             try {
+                showLoadingOverlay(true, 'Creating poll...');
+                
                 const { collection, addDoc, serverTimestamp } = window.firebase.firestore;
                 const pollsRef = collection(db, 'artifacts', APP_ID, 'public', 'data', 'quick_polls');
                 
                 await addDoc(pollsRef, {
-                    question: question.trim(),
+                    question: question,
                     yesVotes: 0,
                     noVotes: 0,
                     voters: {},
@@ -7775,11 +7827,14 @@ ${historyText}`;
                     createdAt: serverTimestamp()
                 });
                 
-                showToast('Poll created successfully!', 'success');
+                showLoadingOverlay(false);
+                showToast('Poll created successfully! 🎉', 'success');
+                closePollCreator();
                 loadQuickPolls();
                 
             } catch (error) {
                 console.error('Error creating poll:', error);
+                showLoadingOverlay(false);
                 showToast('Failed to create poll', 'error');
             }
         };
