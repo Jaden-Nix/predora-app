@@ -3949,6 +3949,7 @@
 
                     html += `
                         <div class="ui-panel p-4 mb-3">
+                            <h3 class="theme-text-primary font-semibold text-base mb-3">${pledge.marketTitle || 'Market'}</h3>
                             <div class="mb-3">
                                 <span class="theme-text-secondary text-xs">Your Pick:</span>
                                 <p class="${pickClass} font-bold text-2xl">${pledge.pick}</p>
@@ -4011,6 +4012,7 @@
 
                     html += `
                       <button onclick="showVerdictModal('${doc.id}')" class="ui-panel p-4 mb-3 w-full text-left ${isWinner ? 'border-l-4 border-green-400' : 'border-l-4 border-red-400'}">
+                            <h3 class="theme-text-primary font-semibold text-base mb-3">${pledge.marketTitle || 'Market'}</h3>
                             <div class="mb-3">
                                 <span class="theme-text-secondary text-xs">Result:</span>
                                 <p class="${resultClass} font-bold text-2xl">${result}</p>
