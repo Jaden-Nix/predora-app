@@ -1343,6 +1343,34 @@
                         <label for="market-insight-input" class="text-sm font-medium text-gray-300">Insight / Summary</label>
                         <textarea id="market-insight-input" rows="4" class="ui-input" placeholder="A brief context or analysis of the event."></textarea>
                     </div>
+                    
+                    <!-- Event Image Section -->
+                    <div class="space-y-3">
+                        <label class="text-sm font-medium text-gray-300">Event Image (Optional)</label>
+                        <div class="ui-panel p-4 space-y-3">
+                            <!-- Image Preview -->
+                            <div id="market-image-preview" class="hidden">
+                                <img id="market-image-preview-img" src="" class="w-full h-48 object-cover rounded-lg mb-3">
+                                <button onclick="clearMarketImage()" class="text-xs text-red-400 hover:text-red-300">Remove Image</button>
+                            </div>
+                            
+                            <!-- Upload & Generate Buttons -->
+                            <div class="grid grid-cols-2 gap-3">
+                                <label for="market-image-upload" class="btn btn-secondary cursor-pointer text-center flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    Upload Image
+                                </label>
+                                <input type="file" id="market-image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                                
+                                <button id="ai-generate-image-btn" onclick="generateMarketImage()" class="btn bg-purple-600 hover:bg-purple-700 flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                    AI Generate
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-400 text-center">Add a visual to make your market stand out</p>
+                        </div>
+                        <input type="hidden" id="market-image-url" value="">
+                    </div>
                 </div>
 
                 <div id="binary-odds-section" class="space-y-4">
@@ -5205,6 +5233,113 @@
             const row = container.querySelector(`[data-option-id="${id}"]`);
             if (row) row.remove();
         }
+        
+        // --- IMAGE UPLOAD & AI GENERATION ---
+        window.handleImageUpload = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageUrl = e.target.result;
+                document.getElementById('market-image-url').value = imageUrl;
+                document.getElementById('market-image-preview-img').src = imageUrl;
+                document.getElementById('market-image-preview').classList.remove('hidden');
+                showToast("Image uploaded successfully!", "success");
+            };
+            reader.readAsDataURL(file);
+        };
+        
+        window.clearMarketImage = () => {
+            document.getElementById('market-image-url').value = '';
+            document.getElementById('market-image-preview-img').src = '';
+            document.getElementById('market-image-preview').classList.add('hidden');
+            document.getElementById('market-image-upload').value = '';
+        };
+        
+        window.generateMarketImage = async () => {
+            const title = document.getElementById('market-title-input').value.trim();
+            if (!title) {
+                showToast("Please enter a market title first!", "warning");
+                return;
+            }
+            
+            const genBtn = document.getElementById('ai-generate-image-btn');
+            const originalText = genBtn.innerHTML;
+            genBtn.disabled = true;
+            genBtn.innerHTML = '<div class="spinner w-4 h-4 border-2 border-transparent rounded-full"></div><span class="ml-2">Generating...</span>';
+            
+            try {
+                // Call Gemini API to generate an image prompt based on the market title
+                const systemPrompt = 'You are a creative assistant that generates detailed image descriptions for prediction market events. Create a vivid, professional image description suitable for DALL-E or Midjourney based on the market title.';
+                const userPrompt = `Generate a detailed, visually striking image prompt for this prediction market: "${title}". Make it professional, eye-catching, and relevant to the event. Keep it under 100 words.`;
+                
+                const schema = {
+                    type: "OBJECT",
+                    properties: {
+                        "imagePrompt": { "type": "STRING" }
+                    },
+                    required: ["imagePrompt"]
+                };
+                
+                const response = await callGemini(systemPrompt, userPrompt, schema);
+                
+                // For now, we'll use a placeholder gradient based on the prompt
+                // In production, you'd integrate with DALL-E or another image generation API
+                const canvas = document.createElement('canvas');
+                canvas.width = 800;
+                canvas.height = 400;
+                const ctx = canvas.getContext('2d');
+                
+                // Create gradient background based on category/title
+                const gradient = ctx.createLinearGradient(0, 0, 800, 400);
+                const colors = ['#6366F1', '#8B5CF6', '#EC4899', '#F59E0B', '#10B981', '#3B82F6'];
+                const color1 = colors[Math.floor(Math.random() * colors.length)];
+                const color2 = colors[Math.floor(Math.random() * colors.length)];
+                gradient.addColorStop(0, color1);
+                gradient.addColorStop(1, color2);
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, 800, 400);
+                
+                // Add title text
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 40px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                ctx.shadowBlur = 10;
+                
+                // Word wrap title
+                const words = title.split(' ');
+                let line = '';
+                let y = 180;
+                for (let word of words) {
+                    const testLine = line + word + ' ';
+                    const metrics = ctx.measureText(testLine);
+                    if (metrics.width > 700 && line !== '') {
+                        ctx.fillText(line, 400, y);
+                        line = word + ' ';
+                        y += 50;
+                    } else {
+                        line = testLine;
+                    }
+                }
+                ctx.fillText(line, 400, y);
+                
+                // Convert to base64
+                const imageUrl = canvas.toDataURL('image/png');
+                document.getElementById('market-image-url').value = imageUrl;
+                document.getElementById('market-image-preview-img').src = imageUrl;
+                document.getElementById('market-image-preview').classList.remove('hidden');
+                
+                showToast("AI image generated! ✨", "success");
+            } catch (error) {
+                console.error("AI image generation failed:", error);
+                showToast("Image generation failed. Try uploading instead.", "error");
+            } finally {
+                genBtn.disabled = false;
+                genBtn.innerHTML = originalText;
+            }
+        };
         
         window.getMultiOptions = () => {
             const container = document.getElementById('multi-options-container');
