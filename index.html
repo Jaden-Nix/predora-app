@@ -1345,7 +1345,7 @@
                     </div>
                 </div>
 
-                <div class="space-y-4">
+                <div id="binary-odds-section" class="space-y-4">
                     <h3 class="text-base font-semibold text-gray-200">Initial Odds</h3>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-2">
@@ -1358,8 +1358,36 @@
                         </div>
                     </div>
                 </div>
+                
+                <div id="multi-option-section" class="space-y-4 hidden">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-semibold text-gray-200">Options (3-6 choices)</h3>
+                        <button type="button" onclick="addMultiOption()" class="text-xs text-sky-400 hover:text-sky-300 font-medium flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+                            Add Option
+                        </button>
+                    </div>
+                    <div id="multi-options-container" class="space-y-2">
+                    </div>
+                    <p class="text-xs text-gray-400">All odds must add up to 100%. Only ONE option will win when the market resolves.</p>
+                </div>
 
                     <div class="space-y-4">
+                        <h3 class="text-base font-semibold text-gray-200">Market Structure</h3>
+                        <input type="hidden" id="market-structure-input" value="binary">
+                        
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <button id="btn-structure-binary" onclick="selectMarketStructure('binary')" class="btn btn-stake-yes">
+                                Binary (YES/NO)
+                                <span class="block text-xs font-light">(Standard)</span>
+                            </button>
+
+                            <button id="btn-structure-multi" onclick="selectMarketStructure('multi-option')" class="btn btn-secondary">
+                                Multi-Option
+                                <span class="block text-xs font-light">(3-6 choices)</span>
+                            </button>
+                        </div>
+                        
                         <h3 class="text-base font-semibold text-gray-200">Market Type</h3>
                         <input type="hidden" id="market-type-input" value="fixed-pot"> 
 
@@ -5064,6 +5092,100 @@
          */
 
         /**
+         * Multi-option market handling
+         */
+        let multiOptionCounter = 0;
+        
+        window.selectMarketStructure = (structure) => {
+            document.getElementById('market-structure-input').value = structure;
+            const btnBinary = document.getElementById('btn-structure-binary');
+            const btnMulti = document.getElementById('btn-structure-multi');
+            const binaryOddsSection = document.getElementById('binary-odds-section');
+            const multiOptionSection = document.getElementById('multi-option-section');
+
+            if (structure === 'binary') {
+                btnBinary.className = 'btn btn-stake-yes';
+                btnMulti.className = 'btn btn-secondary';
+                binaryOddsSection.classList.remove('hidden');
+                multiOptionSection.classList.add('hidden');
+            } else {
+                btnBinary.className = 'btn btn-secondary';
+                btnMulti.className = 'btn btn-stake-yes';
+                binaryOddsSection.classList.add('hidden');
+                multiOptionSection.classList.remove('hidden');
+                
+                // Initialize with 3 default options if empty
+                const container = document.getElementById('multi-options-container');
+                if (container.children.length === 0) {
+                    addMultiOption('Option A', 33);
+                    addMultiOption('Option B', 33);
+                    addMultiOption('Option C', 34);
+                }
+            }
+        }
+        
+        window.addMultiOption = (label = '', odds = 0) => {
+            const container = document.getElementById('multi-options-container');
+            if (container.children.length >= 6) {
+                showToast('Maximum 6 options allowed', 'warning');
+                return;
+            }
+            
+            const id = ++multiOptionCounter;
+            const optionHtml = `
+                <div class="multi-option-row flex gap-2 items-start" data-option-id="${id}">
+                    <div class="flex-1">
+                        <input type="text" 
+                               class="ui-input text-sm" 
+                               placeholder="e.g., BTC below $90k" 
+                               value="${label}"
+                               data-field="label">
+                    </div>
+                    <div class="w-20">
+                        <input type="number" 
+                               class="ui-input text-sm" 
+                               placeholder="25" 
+                               min="1" 
+                               max="99"
+                               value="${odds || ''}"
+                               data-field="odds">
+                    </div>
+                    <button type="button" 
+                            onclick="removeMultiOption(${id})" 
+                            class="mt-2 text-red-400 hover:text-red-300">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', optionHtml);
+        }
+        
+        window.removeMultiOption = (id) => {
+            const container = document.getElementById('multi-options-container');
+            if (container.children.length <= 3) {
+                showToast('Minimum 3 options required', 'warning');
+                return;
+            }
+            const row = container.querySelector(`[data-option-id="${id}"]`);
+            if (row) row.remove();
+        }
+        
+        window.getMultiOptions = () => {
+            const container = document.getElementById('multi-options-container');
+            const options = [];
+            container.querySelectorAll('.multi-option-row').forEach((row, index) => {
+                const label = row.querySelector('[data-field="label"]').value.trim();
+                const odds = parseInt(row.querySelector('[data-field="odds"]').value) || 0;
+                if (label) {
+                    options.push({ id: `opt_${index}`, label, odds });
+                }
+            });
+            return options;
+        }
+        
+        /**
          * Handles the new "No-Loss" vs "Traditional" market type buttons.
          */
         window.selectMarketType = (type) => {
@@ -5117,11 +5239,37 @@
             // 2. Get all form values
             const title = document.getElementById('market-title-input').value;
             const insight = document.getElementById('market-insight-input').value;
-            const yesPercent = parseFloat(dom.marketYesInput.value, 10);
-            const noPercent = parseFloat(dom.marketNoInput.value, 10);
             const stakingDeadline = document.getElementById('staking-deadline-input').value;
             const resolutionDate = document.getElementById('market-resolution-date').value;
             const category = document.getElementById('market-category-select').value;
+            
+            // Handle market structure (binary vs multi-option)
+            const marketStructure = document.getElementById('market-structure-input').value || 'binary';
+            let yesPercent, noPercent, multiOptions = null;
+            
+            if (marketStructure === 'multi-option') {
+                multiOptions = getMultiOptions();
+                if (multiOptions.length < 3) {
+                    showToast('Multi-option markets need at least 3 options', 'error');
+                    return;
+                }
+                if (multiOptions.length > 6) {
+                    showToast('Multi-option markets support maximum 6 options', 'error');
+                    return;
+                }
+                // Validate odds sum to 100
+                const totalOdds = multiOptions.reduce((sum, opt) => sum + opt.odds, 0);
+                if (totalOdds !== 100) {
+                    showToast(`Odds must add up to 100% (currently ${totalOdds}%)`, 'error');
+                    return;
+                }
+                // For multi-option, we'll distribute liquidity evenly initially
+                yesPercent = 50; // Placeholder for validation
+                noPercent = 50;
+            } else {
+                yesPercent = parseFloat(dom.marketYesInput.value, 10);
+                noPercent = parseFloat(dom.marketNoInput.value, 10);
+            }
 
             // Get the new liquidity info
             const liquidityAmount = parseFloat(dom.marketLiquidityInput.value);
@@ -5134,17 +5282,25 @@
             const yieldProtocolFinal = isFixedPotFinal ? (document.getElementById('yield-protocol-select')?.value || document.getElementById('selected-yield-protocol').value) : null;
 
             // 3. --- NEW, STRICTER VALIDATION ---
-            if (!title || !insight || !resolutionDate || isNaN(yesPercent) || isNaN(noPercent) || !liquidityAmount || liquidityAmount <= 0) {
+            if (!title || !insight || !resolutionDate || !liquidityAmount || liquidityAmount <= 0) {
                 showToast("Please fill out all fields, including a valid liquidity amount.");
                 return;
             }
-            if (Math.abs(yesPercent + noPercent - 100) > 0.001) {
-                showToast("Error: Percentages must add up to 100%.");
-                return;
-            }
-            if (yesPercent <= 0 || yesPercent >= 100) {
-                showToast("Error: For AMM markets, odds must be between 1% and 99%.");
-                return;
+            
+            // For binary markets, validate YES/NO percentages
+            if (marketStructure === 'binary') {
+                if (isNaN(yesPercent) || isNaN(noPercent)) {
+                    showToast("Please enter valid YES and NO percentages.");
+                    return;
+                }
+                if (Math.abs(yesPercent + noPercent - 100) > 0.001) {
+                    showToast("Error: Percentages must add up to 100%.");
+                    return;
+                }
+                if (yesPercent <= 0 || yesPercent >= 100) {
+                    showToast("Error: For AMM markets, odds must be between 1% and 99%.");
+                    return;
+                }
             }
             if (category === "Other") {
                 showToast("Please select a market category.");
@@ -5176,21 +5332,18 @@
                     // 3. TRANSACTION WRITE 1: Create the new market
                     const newMarketRef = doc(marketCollectionRef); // Create ref for the new doc
                     const protocolApy = getProtocolApy(yieldProtocolFinal);
-                    transaction.set(newMarketRef, {
+                    
+                    const marketData = {
                         title,
                         insight,
                         category: category,
-                        yesPercent: yesPercent,
-                        noPercent: noPercent,
-                        // Use the user's staked liquidity
-                        yesPool: liquidityAmountInUsd * (yesPercent / 100),
-                        noPool: liquidityAmountInUsd * (noPercent / 100),
+                        marketStructure: marketStructure,
                         isFixedPot: isFixedPotFinal,
                         stakingDeadline,
                         resolutionDate,
                         yieldProtocol: yieldProtocolFinal,
-                        totalStakeVolume: liquidityAmountInUsd, // The creator's stake is the starting volume
-                        uniqueStakerCount: 1, // The creator is the first staker
+                        totalStakeVolume: liquidityAmountInUsd,
+                        uniqueStakerCount: 1,
                         refundVolumeGoal: 100,
                         refundStakerGoal: 10,
                         isResolved: false,
@@ -5198,7 +5351,6 @@
                         createdAt: serverTimestamp(),
                         createdBy: currentUserId,
                         createdByDisplayName: userProfile.displayName,
-                        // Yield system fields
                         totalPrincipalUsd: isFixedPotFinal ? liquidityAmountInUsd : 0,
                         lastAccrualAt: serverTimestamp(),
                         accruedYieldUsd: 0,
@@ -5206,7 +5358,23 @@
                         disputes: [],
                         resolutionSource: null,
                         adminEvents: []
-                    });
+                    };
+                    
+                    // Add structure-specific fields
+                    if (marketStructure === 'binary') {
+                        marketData.yesPercent = yesPercent;
+                        marketData.noPercent = noPercent;
+                        marketData.yesPool = liquidityAmountInUsd * (yesPercent / 100);
+                        marketData.noPool = liquidityAmountInUsd * (noPercent / 100);
+                    } else {
+                        // Multi-option market
+                        marketData.options = multiOptions.map(opt => ({
+                            ...opt,
+                            pool: liquidityAmountInUsd * (opt.odds / 100)
+                        }));
+                    }
+                    
+                    transaction.set(newMarketRef, marketData);
 
                     // 4. TRANSACTION WRITE 2: Deduct liquidity AND award XP
                     const xpToAward = getRandomXP(50);
