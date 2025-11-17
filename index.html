@@ -7304,7 +7304,7 @@ ${historyText}`;
                                             <span class="text-xs text-gray-500 dark:text-gray-400">${replyTimeAgo}</span>
                                         </div>
                                         <p class="text-gray-700 dark:text-gray-300 text-xs mt-0.5">${reply.commentText}</p>
-                                        <button onclick="startReply('${commentId}', '${reply.displayName.replace(/'/g, "\\'")}')" class="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-500 mt-1 flex items-center space-x-1">
+                                        <button onclick="startReply('${commentId}', '${reply.displayName.replace(/'/g, "\\'")}', '${reply.userId}')" class="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-500 mt-1 flex items-center space-x-1">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
                                             </svg>
@@ -7332,7 +7332,7 @@ ${historyText}`;
                                     <span class="text-xs text-gray-500 dark:text-gray-400">${timeAgo}</span>
                                 </div>
                                 <p class="text-gray-700 dark:text-gray-300 text-sm mt-1">${comment.commentText}</p>
-                                <button onclick="startReply('${commentId}', '${displayName.replace(/'/g, "\\'")}')" class="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-500 mt-1 flex items-center space-x-1">
+                                <button onclick="startReply('${commentId}', '${displayName.replace(/'/g, "\\'")}', '${comment.userId}')" class="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-500 mt-1 flex items-center space-x-1">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
                                     </svg>
@@ -7411,8 +7411,8 @@ ${historyText}`;
         /**
          * Start replying to a comment
          */
-        window.startReply = (commentId, displayName) => {
-            replyingTo = { commentId, displayName };
+        window.startReply = (commentId, displayName, userId) => {
+            replyingTo = { commentId, displayName, userId };
             dom.tickerCommentInput.placeholder = `Replying to ${displayName}...`;
             dom.tickerCommentInput.focus();
             
