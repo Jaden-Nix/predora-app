@@ -4382,7 +4382,7 @@
          */
         //
 
-        async function stakeMarket(pick) {
+        window.stakeMarket = async function(pick) {
             // 1. Get all Firebase functions
             const { doc, updateDoc, increment, addDoc, collection, serverTimestamp, runTransaction } = window.firebase.firestore;
 
@@ -6512,6 +6512,21 @@ ${historyText}`;
                     const streakUpdate = isWinner ? increment(1) : 0; // Increment streak if winner, reset to 0 if loser
                     // ---- END STREAK LOGIC BLOCK ----
 
+                    // Create notification for market resolution
+                    const notificationRef = doc(collection(db, 'artifacts', APP_ID, 'public', 'data', USER_PROFILE_COLLECTION, pledge.userId, 'notifications'));
+                    batch.set(notificationRef, {
+                        type: 'market_resolved',
+                        message: isWinner 
+                            ? `You won! Market "${market.title}" resolved in your favor. +$${(totalReturnUsd - pledge.amountUsd).toFixed(2)}`
+                            : `Market "${market.title}" resolved. ${market.isNoLoss ? 'Principal returned.' : 'Better luck next time!'}`,
+                        marketId: market.marketId,
+                        marketTitle: market.title,
+                        isWinner: isWinner,
+                        payout: totalReturnUsd,
+                        timestamp: serverTimestamp(),
+                        read: false
+                    });
+
                     // Find the user's profile to pay them and give XP
                     const profileRef = doc(db, 'artifacts', APP_ID, 'public', 'data', USER_PROFILE_COLLECTION, pledge.userId);
                     batch.update(profileRef, {
@@ -7953,6 +7968,18 @@ ${historyText}`;
                     batch.delete(followingRef);
                     batch.delete(followerRef);
                     await batch.commit();
+
+                    // Create notification for the person being unfollowed
+                    const { addDoc, collection } = window.firebase.firestore;
+                    const notificationsRef = collection(db, 'artifacts', APP_ID, 'public', 'data', USER_PROFILE_COLLECTION, targetUserId, 'notifications');
+                    await addDoc(notificationsRef, {
+                        type: 'new_follower',
+                        message: `${userProfile.displayName} unfollowed you`,
+                        fromUserId: currentUserId,
+                        fromUserName: userProfile.displayName,
+                        timestamp: serverTimestamp(),
+                        read: false
+                    });
 
                     showToast(`You have unfollowed ${targetUserName}`, "info");
                     updateFollowButton(false);
