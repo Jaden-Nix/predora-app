@@ -1362,17 +1362,17 @@
 
                     <div class="space-y-4">
                         <h3 class="text-base font-semibold text-gray-200">Market Type</h3>
-                        <input type="hidden" id="market-type-input" value="no-loss"> 
+                        <input type="hidden" id="market-type-input" value="fixed-pot"> 
 
                         <div class="grid grid-cols-2 gap-3">
-                            <button id="btn-market-no-loss" onclick="selectMarketType('no-loss')" class="btn btn-stake-yes">
-                                No-Loss
+                            <button id="btn-market-fixed-pot" onclick="selectMarketType('fixed-pot')" class="btn btn-stake-yes">
+                                Fixed Pot Yield
                                 <span class="block text-xs font-light">(Principal Safe)</span>
                             </button>
 
                             <button id="btn-market-traditional" onclick="selectMarketType('traditional')" class="btn btn-secondary">
-                                Traditional
-                                <span class="block text-xs font-light">(High-Risk)</span>
+                                Traditional AMM
+                                <span class="block text-xs font-light">(Liquidity Pool)</span>
                             </button>
                         </div>
                     </div>
@@ -1405,12 +1405,12 @@
                             </p>
                         </div>
                         
-                        <div id="no-loss-liquidity-info" class="hidden">
+                        <div id="fixed-pot-liquidity-info" class="hidden">
                             <p class="text-sm text-green-400 font-medium mb-2">
-                                ✓ No-loss markets use yield protocols
+                                ✓ Fixed Pot Yield markets use DeFi protocols
                             </p>
                             <p class="text-sm text-gray-400">
-                                User stakes earn yield from DeFi. You still need initial liquidity to bootstrap the market.
+                                All stakes go into a yield vault. Principal is returned to everyone. Only the yield is distributed to winners.
                             </p>
                         </div>
 
@@ -1438,7 +1438,7 @@
                     </div>
                 </div>
 
-                <div id="no-loss-options" class="space-y-4">
+                <div id="fixed-pot-options" class="space-y-4">
                     <h3 class="text-base font-semibold text-gray-200">Yield Protocol</h3>
                     <div class="ui-panel p-4 space-y-2">
                         <div id="yield-protocol-aave" class="flex justify-between items-center p-3 rounded-lg border border-sky-400 bg-sky-500/10 cursor-pointer" onclick="selectYield('aave')">
@@ -1469,12 +1469,18 @@
                     <input type="hidden" id="selected-yield-protocol" value="aave">
                 </div>
 
-                <div id="standard-market-options" class="form-section space-y-4">
+                <div id="market-timing-section" class="form-section space-y-4">
                     <h3 class="text-base font-semibold text-gray-200">Market Timing</h3>
+                    
                     <div class="space-y-2">
-                        <label for="market-stake-duration" class="text-sm font-medium text-gray-300">Staking Window (Duration)</label>
-                        <input type="text" id="market-stake-duration" class="ui-input" placeholder="e.g., 24h, 3d, 1 week">
+                        <div class="flex items-center justify-between">
+                            <label for="staking-deadline-input" class="text-sm font-medium text-gray-300">Staking Deadline</label>
+                            <span class="text-xs text-gray-400">Market locks after this</span>
+                        </div>
+                        <input type="date" id="staking-deadline-input" class="ui-input" style="color-scheme: dark;">
+                        <p class="text-xs text-gray-400">Users can only stake until this deadline. Set 1-7 days before resolution.</p>
                     </div>
+                    
                     <div class="space-y-2">
                         <div class="flex items-center justify-between">
                             <label for="market-resolution-date" class="text-sm font-medium text-gray-300">Resolution Date</label>
@@ -4170,7 +4176,7 @@
                 // --- END OF TRANSACTION ---
 
                 showLoadingOverlay(false);
-                showToast(`Stake Confirmed! +${xpToAward} XP`, "success");
+                showToast(`Stake Confirmed!`, "success");
 
             } catch (error) {
                 console.error("Staking failed:", error);
@@ -4852,33 +4858,33 @@
          * Handles the new "No-Loss" vs "Traditional" market type buttons.
          */
         window.selectMarketType = (type) => {
-            const noLossBtn = document.getElementById('btn-market-no-loss');
+            const fixedPotBtn = document.getElementById('btn-market-fixed-pot');
             const traditionalBtn = document.getElementById('btn-market-traditional');
-            const noLossOptions = document.getElementById('no-loss-options');
+            const fixedPotOptions = document.getElementById('fixed-pot-options');
             const typeInput = document.getElementById('market-type-input');
             const traditionalInfo = document.getElementById('traditional-liquidity-info');
-            const noLossInfo = document.getElementById('no-loss-liquidity-info');
+            const fixedPotInfo = document.getElementById('fixed-pot-liquidity-info');
 
-            if (type === 'no-loss') {
-                typeInput.value = 'no-loss';
-                noLossBtn.classList.replace('btn-secondary', 'btn-stake-yes');
+            if (type === 'fixed-pot') {
+                typeInput.value = 'fixed-pot';
+                fixedPotBtn.classList.replace('btn-secondary', 'btn-stake-yes');
                 traditionalBtn.classList.replace('btn-stake-no', 'btn-secondary');
-                noLossOptions.classList.remove('hidden');
+                fixedPotOptions.classList.remove('hidden');
                 if (traditionalInfo) traditionalInfo.classList.add('hidden');
-                if (noLossInfo) noLossInfo.classList.remove('hidden');
+                if (fixedPotInfo) fixedPotInfo.classList.remove('hidden');
             } else {
                 typeInput.value = 'traditional';
-                noLossBtn.classList.replace('btn-stake-yes', 'btn-secondary');
+                fixedPotBtn.classList.replace('btn-stake-yes', 'btn-secondary');
                 traditionalBtn.classList.replace('btn-secondary', 'btn-stake-no');
-                noLossOptions.classList.add('hidden');
+                fixedPotOptions.classList.add('hidden');
                 if (traditionalInfo) traditionalInfo.classList.remove('hidden');
-                if (noLossInfo) noLossInfo.classList.add('hidden');
+                if (fixedPotInfo) fixedPotInfo.classList.add('hidden');
             }
         }
         
-        // Initialize on page load (default is no-loss)
+        // Initialize on page load (default is fixed-pot)
         document.addEventListener('DOMContentLoaded', () => {
-            selectMarketType('no-loss');
+            selectMarketType('fixed-pot');
         });
         // ---- END OF NEW FUNCTION ----
 
@@ -4892,7 +4898,7 @@
             const insight = document.getElementById('market-insight-input').value;
             const yesPercent = parseFloat(dom.marketYesInput.value, 10);
             const noPercent = parseFloat(dom.marketNoInput.value, 10);
-            const stakeDuration = document.getElementById('market-stake-duration').value;
+            const stakingDeadline = document.getElementById('staking-deadline-input').value;
             const resolutionDate = document.getElementById('market-resolution-date').value;
             const category = document.getElementById('market-category-select').value;
 
@@ -4903,11 +4909,11 @@
             const liquidityAmountInUsd = liquidityAmount * getMockPrice(liquidityAsset);
 
             const selectedMarketType = document.getElementById('market-type-input').value;
-            const isNoLossFinal = selectedMarketType === 'no-loss';
-            const yieldProtocolFinal = isNoLossFinal ? document.getElementById('selected-yield-protocol').value : null;
+            const isFixedPotFinal = selectedMarketType === 'fixed-pot';
+            const yieldProtocolFinal = isFixedPotFinal ? document.getElementById('selected-yield-protocol').value : null;
 
             // 3. --- NEW, STRICTER VALIDATION ---
-            if (!title || !insight || !stakeDuration || !resolutionDate || isNaN(yesPercent) || isNaN(noPercent) || !liquidityAmount || liquidityAmount <= 0) {
+            if (!title || !insight || !resolutionDate || isNaN(yesPercent) || isNaN(noPercent) || !liquidityAmount || liquidityAmount <= 0) {
                 showToast("Please fill out all fields, including a valid liquidity amount.");
                 return;
             }
@@ -4958,8 +4964,8 @@
                         // Use the user's staked liquidity
                         yesPool: liquidityAmountInUsd * (yesPercent / 100),
                         noPool: liquidityAmountInUsd * (noPercent / 100),
-                        isNoLoss: isNoLossFinal,
-                        stakeDuration,
+                        isFixedPot: isFixedPotFinal,
+                        stakingDeadline,
                         resolutionDate,
                         yieldProtocol: yieldProtocolFinal,
                         totalStakeVolume: liquidityAmountInUsd, // The creator's stake is the starting volume
@@ -4972,7 +4978,7 @@
                         createdBy: currentUserId,
                         createdByDisplayName: userProfile.displayName,
                         // Yield system fields
-                        totalPrincipalUsd: isNoLossFinal ? liquidityAmountInUsd : 0,
+                        totalPrincipalUsd: isFixedPotFinal ? liquidityAmountInUsd : 0,
                         lastAccrualAt: serverTimestamp(),
                         accruedYieldUsd: 0,
                         protocolApy: protocolApy,
@@ -5002,7 +5008,7 @@
                 document.getElementById('market-insight-input').value = '';
                 dom.marketYesInput.value = '';
                 dom.marketNoInput.value = '';
-                document.getElementById('market-stake-duration').value = '';
+                document.getElementById('staking-deadline-input').value = '';
                 document.getElementById('market-resolution-date').value = '';
                 dom.marketLiquidityInput.value = '';
 
@@ -5144,9 +5150,12 @@
                                             "insight": { "type": "STRING", "description": "Brief, compelling insight supporting the market." },
                                             "yesPercent": { "type": "NUMBER", "description": "Initial confidence level for YES (1-99)." },
                                             "noPercent": { "type": "NUMBER", "description": "Initial confidence level for NO (1-99)." },
-                                            "category": { "type": "STRING", "description": "The market category. Must be one of: Crypto, Sports, Politics, Entertainment, Finance, Tech, Other" }
+                                            "category": { "type": "STRING", "description": "The market category. Must be one of: Crypto, Sports, Politics, Entertainment, Finance, Tech, Micro-Influencer, Creator Milestones, Gossip, Campus, Local Sports, Gaming, Other" },
+                                            "resolutionDate": { "type": "STRING", "description": "The exact resolution date in YYYY-MM-DD format. Parse from context (e.g., 'Q2 2026' = '2026-06-30', 'end of 2025' = '2025-12-31', 'Super Bowl 2026' = '2026-02-08')." },
+                                            "marketType": { "type": "STRING", "description": "Market type: 'traditional' for AMM-based markets or 'fixed-pot' for no-loss yield markets. Use 'fixed-pot' for GenZ/low-risk events." },
+                                            "stakingDeadline": { "type": "STRING", "description": "Deadline for staking in YYYY-MM-DD format. Usually 1-7 days before resolution date." }
                                         },
-                                        "required": ["title", "insight", "yesPercent", "noPercent", "category"]
+                                        "required": ["title", "insight", "yesPercent", "noPercent", "category", "resolutionDate"]
                                     }
                                 }
                             ]
@@ -5155,10 +5164,16 @@
 
                         const systemPrompt_2 = `You are a market creator. A user has provided context about a future event.
                         Your ONLY job is to use the 'create_market_form' tool to create a market based on this context.
-                        The 'title' must be a yes/no question.
-                        The 'insight' must be a brief summary of the context.
-                        You MUST select the most relevant 'category' from the allowed list.
-                        Odds (yesPercent, noPercent) must be between 1 and 99, and sum to 100.
+                        
+                        RULES:
+                        - 'title' must be a yes/no question
+                        - 'insight' must be a brief summary of the context
+                        - 'category' must match one from the allowed list (use new categories like Campus, Gaming, Creator Milestones for GenZ content)
+                        - 'resolutionDate' must be parsed from context (Q1 2026 = 2026-03-31, Q2 2026 = 2026-06-30, end of 2025 = 2025-12-31, etc.)
+                        - 'marketType' should be 'fixed-pot' for low-risk/GenZ/campus events, 'traditional' for high-volume crypto/sports
+                        - 'stakingDeadline' should be 1-7 days before resolutionDate
+                        - Odds (yesPercent, noPercent) must be between 1 and 99, and sum to 100
+                        
                         You MUST use the 'create_market_form' tool.`;
 
                         // The 'prompt' for this call is the *result* from Call 1
@@ -5174,7 +5189,27 @@
                             dom.marketYesInput.value = data.yesPercent;
                             dom.marketNoInput.value = data.noPercent;
                             document.getElementById('market-category-select').value = data.category;
+                            
+                            // Fill resolution date if provided
+                            if (data.resolutionDate) {
+                                document.getElementById('market-resolution-date').value = data.resolutionDate;
+                            }
+                            
+                            // Set market type if provided
+                            if (data.marketType && (data.marketType === 'traditional' || data.marketType === 'fixed-pot')) {
+                                selectMarketType(data.marketType);
+                            }
+                            
+                            // Fill staking deadline if provided
+                            if (data.stakingDeadline) {
+                                const deadlineInput = document.getElementById('staking-deadline-input');
+                                if (deadlineInput) {
+                                    deadlineInput.value = data.stakingDeadline;
+                                }
+                            }
+                            
                             updatePreview();
+                            showToast("AI filled the form! Review and publish.", "success");
                         } else {
                             throw new Error("AI (Step 2) failed to return a valid form.");
                         }
