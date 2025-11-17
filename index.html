@@ -7706,36 +7706,8 @@ ${historyText}`;
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, 1200, 675);
             
-            // LOAD LOGO FIRST FOR BACKGROUND PLACEMENT
-            const logoPromise = new Promise((resolve) => {
-                const logoImg = new Image();
-                logoImg.crossOrigin = 'anonymous';
-                logoImg.onload = () => resolve(logoImg);
-                logoImg.onerror = () => {
-                    console.warn('Logo failed to load from Cloudinary');
-                    resolve(null);
-                };
-                // Use white logo on black background for better contrast
-                logoImg.src = 'https://res.cloudinary.com/djslxbghy/image/upload/Predora-app.png';
-            });
-            
-            // Wait for logo to load before drawing
-            const logoImg = await logoPromise;
-            
-            // LARGE DIAGONAL LOGO WATERMARK - CREATIVE PLACEMENT
-            if (logoImg) {
-                ctx.save();
-                // Move to center, rotate, then draw huge logo
-                ctx.translate(600, 337);
-                ctx.rotate(-15 * Math.PI / 180); // Rotate -15 degrees for dynamic look
-                ctx.globalAlpha = 0.08;
-                const hugeLogo = 600;
-                ctx.drawImage(logoImg, -hugeLogo/2, -hugeLogo/2, hugeLogo, hugeLogo);
-                ctx.restore();
-            }
-            
             // ABSTRACT BACKGROUND SHAPES
-            ctx.globalAlpha = 0.08;
+            ctx.globalAlpha = 0.1;
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
             ctx.arc(200, 150, 180, 0, Math.PI * 2);
@@ -7841,21 +7813,50 @@ ${historyText}`;
                 ctx.fillText(marketType, 150, yPos + 30);
             }
             
-            // BOTTOM LEFT LOGO BADGE - BOLD AND CREATIVE
+            // LOAD LOGO FOR FOOTER BADGE
+            const logoPromise = new Promise((resolve) => {
+                const logoImg = new Image();
+                logoImg.crossOrigin = 'anonymous';
+                logoImg.onload = () => resolve(logoImg);
+                logoImg.onerror = () => {
+                    console.warn('Footer logo failed to load');
+                    resolve(null);
+                };
+                logoImg.src = 'https://res.cloudinary.com/djslxbghy/image/upload/F3035734-12A9-4231-94C3-40B745E7193E_fqrluw.png';
+            });
+            
+            const logoImg = await logoPromise;
+            
+            // FOOTER BADGE WITH LOGO + TEXT (centered at bottom)
+            const footerText = 'predora-app.vercel.app';
+            ctx.font = 'bold 22px Inter, Arial, sans-serif';
+            const textWidth = ctx.measureText(footerText).width;
+            const logoSize = 28;
+            const spacing = 10;
+            const pillWidth = logoSize + spacing + textWidth + 40; // padding on sides
+            const pillHeight = 45;
+            const pillX = 600 - pillWidth / 2; // Center horizontally
+            const pillY = 545;
+            
+            // Draw pill background
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.beginPath();
+            ctx.roundRect(pillX, pillY, pillWidth, pillHeight, 25);
+            ctx.fill();
+            
+            // Draw logo in pill
             if (logoImg) {
-                ctx.globalAlpha = 0.6;
-                const badgeSize = 100;
-                ctx.drawImage(logoImg, 140, 475, badgeSize, badgeSize);
-                ctx.globalAlpha = 1;
+                const logoX = pillX + 20;
+                const logoY = pillY + (pillHeight - logoSize) / 2;
+                ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
             }
             
-            // FOOTER INSIDE CARD (at bottom of glass card) - READABLE
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-            ctx.font = 'bold 24px Inter, Arial, sans-serif';
-            const footerText = 'predora-app.vercel.app';
-            const footerWidth = ctx.measureText(footerText).width;
-            const footerX = 600 - footerWidth / 2; // Center horizontally
-            ctx.fillText(footerText, footerX, 560);
+            // Draw text in pill
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.font = 'bold 22px Inter, Arial, sans-serif';
+            const textX = pillX + 20 + logoSize + spacing;
+            const textY = pillY + pillHeight / 2 + 8; // Vertically centered
+            ctx.fillText(footerText, textX, textY);
             
             return canvas;
         };
