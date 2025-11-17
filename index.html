@@ -844,6 +844,18 @@
             transform: scale(0.95);
         }
 
+        /* --- Toast Notifications --- */
+        .toast-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @media (max-width: 640px) {
+            #toast-container {
+                right: 1rem;
+                left: 1rem;
+                max-width: calc(100% - 2rem);
+            }
+        }
+
         /* --- QUICK PLAY  --- */
         #quick-play-screen {
             position: fixed;
@@ -1618,6 +1630,17 @@
                             </div>
                         </div>
 
+                        <div class="ui-panel p-4 lg:p-6 space-y-3">
+                            <h3 class="text-base font-semibold text-amber-400">🔐 Admin Panel</h3>
+                            <p class="text-sm text-gray-400">Manage markets and oracle functions (Demo Only)</p>
+                            <button onclick="showScreen('admin-panel-screen')" class="btn btn-secondary w-full">
+                                <svg class="w-4 h-4 mr-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <span>Open Admin Panel</span>
+                            </button>
+                        </div>
+
                         <div class="ui-panel lg:p-6">
                             <h2 class="text-base font-semibold gradient-text mb-3">Staking Summary</h2>
                             <div class="grid grid-cols-2 gap-4 text-center">
@@ -1899,8 +1922,9 @@
             </button>
         </nav>
 
-        <div id="toast-notification">
-            <span id="toast-message" class="text-sm font-medium text-gray-900 dark:text-white"></span>
+        <!-- Toast Notification Container -->
+        <div id="toast-container" class="fixed top-20 right-4 z-[999] space-y-2 max-w-sm">
+            <!-- Toasts will be dynamically inserted here -->
         </div>
 
         <div id="loading-overlay" class="hidden fixed inset-0 bg-black/80 z-[998] flex justify-center items-center backdrop-blur-sm">
@@ -2456,7 +2480,7 @@
             const email = document.getElementById('mock-email-input').value;
 
             if (!email || email.trim() === '' || !email.includes('@')) {
-                showToast("Please enter a valid email address.");
+                showToast("Please enter a valid email address.", "warning");
             } else {
                 showScreen('otp-screen');
             }
@@ -2505,7 +2529,7 @@
                 const displayName = `@${userId}`;
                 mockLogin(userId, displayName);
             } else {
-                showToast("Invalid OTP. Hint: 123456");
+                showToast("Invalid OTP. Hint: 123456", "error");
             }
         }
         /**
@@ -2685,7 +2709,7 @@
                 // Update UI
                 updateNotificationBadge(0);
                 loadNotifications();
-                showToast('All notifications marked as read');
+                showToast('All notifications marked as read', "success");
             } catch (error) {
                 console.error('Error marking notifications as read:', error);
             }
@@ -3011,21 +3035,81 @@
         }
 
         /**
-         * Shows a pop-up "toast" notification from the top of the screen.
+         * Shows a beautiful toast notification
+         * @param {string} message - The message to display
+         * @param {string} type - Type of toast: 'success', 'error', 'info', 'warning'
+         * @param {number} duration - How long to show the toast in ms
          */
-        function showToast(message, duration = 3000) {
-            const toast = document.getElementById('toast-notification');
-            const toastMessage = document.getElementById('toast-message');
-            if (!toast || !toastMessage) return;
+        function showToast(message, type = 'info', duration = 3500) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
 
-            clearTimeout(toastTimer); 
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = 'toast-item transform transition-all duration-300 ease-out';
+            
+            // Icon and colors based on type
+            const config = {
+                success: {
+                    icon: '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>',
+                    bgClass: 'bg-gradient-to-r from-emerald-500/20 to-green-500/20 dark:from-emerald-500/20 dark:to-green-500/20 light:from-emerald-50 light:to-green-50',
+                    borderClass: 'border-l-4 border-emerald-500',
+                    iconColor: 'text-emerald-500',
+                    textColor: 'text-emerald-100 dark:text-emerald-100 light:text-emerald-900'
+                },
+                error: {
+                    icon: '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>',
+                    bgClass: 'bg-gradient-to-r from-rose-500/20 to-red-500/20 dark:from-rose-500/20 dark:to-red-500/20 light:from-rose-50 light:to-red-50',
+                    borderClass: 'border-l-4 border-rose-500',
+                    iconColor: 'text-rose-500',
+                    textColor: 'text-rose-100 dark:text-rose-100 light:text-rose-900'
+                },
+                warning: {
+                    icon: '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>',
+                    bgClass: 'bg-gradient-to-r from-amber-500/20 to-yellow-500/20 dark:from-amber-500/20 dark:to-yellow-500/20 light:from-amber-50 light:to-yellow-50',
+                    borderClass: 'border-l-4 border-amber-500',
+                    iconColor: 'text-amber-500',
+                    textColor: 'text-amber-100 dark:text-amber-100 light:text-amber-900'
+                },
+                info: {
+                    icon: '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>',
+                    bgClass: 'bg-gradient-to-r from-sky-500/20 to-blue-500/20 dark:from-sky-500/20 dark:to-blue-500/20 light:from-sky-50 light:to-blue-50',
+                    borderClass: 'border-l-4 border-sky-500',
+                    iconColor: 'text-sky-500',
+                    textColor: 'text-sky-100 dark:text-sky-100 light:text-sky-900'
+                }
+            };
 
-            // Use .innerHTML to allow for line breaks (<br>) and other simple HTML
-            toastMessage.innerHTML = message;
-            toast.classList.add('show');
+            const style = config[type] || config.info;
 
-            toastTimer = setTimeout(() => {
-                toast.classList.remove('show');
+            toast.innerHTML = `
+                <div class="flex items-start gap-3 p-4 rounded-lg shadow-2xl backdrop-blur-md ${style.bgClass} ${style.borderClass} border border-white/10 dark:border-white/10 light:border-gray-200 min-w-[280px] max-w-sm">
+                    <div class="${style.iconColor} flex-shrink-0 mt-0.5">
+                        ${style.icon}
+                    </div>
+                    <p class="${style.textColor} text-sm font-medium flex-1 leading-relaxed">${message}</p>
+                    <button onclick="this.closest('.toast-item').remove()" class="text-gray-400 hover:text-white dark:hover:text-white light:hover:text-gray-900 flex-shrink-0 transition-colors">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                    </button>
+                </div>
+            `;
+
+            // Add with slide-in animation
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100%)';
+            container.appendChild(toast);
+
+            // Trigger animation
+            requestAnimationFrame(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(0)';
+            });
+
+            // Auto-remove after duration
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
             }, duration);
         }
 
@@ -3223,7 +3307,7 @@
                     if (change.type === 'added') {
                         const follower = change.doc.data();
                         console.log("New follower detected:", follower.displayName);
-                        showToast(`✨ ${follower.displayName} just followed you!`);
+                        showToast(`${follower.displayName} just followed you!`, "info");
                     }
                 });
             });
@@ -3436,13 +3520,13 @@
                 updateProfileUI(userProfile);
 
                 showLoadingOverlay(false);
-                showToast(`✅ ${amount} ${asset} received!`);
+                showToast(`${amount} ${asset} received from faucet!`, "success");
 
 
             } catch (error) {
                 console.error("Faucet claim failed:", error);
                 showLoadingOverlay(false);
-                showToast("Faucet claim failed. Check console.");
+                showToast("Faucet claim failed. Check console.", "error");
             }
         }
 
@@ -3684,7 +3768,7 @@
                         const marketRef = doc(db, 'artifacts', APP_ID, 'public', 'data', STANDARD_MARKETS_COLLECTION, marketId);
                         const docSnap = await getDoc(marketRef);
                         if (!docSnap.exists()) {
-                            showToast("Error: Market not found.");
+                            showToast("Error: Market not found.", "error");
                             return;
                         }
 
@@ -3738,7 +3822,7 @@
                         // THIS IS THE NEW, UPGRADED LISTENER
                         detailMarketUnsubscribe = onSnapshot(marketRef, (docSnap) => {
                             if (!docSnap.exists()) {
-                                showToast("Error: This market no longer exists.");
+                                showToast("Error: This market no longer exists.", "error");
                                 goBack();
                                 return;
                             }
@@ -3765,7 +3849,7 @@
                             // 5. Check if the market was resolved *while* we were watching
                             if (currentMarket.isResolved) {
                                 console.log("Market resolved while user was viewing.");
-                                showToast("This market has just been resolved! Staking is closed.");
+                                showToast("This market has just been resolved! Staking is closed.", "warning");
                                 document.getElementById('stake-yes-btn').disabled = true;
                                 document.getElementById('stake-no-btn').disabled = true;
                                 dom.stakeAmountInput.disabled = true;
@@ -3777,7 +3861,7 @@
 
                 } catch (error) {
                     console.error("Error fetching market detail:", error);
-                    showToast("Error loading market details.");
+                    showToast("Error loading market details.", "error");
                 }
             }
 
@@ -3839,15 +3923,15 @@
 
             // 3. --- VALIDATION ---
             if (!amount || amount <= 0) {
-                showToast("Please enter a valid stake amount.");
+                showToast("Please enter a valid stake amount.", "warning");
                 return;
             }
             if (!currentMarketId || !currentMarket) {
-                showToast("Error: No market selected.");
+                showToast("Error: No market selected.", "error");
                 return;
             }
             if (currentMarket.isResolved) {
-                showToast("This market is closed and no longer accepting stakes.");
+                showToast("This market is closed and no longer accepting stakes.", "warning");
                 return;
             }
 
@@ -3970,12 +4054,12 @@
                 // --- END OF TRANSACTION ---
 
                 showLoadingOverlay(false);
-                showToast(`✅ Stake Confirmed! +${xpToAward} XP`);
+                showToast(`Stake Confirmed! +${xpToAward} XP`, "success");
 
             } catch (error) {
                 console.error("Staking failed:", error);
                 showLoadingOverlay(false);
-                showToast(`Staking failed: ${error.message}`); // This will now show "Insufficient balance"
+                showToast(`Staking failed: ${error.message}`, "error"); // This will now show "Insufficient balance"
             }
         }
 
@@ -4136,7 +4220,7 @@
             } else {
                 // Add new item to the pool
                 pledgePoolItems.push({ id: marketId, title: marketTitle, pick: pick, isMock: isMock });
-                showToast(`Added to Pledge Pool!`);
+                showToast(`Added to Pledge Pool!`, "success");
                 if (currentScreenId === 'pledge-pool-screen') renderPledgePool();
             }
 
@@ -4151,7 +4235,7 @@
          */
         window.removeItemFromPledgePool = (marketId) => {
             pledgePoolItems = pledgePoolItems.filter(item => item.id !== marketId);
-            showToast("Removed from pool.");
+            showToast("Removed from pool.", "info");
             renderPledgePool(); 
             localStorage.setItem('pledgePool', JSON.stringify(pledgePoolItems));
             // Re-render the pool
@@ -4282,7 +4366,7 @@
             }
 
             if (pledgesToProcess.length === 0) {
-                showToast("Please enter a valid amount for at least one pledge.");
+                showToast("Please enter a valid amount for at least one pledge.", "warning");
                 return;
             }
 
@@ -4443,14 +4527,14 @@
 
                 renderPledgePool(); // Re-render the (now empty) pool
                 showLoadingOverlay(false);
-                showToast(`✅ ${pledgesToProcess.length} Pledges Confirmed on BNB Testnet!`);
+                showToast(`${pledgesToProcess.length} Pledges Confirmed on BNB Testnet!`, "success");
                 showScreen('profile-screen'); 
 
             } catch (error) {
                 console.error("Pledge staking failed:", error);
                 showLoadingOverlay(false);
                 // Use the string(error) trick to show the real error
-                showToast(`Staking failed: ${String(error)}`);
+                showToast(`Staking failed: ${String(error)}`, "error");
             }
         }
 
@@ -4649,7 +4733,7 @@
                 // --- END OF TRANSACTION ---
 
                 showLoadingOverlay(false);
-                showToast("Market created successfully!");
+                showToast("Market created successfully!", "success");
                 showScreen('home-screen');
 
                 // 6. Clear the form
@@ -4664,7 +4748,7 @@
             } catch (error) {
                 console.error("Error creating market:", error);
                 showLoadingOverlay(false);
-                showToast(`Market creation failed: ${error.message}`);
+                showToast(`Market creation failed: ${error.message}`, "error");
             }
         }
 
@@ -5917,7 +6001,7 @@ ${historyText}`;
                 // After saving, log them into the app
                 showLoadingOverlay(false);
                 closeAvatarModal();
-                showToast("Avatar saved! Welcome to Predora!");
+                showToast("Avatar saved! Welcome to Predora!", "success");
 
                 // Attach all data listeners
                 attachDataListeners();
@@ -6181,7 +6265,7 @@ ${historyText}`;
                     });
                     
                     console.log('Reply posted successfully');
-                    showToast('Reply posted!');
+                    showToast('Reply posted!', "success");
                     cancelReply();
                     
                     // Reload the ticker feed to show the new reply
@@ -6667,7 +6751,7 @@ ${historyText}`;
                     batch.delete(followerRef);
                     await batch.commit();
 
-                    showToast(`You have unfollowed ${targetUserName}`);
+                    showToast(`You have unfollowed ${targetUserName}`, "info");
                     updateFollowButton(false);
                 } else {
                     // --- FOLLOW Logic ---
@@ -6699,7 +6783,7 @@ ${historyText}`;
                     });
                     await batch.commit();
 
-                    showToast(`You are now following ${targetUserName}`);
+                    showToast(`You are now following ${targetUserName}`, "success");
                     updateFollowButton(true);
                 }
             } catch (error) {

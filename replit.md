@@ -2,7 +2,7 @@
 
 ## Overview
 
-Predora is a web application that integrates AI capabilities through Google's Gemini API. The application features a dark-themed UI built with Tailwind CSS and Chart.js for data visualization, with a Node.js/Express backend that handles secure API communications and Firebase integration for data persistence and authentication.
+Predora is a web application designed to integrate AI capabilities using Google's Gemini API. It features a dark-themed UI (with a comprehensive light mode) built with Tailwind CSS and Chart.js for data visualization. The application's backend, powered by Node.js/Express, securely handles API communications and leverages Firebase for data persistence and authentication. Predora aims to provide a modern, engaging user experience with features like market predictions, social interactions, and a robust notification system, targeting GenZ users with its contemporary design choices.
 
 ## User Preferences
 
@@ -12,231 +12,75 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Architecture
 
-**Technology Stack**
-- Pure HTML/CSS/JavaScript (no framework)
-- Tailwind CSS via CDN for styling
-- Chart.js for data visualization
-- Inter font family from Google Fonts
+**Technology Stack**: Pure HTML/CSS/JavaScript, Tailwind CSS (CDN), Chart.js, Google Fonts (Inter).
 
-**Design Decisions**
-- **Dual-theme system** with equally beautiful dark and light modes:
-  - **Dark Mode**: Deep blacks (#0D1117) with neon accent glows and glassmorphism effects
-  - **Light Mode**: Luminous & Airy aesthetic with soft backgrounds (#F5F7FB), pastel accents, dual-shadow system (ambient + drop), and frosted glass effects
-  - Theme persistence via localStorage with smooth transitions
-- Responsive design with mobile-first approach (meta viewport configuration)
-- CDN-based dependencies to minimize build complexity and improve load times
-- Glow-pulse animations for interactive feedback in both themes
-- Modern GenZ-friendly navigation: Sleek top navigation bar with pill-style buttons instead of traditional sidebar
-  - Desktop: Centered glassmorphic pill container with rounded navigation buttons
-  - Mobile: Bottom navigation bar with 5 buttons (Home, Leaders, Create, Pledges, Profile) for full feature access with easy thumb reach
-  - Smooth transitions and hover effects with gradient active states
-  - Navigation automatically hidden on login/OTP screens for clean authentication UX
-
-**Rationale**: Choosing vanilla JavaScript with CDN-based libraries provides rapid prototyping capability and reduced deployment complexity, suitable for a demo/hackathon build. The modern top navigation design appeals to GenZ users by avoiding outdated sidebar patterns and embracing contemporary UI trends seen in popular apps. Dual-theme support ensures accessibility and user preference accommodation.
+**Design Decisions**:
+- **Dual-theme system**: Comprehensive dark and light modes ("Luminous & Airy") with theme persistence via localStorage and smooth transitions.
+- **Responsive Design**: Mobile-first approach.
+- **Modern UI**: CDN-based dependencies, glow-pulse animations, GenZ-friendly top navigation bar (desktop) and bottom navigation bar (mobile) with pill-style buttons and smooth transitions.
+- **Toast Notifications**: Redesigned, animated toast notification system with four types (Success, Error, Warning, Info), glassmorphism effects, auto-dismissal, and stacking support.
 
 ### Backend Architecture
 
-**Technology Stack**
-- Node.js with Express.js framework
-- ES Modules (type: "module" in package.json)
-- RESTful API design pattern
+**Technology Stack**: Node.js with Express.js, ES Modules.
 
-**Core Components**
-1. **Express Server**: Handles HTTP requests and serves static files
-2. **API Proxy Layer**: Securely forwards requests to external services while keeping API keys server-side
-3. **CORS-enabled**: Allows cross-origin requests for flexible frontend deployment
+**Core Components**: Express Server, API Proxy Layer for secure external service communication, CORS-enabled.
 
-**Key Design Decisions**
-
-*Server Configuration*
-- Port flexibility with environment variable fallback (PORT || 5000)
-- Static file serving from root directory
-- Separation of concerns: frontend served at root, API endpoints prefixed with `/api`
-
-*Security Model*
-- API keys stored as environment variables (GEMINI_API_KEY, CRON_SECRET)
-- Backend proxy pattern prevents API key exposure to client
-- Firebase Admin SDK with service account credentials from environment
-
-**Rationale**: The proxy architecture pattern protects sensitive credentials while maintaining a simple deployment model. Using Express provides a lightweight, well-documented framework suitable for API-centric applications.
+**Key Design Decisions**:
+- **Server Configuration**: Port flexibility, static file serving, API endpoints prefixed with `/api`.
+- **Security Model**: API keys as environment variables, backend proxy for API key protection, Firebase Admin SDK with service account credentials from environment.
 
 ### Data Storage & Authentication
 
-**Firebase Integration**
-- Firebase Admin SDK for server-side operations
-- Firestore for NoSQL data persistence
-- Firebase client SDK included (firebase@12.5.0) for potential frontend auth
-
-**Configuration Approach**
-- Service account credentials loaded from `GOOGLE_APPLICATION_CREDENTIALS` environment variable
-- Critical initialization with error handling to prevent startup with misconfigured credentials
-- App ID: 'predora-hackathon'
-
-**Rationale**: Firebase provides a fully managed backend-as-a-service, eliminating the need for database setup and maintenance. The Admin SDK on the server ensures secure, privileged access to Firebase services while potentially allowing client-side authentication flows.
+**Firebase Integration**:
+- Firebase Admin SDK for server-side.
+- Firestore for NoSQL data persistence.
+- Firebase client SDK for potential frontend auth.
+- Configuration via `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
 
 ### AI Integration Architecture
 
-**Gemini API Integration**
-- Model: `gemini-2.5-flash-preview-09-2025`
-- Endpoint: `/api/gemini` (proxied through Express backend)
-- Capabilities supported:
-  - Tools integration (for Search functionality)
-  - JSON Schema mode for structured outputs
-
-**Implementation Pattern**
-- Frontend sends structured requests with optional `tools` and `jsonSchema` parameters
-- Backend validates and forwards to Google's Generative Language API
-- Response streaming or single-shot completion based on request configuration
-
-**Rationale**: Using the latest Gemini model preview provides access to cutting-edge AI features. The backend proxy ensures API key security while the flexible tool/schema configuration enables diverse use cases from search-augmented generation to structured data extraction.
+**Gemini API Integration**:
+- Model: `gemini-2.5-flash-preview-09-2025`.
+- Endpoint: `/api/gemini` (proxied).
+- Capabilities: Tools integration (for Search), JSON Schema mode for structured outputs.
 
 ### Deployment Architecture
 
-**Vercel Configuration**
-- Single rewrite rule routing all traffic to `index.js`
-- Serverless function deployment model
-- Environment variables managed through Vercel dashboard
+**Vercel Configuration**: Single rewrite rule to `index.js`, serverless function deployment, environment variables managed via Vercel.
 
-**Rationale**: Vercel's serverless platform simplifies deployment with automatic scaling and zero infrastructure management, ideal for demo applications with variable traffic patterns.
+### Feature Specifications
+
+- **Follower Count Display & Navigation**: Clickable follower count badges on profiles, navigation to a dedicated Followers tab with user lists.
+- **Live Ticker Chat Improvements**: Enhanced readability for text in both themes, timestamp display, and improved visual hierarchy.
+- **Reply Threading System**: Full reply functionality for chat using Firestore subcollections, with visual feedback, nested display, and `getTimeAgo()` utility.
+- **Expanded Market Categories**: Six new GenZ/niche categories added (Creator & Social, Local & Campus, Gaming) with organized dropdowns and integrated filtering.
+- **Notification System**: Comprehensive infrastructure with UI components (bell icon, Alerts tab in profile), multiple notification types (`market_resolved`, `market_disputed`, `new_follower`, `comment_reply`), real-time updates via Firestore, and "Mark all read" functionality.
 
 ## External Dependencies
 
 ### Third-Party Services
 
-**Google Gemini API**
-- Purpose: AI-powered content generation and analysis
-- Authentication: API key-based
-- Endpoint: `https://generativelanguage.googleapis.com/v1beta/models/`
-- Features used: Text generation, tool calling (search), JSON mode
-
-**Firebase/Firestore**
-- Purpose: User authentication and data persistence
-- Authentication: Service account credentials (Admin SDK)
-- Services used:
-  - Firestore: NoSQL database
-  - Authentication: User management (client SDK included)
+- **Google Gemini API**: AI-powered content generation and analysis.
+- **Firebase/Firestore**: User authentication and NoSQL data persistence.
 
 ### NPM Dependencies
 
-**Core Dependencies**
-- `express@^4.19.2`: Web application framework
-- `cors@^2.8.5`: Cross-origin resource sharing middleware
-- `node-fetch@^3.3.2`: HTTP client for making external API requests
-- `firebase@^12.5.0`: Firebase client SDK
-- `firebase-admin@^13.6.0`: Firebase Admin SDK for server-side operations
+- `express`: Web application framework.
+- `cors`: Cross-origin resource sharing middleware.
+- `node-fetch`: HTTP client.
+- `firebase`: Firebase client SDK.
+- `firebase-admin`: Firebase Admin SDK.
 
-**Frontend CDN Dependencies**
-- Tailwind CSS: Utility-first CSS framework
-- Chart.js: Data visualization library
-- Google Fonts (Inter): Typography
+### Frontend CDN Dependencies
+
+- Tailwind CSS: Utility-first CSS framework.
+- Chart.js: Data visualization library.
+- Google Fonts (Inter): Typography.
 
 ### Environment Variables Required
 
-- `GEMINI_API_KEY`: Google Gemini API authentication
-- `GOOGLE_APPLICATION_CREDENTIALS`: Firebase service account JSON (stringified)
-- `CRON_SECRET`: Authentication for scheduled tasks/webhooks
-- `PORT`: Server port configuration (optional, defaults to 5000)
-
-### Browser APIs & Features
-
-- Modern CSS features: `backdrop-filter` for glassmorphism effects
-- CSS animations: Keyframe-based glow effects
-- Responsive design APIs: Viewport meta tag configuration
-- localStorage: Theme preference persistence
-
-## Recent Enhancements (November 16, 2025)
-
-### Light Mode Redesign
-Implemented comprehensive light mode styling with "Luminous & Airy" aesthetic to match dark mode quality:
-- **Color Palette**: Daylight Mist (#F5F7FB), Airy Blue-Gray (#E8EEFF), Soft Blue borders (#CBD5F5), Coral accents (#F26D85), Emerald accents (#3CBF8C)
-- **Dual-Shadow System**: Ambient white glow + soft blue drop shadows for depth
-- **Complete Component Coverage**: All interactive elements styled including buttons (primary gradient #5CC6FF→#7B8CFF, secondary, stake yes/no), inputs/selects (white backgrounds with soft blue borders), badges (all variants with pastels and high-contrast text), Quick Play screens and buttons (including SVG icon color overrides), toast notifications, wallet modal, live user counter, glowing cards, and filter pills
-
-### Theme Toggle in Profile Panel
-- Moved theme toggle to top-right of profile panel (removed from mobile bottom nav)
-- Theme toggle features smooth flip animation when clicked
-  - Panel flips left (rotateY animation) with cubic-bezier easing
-  - Theme change happens at animation midpoint for smooth visual transition
-  - Duration: 0.6s with bounce effect
-- Fixed updateNavStyles() to safely handle non-navigation buttons
-
-### Enhanced Light Mode Text Contrast
-- Targeted text color overrides for improved readability while preserving colorful UI:
-  - Base text: #0F172A (dark slate, ~14:1 contrast ratio)
-  - Specific Tailwind gray/slate/neutral utilities mapped to darker colors
-  - Sky colors updated to #0369A1 for better visibility
-  - Gradient text uses darker blue gradient (#0369A1 → #6366F1)
-  - Intentionally preserved: green/red/emerald/rose colors for financial metrics (gains/losses/yields)
-  - Design decision: Avoided blanket element overrides to maintain semantic color coding
-
-### Follower Notification Fix
-- Implemented isFirstLoad flag to skip initial Firestore snapshot
-- Prevents false-positive "user followed you" toasts on every login
-- Only shows notifications for new followers after authentication completes
-
-### Follower Count Display & Navigation (November 17, 2025)
-- Added clickable follower count badges to personal and public profile panels
-- Follower counts fetched from Firestore and displayed with people icon
-- Clicking follower count navigates to profile with Followers tab open
-- Public profiles now have 3 tabs: Active, History, and Followers
-- Followers tab shows list of users with avatars, XP, and "View Profile" buttons
-- Fixed tab navigation to support initialTab parameter for deep linking
-
-### Live Ticker Chat Improvements (November 17, 2025)
-- Fixed white text readability issue in light mode:
-  - User names now use `text-gray-900 dark:text-white`
-  - Comment text uses `text-gray-700 dark:text-gray-300`
-  - Hover states properly styled for both themes
-- Added timestamp display ("2m ago", "5h ago") to all comments
-- Improved visual hierarchy with borders between comments
-
-### Reply Threading System (November 17, 2025)
-- Implemented full reply functionality for live ticker chat
-- Architecture uses Firestore subcollections (comments/{commentId}/replies)
-- Features:
-  - Reply button under each comment with reply count display
-  - Replying mode with visual feedback (placeholder updates to "Replying to @username...")
-  - Threaded replies display with smaller avatars and indentation
-  - Timestamp formatting for replies
-  - Replies stored in subcollections for efficient querying
-- UI updates:
-  - Reply button shows count when replies exist ("Reply (3)")
-  - Nested reply display with reduced styling
-  - Cancel reply mode when posting
-- Helper function `getTimeAgo()` converts timestamps to human-readable format
-
-### Expanded Market Categories (November 17, 2025)
-- Added 6 new market categories to appeal to GenZ and niche communities:
-  - **Creator & Social**: Micro-Influencer Predictions, Creator Personal Milestones, Gossip Predictions
-  - **Local & Campus**: Campus Predictions, Local Football Predictions
-  - **Gaming**: Gaming/E-sports Round Predictions
-- Create Market screen now features organized dropdown with optgroups for easy category selection
-- Home filter bar updated with concise category labels (Influencers, Creators, Gossip, Campus, Local Sports, Gaming)
-- Category selector integrated with existing `createMarket()` function for automatic persistence
-
-### Notification System (November 17, 2025)
-- Implemented comprehensive notification infrastructure for user engagement
-- **UI Components**:
-  - Notification bell icon in top nav (desktop) with pulsing red badge showing unread count
-  - "Alerts" tab in profile screen with badge for easy access
-  - Profile has 5 tabs: Active, History, Alerts, Network, Assets
-  - 3 filter sub-tabs in Alerts: All, Markets, Social for categorizing notifications
-- **Notification Types Supported**:
-  - `market_resolved`: Green checkmark icon, triggers when staked market resolves
-  - `market_disputed`: Yellow warning icon, alerts when resolution is disputed
-  - `new_follower`: Blue user icon, notifies when someone follows you
-  - `comment_reply`: Purple chat icon, alerts when someone replies to your comment
-- **Features**:
-  - Real-time Firestore listener updates badge count and refreshes panel when open
-  - Click notification to mark as read and navigate to relevant screen
-  - "Mark all read" bulk action for clearing unread notifications
-  - Safe icon/title/message defaults prevent UI breaks from unknown notification types
-  - Time ago formatting (e.g., "2m ago", "5h ago") for recency context
-- **Firestore Schema**:
-  - Collection: `users/{userId}/notifications`
-  - Fields: `type`, `message`, `actionUrl`, `read` (boolean), `timestamp`
-- **Integration**:
-  - Listener initialized in `initializeUserProfile()` after login
-  - Badge and feed stay synced via snapshot listener on all notifications
-  - Navigation handled via `handleNotificationAction()` with screen routing
-- **Note**: Notification preferences UI placeholder added (planned for future implementation)
+- `GEMINI_API_KEY`: Google Gemini API authentication.
+- `GOOGLE_APPLICATION_CREDENTIALS`: Firebase service account JSON.
+- `CRON_SECRET`: Authentication for scheduled tasks/webhooks.
+- `PORT`: Server port configuration (optional).
