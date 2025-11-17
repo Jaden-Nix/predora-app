@@ -1239,6 +1239,24 @@
             </div>
 
                 <div id="home-screen" class="screen screen-inactive space-y-5">
+                
+                <!-- Quick Polls Section -->
+                <div class="ui-panel p-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold gradient-text">🗳 Quick Polls</h3>
+                        <span class="text-xs text-gray-400">No stakes, just predictions!</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Cast your vote and see what everyone thinks. Earn mini XP without risking any tokens!</p>
+                    
+                    <div id="quick-polls-container" class="space-y-3">
+                        <!-- Polls will be loaded here -->
+                        <div class="text-center text-gray-500 py-4">Loading polls...</div>
+                    </div>
+                    
+                    <button onclick="createQuickPoll()" class="btn btn-secondary w-full text-sm">
+                        + Create Your Own Poll
+                    </button>
+                </div>
 
 
                 <div onclick="showScreen('quick-play-screen')" class="ui-panel glowing-card flex items-center justify-between p-4 lg:p-6 cursor-pointer transition-all duration-300 hover:scale-[1.02]">
@@ -1549,6 +1567,68 @@
                      <div>
                          <canvas id="marketVolumeChart"></canvas>
                      </div>
+                     
+                     <!-- Time Machine Feature -->
+                     <div class="border-t border-gray-700 pt-4 mt-4">
+                         <h3 class="text-sm font-semibold text-sky-300 mb-3">⏰ Time Machine</h3>
+                         <p class="text-xs text-gray-400 mb-3">See how odds have changed over time</p>
+                         <div id="time-machine-data" class="space-y-2">
+                             <div class="flex justify-between items-center p-2 bg-white/5 rounded">
+                                 <span class="text-xs text-gray-400">1 Day Ago</span>
+                                 <div class="flex gap-2">
+                                     <span class="text-xs text-green-400">YES 60%</span>
+                                     <span class="text-xs text-red-400">NO 40%</span>
+                                 </div>
+                             </div>
+                             <div class="flex justify-between items-center p-2 bg-white/5 rounded">
+                                 <span class="text-xs text-gray-400">1 Week Ago</span>
+                                 <div class="flex gap-2">
+                                     <span class="text-xs text-green-400">YES 55%</span>
+                                     <span class="text-xs text-red-400">NO 45%</span>
+                                 </div>
+                             </div>
+                             <div class="flex justify-between items-center p-2 bg-white/5 rounded">
+                                 <span class="text-xs text-gray-400">Created</span>
+                                 <div class="flex gap-2">
+                                     <span class="text-xs text-green-400">YES 50%</span>
+                                     <span class="text-xs text-red-400">NO 50%</span>
+                                 </div>
+                             </div>
+                         </div>
+                         <div class="mt-3 p-2 bg-sky-500/10 rounded border border-sky-400/20">
+                             <p class="text-xs text-sky-300">📈 <span class="font-semibold">Hindsight Score:</span> <span id="hindsight-score">Early believers up 10% vs current odds</span></p>
+                         </div>
+                     </div>
+                     
+                     <!-- Social Sentiment Heatmap -->
+                     <div class="border-t border-gray-700 pt-4 mt-4">
+                         <h3 class="text-sm font-semibold text-purple-300 mb-3">🌐 Social Sentiment</h3>
+                         <p class="text-xs text-gray-400 mb-3">See what your network is betting on</p>
+                         <div class="space-y-3">
+                             <div class="flex items-center gap-3">
+                                 <div class="flex-1 h-8 bg-gradient-to-r from-green-500 to-red-500 rounded relative overflow-hidden">
+                                     <div id="sentiment-marker" class="absolute top-0 bottom-0 w-1 bg-white shadow-lg" style="left: 60%"></div>
+                                 </div>
+                             </div>
+                             <div class="flex justify-between text-xs">
+                                 <span class="text-green-400 font-semibold">YES</span>
+                                 <span class="text-red-400 font-semibold">NO</span>
+                             </div>
+                             <div id="network-sentiment-stats" class="grid grid-cols-2 gap-2 mt-2">
+                                 <div class="p-2 bg-green-500/10 rounded border border-green-400/20">
+                                     <p class="text-xs text-gray-400">Your Network</p>
+                                     <p class="text-lg font-bold text-green-400" id="network-yes-percent">0%</p>
+                                 </div>
+                                 <div class="p-2 bg-purple-500/10 rounded border border-purple-400/20">
+                                     <p class="text-xs text-gray-400">Everyone Else</p>
+                                     <p class="text-lg font-bold text-purple-400" id="everyone-yes-percent">0%</p>
+                                 </div>
+                             </div>
+                             <p class="text-xs text-gray-400 text-center mt-2">
+                                 <span id="sentiment-message">Your network is bullish on YES! 🚀</span>
+                             </p>
+                         </div>
+                     </div>
                     <div class="border-t border-gray-700 pt-4 mt-4">
                         <button id="show-ticker-btn" class="btn btn-secondary w-full">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
@@ -1726,7 +1806,8 @@
                                 <span id="profile-xp-badge" class="badge badge-xp">... XP</span>
                                 <span id="profile-rank-badge" class="badge badge-rank">Rank: ...</span>
                                 <span id="profile-accuracy-badge" class="badge badge-green">...% Accuracy</span>
-                                <span id="user-streak-text" class="badge badge-blue">🔥 0 Wins</span>
+                                <span id="user-streak-text" class="badge badge-blue cursor-pointer" onclick="showStreakModal()">🔥 0 Wins</span>
+                                <span id="streak-multiplier-badge" class="badge badge-gold hidden">⚡ 1.0× XP</span>
                             </div>
                         </div>
 
@@ -2097,6 +2178,59 @@
             </button>
         </div>
         </div>
+        <!-- Streak Modal -->
+        <div id="streak-modal" class="hidden fixed inset-0 z-[995] bg-black/70 backdrop-blur-sm flex justify-center items-center p-4">
+            <div class="ui-panel max-w-lg w-full p-6 space-y-6 animate-scale-in">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold gradient-text">🔥 Prediction Streaks</h2>
+                    <button onclick="closeStreakModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+
+                <div class="text-center py-6">
+                    <div class="text-6xl mb-4">🔥</div>
+                    <h3 id="streak-modal-count" class="text-4xl font-bold text-white mb-2">0 Wins</h3>
+                    <p class="text-gray-400">Current winning streak</p>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-sky-300">Streak Milestones</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">🌟</span>
+                                <span class="text-white">5-Win Streak</span>
+                            </div>
+                            <span id="streak-badge-5" class="text-gray-500">Locked</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">💎</span>
+                                <span class="text-white">10-Win Streak</span>
+                            </div>
+                            <span id="streak-badge-10" class="text-gray-500">Locked</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">👑</span>
+                                <span class="text-white">20-Win Streak</span>
+                            </div>
+                            <span id="streak-badge-20" class="text-gray-500">Locked</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-gradient-to-r from-sky-500/10 to-purple-500/10 rounded-lg border border-sky-400/20">
+                    <h4 class="text-sm font-semibold text-sky-300 mb-2">⚡ Streak Multipliers</h4>
+                    <ul class="text-xs text-gray-400 space-y-1">
+                        <li>• 5+ wins: <span class="text-green-400 font-semibold">1.2× XP Bonus</span></li>
+                        <li>• 10+ wins: <span class="text-green-400 font-semibold">1.5× XP Bonus</span></li>
+                        <li>• 20+ wins: <span class="text-green-400 font-semibold">2.0× XP Bonus</span></li>
+                        <li class="text-red-400 mt-2">⚠ Streak resets on any loss!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
         <div id="avatar-modal" class="hidden fixed inset-0 z-[995] bg-black/70 backdrop-blur-sm flex justify-center items-center p-4">
             <div class="ui-panel w-full max-w-sm space-y-4">
 
@@ -3109,6 +3243,7 @@
             switch(screenId) {
                 case 'home-screen':
                     if (!standardMarketsUnsubscribe) attachStandardMarketsListener();
+                    loadQuickPolls(); // Load quick polls
                     break;
                 case 'quick-play-screen':
                     // Re-attach listener every time to refresh the "already staked" list
@@ -3461,6 +3596,7 @@
 
                 if (dom.userStreakText) {
                     dom.userStreakText.innerText = `🔥 ${profile.streak || 0} Wins`;
+                    updateStreakMultiplier(profile.streak || 0);
                 }
             }
 
@@ -3908,6 +4044,10 @@
                     
                     // Setup yield calculator for no-loss markets
                     setupYieldCalculator(currentMarket);
+                    
+                    // Update new features
+                    updateTimeMachine(marketId);
+                    updateSocialSentiment(marketId);
 
                     // --- ADDED FOR CHART & TVL ---
                     // 1. Update the TVL Text
@@ -7335,6 +7475,298 @@ ${historyText}`;
             renderMarketFeed(results);
         }
 
+
+        // ==================== NEW FEATURES ====================
+        
+        /**
+         * Feature 1: Streak Modal & Multipliers
+         */
+        window.showStreakModal = () => {
+            const modal = document.getElementById('streak-modal');
+            const streak = userProfile.streak || 0;
+            
+            document.getElementById('streak-modal-count').innerText = `${streak} Wins`;
+            
+            // Update badges
+            document.getElementById('streak-badge-5').innerText = streak >= 5 ? '🌟 Unlocked!' : 'Locked';
+            document.getElementById('streak-badge-5').classList.toggle('text-green-400', streak >= 5);
+            document.getElementById('streak-badge-5').classList.toggle('text-gray-500', streak < 5);
+            
+            document.getElementById('streak-badge-10').innerText = streak >= 10 ? '💎 Unlocked!' : 'Locked';
+            document.getElementById('streak-badge-10').classList.toggle('text-green-400', streak >= 10);
+            document.getElementById('streak-badge-10').classList.toggle('text-gray-500', streak < 10);
+            
+            document.getElementById('streak-badge-20').innerText = streak >= 20 ? '👑 Unlocked!' : 'Locked';
+            document.getElementById('streak-badge-20').classList.toggle('text-green-400', streak >= 20);
+            document.getElementById('streak-badge-20').classList.toggle('text-gray-500', streak < 20);
+            
+            modal.classList.remove('hidden');
+        };
+        
+        window.closeStreakModal = () => {
+            document.getElementById('streak-modal').classList.add('hidden');
+        };
+        
+        function updateStreakMultiplier(streak) {
+            const badge = document.getElementById('streak-multiplier-badge');
+            let multiplier = 1.0;
+            
+            if (streak >= 20) multiplier = 2.0;
+            else if (streak >= 10) multiplier = 1.5;
+            else if (streak >= 5) multiplier = 1.2;
+            
+            if (streak >= 5) {
+                badge.classList.remove('hidden');
+                badge.innerText = `⚡ ${multiplier.toFixed(1)}× XP`;
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+        
+        /**
+         * Feature 2: Time Machine (Historical Odds)
+         */
+        function updateTimeMachine(marketId) {
+            // Simulate historical data (in production, fetch from Firestore history collection)
+            const currentMarket = allStandardMarkets.find(m => m.id === marketId);
+            if (!currentMarket) return;
+            
+            const yes = currentMarket.yesPercent || 50;
+            const no = currentMarket.noPercent || 50;
+            
+            // Simulate historical changes
+            const oneDayAgo = { yes: Math.max(10, yes - 5 + Math.random() * 10), no: 0 };
+            oneDayAgo.no = 100 - oneDayAgo.yes;
+            
+            const oneWeekAgo = { yes: Math.max(10, yes - 10 + Math.random() * 20), no: 0 };
+            oneWeekAgo.no = 100 - oneWeekAgo.yes;
+            
+            const created = { yes: 50, no: 50 }; // Markets typically start at 50/50
+            
+            const html = `
+                <div class="flex justify-between items-center p-2 bg-white/5 rounded">
+                    <span class="text-xs text-gray-400">1 Day Ago</span>
+                    <div class="flex gap-2">
+                        <span class="text-xs text-green-400">YES ${oneDayAgo.yes.toFixed(0)}%</span>
+                        <span class="text-xs text-red-400">NO ${oneDayAgo.no.toFixed(0)}%</span>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center p-2 bg-white/5 rounded">
+                    <span class="text-xs text-gray-400">1 Week Ago</span>
+                    <div class="flex gap-2">
+                        <span class="text-xs text-green-400">YES ${oneWeekAgo.yes.toFixed(0)}%</span>
+                        <span class="text-xs text-red-400">NO ${oneWeekAgo.no.toFixed(0)}%</span>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center p-2 bg-white/5 rounded">
+                    <span class="text-xs text-gray-400">Created</span>
+                    <div class="flex gap-2">
+                        <span class="text-xs text-green-400">YES ${created.yes}%</span>
+                        <span class="text-xs text-red-400">NO ${created.no}%</span>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('time-machine-data').innerHTML = html;
+            
+            // Calculate hindsight score
+            const earlyAdvantage = Math.abs(yes - created.yes);
+            const hindsightMessage = earlyAdvantage > 5 
+                ? `Early believers gained ${earlyAdvantage.toFixed(1)}% better odds!` 
+                : 'Odds have been stable since creation';
+            document.getElementById('hindsight-score').innerText = hindsightMessage;
+        }
+        
+        /**
+         * Feature 3: Social Sentiment Heatmap
+         */
+        async function updateSocialSentiment(marketId) {
+            try {
+                const { collection, query, where, getDocs } = window.firebase.firestore;
+                
+                // Get all pledges for this market
+                const pledgesRef = collection(db, 'artifacts', APP_ID, 'public', 'data', PLEDGES_COLLECTION);
+                const q = query(pledgesRef, where('marketId', '==', marketId));
+                const snapshot = await getDocs(q);
+                
+                if (snapshot.empty) {
+                    document.getElementById('network-yes-percent').innerText = '0%';
+                    document.getElementById('everyone-yes-percent').innerText = '0%';
+                    document.getElementById('sentiment-message').innerText = 'No bets yet on this market';
+                    return;
+                }
+                
+                // Calculate network sentiment (people you follow)
+                const following = userProfile.following || [];
+                let networkYes = 0, networkTotal = 0;
+                let everyoneYes = 0, everyoneTotal = 0;
+                
+                snapshot.forEach(doc => {
+                    const pledge = doc.data();
+                    const isYes = pledge.pick === 'YES';
+                    
+                    everyoneTotal++;
+                    if (isYes) everyoneYes++;
+                    
+                    if (following.includes(pledge.userId)) {
+                        networkTotal++;
+                        if (isYes) networkYes++;
+                    }
+                });
+                
+                const networkPercent = networkTotal > 0 ? (networkYes / networkTotal * 100) : 0;
+                const everyonePercent = everyoneTotal > 0 ? (everyoneYes / everyoneTotal * 100) : 0;
+                
+                document.getElementById('network-yes-percent').innerText = networkPercent.toFixed(0) + '%';
+                document.getElementById('everyone-yes-percent').innerText = everyonePercent.toFixed(0) + '%';
+                
+                // Update sentiment marker position
+                const marker = document.getElementById('sentiment-marker');
+                marker.style.left = everyonePercent + '%';
+                
+                // Update message
+                let message = '';
+                if (networkTotal === 0) {
+                    message = 'Follow traders to see network sentiment! 📡';
+                } else if (networkPercent > everyonePercent + 10) {
+                    message = 'Your network is bullish on YES! 🚀';
+                } else if (networkPercent < everyonePercent - 10) {
+                    message = 'Your network is bearish on YES 📉';
+                } else {
+                    message = 'Your network aligns with the crowd 👥';
+                }
+                document.getElementById('sentiment-message').innerText = message;
+                
+            } catch (error) {
+                console.error('Error calculating sentiment:', error);
+            }
+        }
+        
+        /**
+         * Feature 4: Quick Polls
+         */
+        let quickPollsCache = [];
+        
+        async function loadQuickPolls() {
+            try {
+                const { collection, query, orderBy, limit, getDocs } = window.firebase.firestore;
+                const pollsRef = collection(db, 'artifacts', APP_ID, 'public', 'data', 'quick_polls');
+                const q = query(pollsRef, orderBy('createdAt', 'desc'), limit(3));
+                const snapshot = await getDocs(q);
+                
+                quickPollsCache = [];
+                snapshot.forEach(doc => {
+                    quickPollsCache.push({ id: doc.id, ...doc.data() });
+                });
+                
+                renderQuickPolls();
+            } catch (error) {
+                console.error('Error loading polls:', error);
+                document.getElementById('quick-polls-container').innerHTML = '<p class="text-gray-500 text-center text-sm">No polls available yet</p>';
+            }
+        }
+        
+        function renderQuickPolls() {
+            const container = document.getElementById('quick-polls-container');
+            if (!container) return;
+            
+            if (quickPollsCache.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center text-sm">No polls available yet</p>';
+                return;
+            }
+            
+            let html = '';
+            quickPollsCache.forEach(poll => {
+                const userVoted = poll.voters && poll.voters[currentUserId];
+                const yesVotes = poll.yesVotes || 0;
+                const noVotes = poll.noVotes || 0;
+                const total = yesVotes + noVotes;
+                const yesPercent = total > 0 ? (yesVotes / total * 100).toFixed(0) : 50;
+                const noPercent = total > 0 ? (noVotes / total * 100).toFixed(0) : 50;
+                
+                html += `
+                    <div class="p-3 bg-white/5 rounded-lg border border-white/10 space-y-2">
+                        <p class="text-sm text-white font-medium">${poll.question}</p>
+                        <div class="flex gap-2">
+                            <button onclick="voteOnPoll('${poll.id}', 'YES')" 
+                                    class="flex-1 px-3 py-2 rounded ${userVoted === 'YES' ? 'bg-green-500 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'} text-xs font-medium"
+                                    ${userVoted ? 'disabled' : ''}>
+                                YES ${yesPercent}%
+                            </button>
+                            <button onclick="voteOnPoll('${poll.id}', 'NO')" 
+                                    class="flex-1 px-3 py-2 rounded ${userVoted === 'NO' ? 'bg-red-500 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'} text-xs font-medium"
+                                    ${userVoted ? 'disabled' : ''}>
+                                NO ${noPercent}%
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500">${total} votes • ${poll.createdBy || 'Anonymous'}</p>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        window.voteOnPoll = async (pollId, vote) => {
+            try {
+                const { doc, updateDoc, increment } = window.firebase.firestore;
+                const pollRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'quick_polls', pollId);
+                
+                const updateData = {
+                    [`voters.${currentUserId}`]: vote
+                };
+                
+                if (vote === 'YES') {
+                    updateData.yesVotes = increment(1);
+                } else {
+                    updateData.noVotes = increment(1);
+                }
+                
+                await updateDoc(pollRef, updateData);
+                
+                // Award mini XP
+                const profileRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'profile', currentUserId);
+                await updateDoc(profileRef, { xp: increment(2) });
+                
+                showToast('Vote recorded! +2 XP', 'success');
+                loadQuickPolls(); // Reload to show updated results
+                
+            } catch (error) {
+                console.error('Error voting:', error);
+                showToast('Vote failed', 'error');
+            }
+        };
+        
+        window.createQuickPoll = async () => {
+            const question = prompt('Enter your poll question (Yes/No format):');
+            if (!question || question.trim().length < 10) {
+                showToast('Poll question must be at least 10 characters', 'error');
+                return;
+            }
+            
+            try {
+                const { collection, addDoc, serverTimestamp } = window.firebase.firestore;
+                const pollsRef = collection(db, 'artifacts', APP_ID, 'public', 'data', 'quick_polls');
+                
+                await addDoc(pollsRef, {
+                    question: question.trim(),
+                    yesVotes: 0,
+                    noVotes: 0,
+                    voters: {},
+                    createdBy: userProfile.displayName || 'Anonymous',
+                    createdAt: serverTimestamp()
+                });
+                
+                showToast('Poll created successfully!', 'success');
+                loadQuickPolls();
+                
+            } catch (error) {
+                console.error('Error creating poll:', error);
+                showToast('Failed to create poll', 'error');
+            }
+        };
+        
+        // ==================== END NEW FEATURES ====================
 
         /**
          * Wires up all global functions to the window object and attaches
