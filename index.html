@@ -7813,50 +7813,13 @@ ${historyText}`;
                 ctx.fillText(marketType, 150, yPos + 30);
             }
             
-            // LOAD LOGO FOR FOOTER BADGE
-            const logoPromise = new Promise((resolve) => {
-                const logoImg = new Image();
-                logoImg.crossOrigin = 'anonymous';
-                logoImg.onload = () => resolve(logoImg);
-                logoImg.onerror = () => {
-                    console.warn('Footer logo failed to load');
-                    resolve(null);
-                };
-                logoImg.src = 'https://res.cloudinary.com/djslxbghy/image/upload/F3035734-12A9-4231-94C3-40B745E7193E_fqrluw.png';
-            });
-            
-            const logoImg = await logoPromise;
-            
-            // FOOTER BADGE WITH LOGO + TEXT (centered at bottom)
+            // FOOTER INSIDE CARD (at bottom of glass card) - READABLE
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.font = 'bold 24px Inter, Arial, sans-serif';
             const footerText = 'predora-app.vercel.app';
-            ctx.font = 'bold 22px Inter, Arial, sans-serif';
-            const textWidth = ctx.measureText(footerText).width;
-            const logoSize = 28;
-            const spacing = 10;
-            const pillWidth = logoSize + spacing + textWidth + 40; // padding on sides
-            const pillHeight = 45;
-            const pillX = 600 - pillWidth / 2; // Center horizontally
-            const pillY = 545;
-            
-            // Draw pill background
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-            ctx.beginPath();
-            ctx.roundRect(pillX, pillY, pillWidth, pillHeight, 25);
-            ctx.fill();
-            
-            // Draw logo in pill
-            if (logoImg) {
-                const logoX = pillX + 20;
-                const logoY = pillY + (pillHeight - logoSize) / 2;
-                ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
-            }
-            
-            // Draw text in pill
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-            ctx.font = 'bold 22px Inter, Arial, sans-serif';
-            const textX = pillX + 20 + logoSize + spacing;
-            const textY = pillY + pillHeight / 2 + 8; // Vertically centered
-            ctx.fillText(footerText, textX, textY);
+            const footerWidth = ctx.measureText(footerText).width;
+            const footerX = 600 - footerWidth / 2; // Center horizontally
+            ctx.fillText(footerText, footerX, 560);
             
             return canvas;
         };
