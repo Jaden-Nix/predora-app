@@ -2690,7 +2690,6 @@
             if (!auth.currentUser) return;
             
             const { collection, query, where, getDocs, updateDoc, doc } = window.firebase.firestore;
-            const db = window.firebase.db;
             
             try {
                 const notificationsRef = collection(db, 'users', auth.currentUser.uid, 'notifications');
@@ -2727,7 +2726,6 @@
             if (!auth.currentUser) return;
             
             const { collection, query, orderBy, limit, getDocs, where } = window.firebase.firestore;
-            const db = window.firebase.db;
             
             try {
                 let notificationsRef = collection(db, 'users', auth.currentUser.uid, 'notifications');
@@ -2827,7 +2825,6 @@
             div.onclick = async () => {
                 if (!notification.read && auth.currentUser) {
                     const { doc, updateDoc } = window.firebase.firestore;
-                    const db = window.firebase.db;
                     try {
                         await updateDoc(doc(db, 'users', auth.currentUser.uid, 'notifications', notification.id), { read: true });
                         loadNotifications();
@@ -2879,7 +2876,6 @@
             if (!auth.currentUser) return;
             
             const { collection, query, onSnapshot, orderBy } = window.firebase.firestore;
-            const db = window.firebase.db;
             
             const notificationsRef = collection(db, 'users', auth.currentUser.uid, 'notifications');
             const allQuery = query(notificationsRef, orderBy('timestamp', 'desc'));
