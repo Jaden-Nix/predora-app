@@ -135,17 +135,23 @@ Standard automated market maker mechanics for users who prefer immediate liquidi
 6. Losers: XP remains deducted (already taken during vote)
 7. Ties: All stakes returned to participants
 
-**Oracle Resolution Logic** (`autoResolveQuickPolls` - runs daily):
-- Identifies polls older than 24 hours with `isResolved: false`
-- Determines winner based on majority vote (YES > NO, or NO > YES)
+**Oracle Resolution Logic** (`autoResolveQuickPolls` - runs every 4 hours):
+- Identifies polls older than their `resolutionHours` with `isResolved: false`
+- Uses AI (Gemini with Search) to verify actual outcome
+- AI returns: `{outcome: 'YES'|'NO'|'UNKNOWN', confidence: 'HIGH'|'MEDIUM'|'LOW', reasoning: string}`
+- **Retry Logic**: If AI is uncertain (LOW/UNKNOWN confidence):
+  - Increments `retryAttempts` counter (max 5 attempts)
+  - Skips resolution and retries in next CRON run (4h later)
+  - After 5 failed attempts: Falls back to majority vote
 - Calculates proportional XP distribution for winners
-- Updates user XP balances and streaks
-- Marks polls as `isResolved: true` with `winningOutcome` field
+- Updates user XP balances and streaks in BOTH profile AND leaderboard collections
+- Marks polls as `isResolved: true` with `winningOutcome`, `aiReasoning`, and `aiConfidence` fields
 
 **Data Schema:**
 ```javascript
 {
   question: string,
+  resolutionHours: number, // User-customizable: 1, 3, 6, 12, 24, 48, 72, 168, 336, 720
   yesVotes: number,
   noVotes: number,
   xpStakedYES: number,
@@ -155,6 +161,9 @@ Standard automated market maker mechanics for users who prefer immediate liquidi
   },
   isResolved: boolean,
   winningOutcome: 'YES' | 'NO' | 'TIE' | 'NO_VOTES',
+  aiReasoning: string,
+  aiConfidence: 'HIGH' | 'MEDIUM' | 'LOW',
+  retryAttempts: number, // Tracks AI resolution retries (max 5)
   createdBy: string,
   createdAt: Timestamp,
   resolvedAt: Timestamp (optional)
@@ -179,10 +188,14 @@ Standard automated market maker mechanics for users who prefer immediate liquidi
 
 ### AI Services
 - **Google Gemini AI** (gemini-2.5-flash-preview-09-2025)
-  - Purpose: Market creation assistance, prediction analysis
+  - Purpose: Market creation assistance, prediction analysis, **AI-powered resolution oracle**
   - Integration: Backend proxy at `/api/gemini`
-  - Features: Search tools support, JSON mode for structured responses
+  - Features: Google Search tools support (`google_search` tool), JSON mode for structured responses
   - Authentication: API key via `GEMINI_API_KEY` environment variable
+  - **Oracle Usage**: Verifies Quick Poll and Quick Play outcomes using real-time web search
+    - Returns structured outcome with confidence levels
+    - Prevents false resolutions for uncertain events
+    - Retry logic with 5-attempt limit before fallback
 
 ### Firebase Services
 - **Firebase Admin SDK** (v13.6.0)
@@ -215,5 +228,24 @@ These integrations would proxy through the backend for credential protection.
 ### Environment Variables Required
 - `GEMINI_API_KEY` - Google Gemini AI authentication
 - `GOOGLE_APPLICATION_CREDENTIALS` - Firebase service account JSON (as string)
-- `CRON_SECRET` - CRON job endpoint protection
+- `CRON_SECRET` - CRON job endpoint protection (required for `/api/run-jobs` endpoint)
 - `PORT` - Server port (defaults to 5000)
+
+### CRON Job Configuration
+**Endpoint**: `POST /api/run-jobs`
+**Schedule**: Every 4 hours
+**Authentication**: Requires `CRON_SECRET` in request body as `{ "key": "YOUR_SECRET" }`
+**Recommended Service**: cron-job.org or EasyCron
+
+**Jobs Executed:**
+1. `autoResolveMarkets()` - Resolve standard prediction markets
+2. `createDailyMarkets()` - Generate daily featured markets
+3. `autoGenerateQuickPlays()` - Create 2 AI-generated Quick Play events
+4. `autoResolveQuickPolls()` - Resolve Quick Polls with AI verification (5 retry limit)
+5. `autoResolveQuickPlays()` - Resolve Quick Play markets with AI verification (5 retry limit)
+
+**Why Every 4 Hours:**
+- Polls can have resolution times as short as 1 hour
+- 4-hour CRON ensures polls resolve within reasonable timeframe (max 5h delay: 1h + 4h wait)
+- Balances timely resolution with API cost efficiency
+- Allows 5 retry attempts over 20 hours for uncertain AI outcomes

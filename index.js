@@ -545,6 +545,7 @@ async function autoResolveQuickPolls() {
         }
         
         let resolvedCount = 0;
+        let batchHasUpdates = false;
         const batch = db.batch();
         
         for (const pollDoc of snapshot.docs) {
@@ -567,6 +568,7 @@ async function autoResolveQuickPolls() {
                         winningOutcome: 'NO_VOTES',
                         aiReasoning: 'No votes cast'
                     });
+                    batchHasUpdates = true;
                     resolvedCount++;
                     continue;
                 }
@@ -574,26 +576,40 @@ async function autoResolveQuickPolls() {
                 // Use AI to verify the actual outcome
                 const aiResult = await verifyOutcomeWithAI(poll.question);
                 let winningOutcome = aiResult.outcome;
+                const retryAttempts = poll.retryAttempts || 0;
                 
-                // If AI can't determine, fall back to majority vote
+                // If AI can't determine, track retries
                 if (winningOutcome === 'UNKNOWN' || aiResult.confidence === 'LOW') {
-                    console.log(`  AI uncertain, using majority vote as fallback`);
-                    winningOutcome = yesVotes > noVotes ? 'YES' : yesVotes < noVotes ? 'NO' : 'TIE';
-                    aiResult.reasoning = `AI uncertain. Majority vote: ${winningOutcome}`;
+                    if (retryAttempts < 5) {
+                        // Increment retry counter and skip this round
+                        console.log(`  AI uncertain (attempt ${retryAttempts + 1}/5), will retry later`);
+                        batch.update(pollDoc.ref, {
+                            retryAttempts: admin.firestore.FieldValue.increment(1)
+                        });
+                        batchHasUpdates = true;
+                        continue; // Skip resolution, try again in next CRON run
+                    } else {
+                        // Max retries reached, fall back to majority vote
+                        console.log(`  AI uncertain after 5 attempts, using majority vote as fallback`);
+                        winningOutcome = yesVotes > noVotes ? 'YES' : yesVotes < noVotes ? 'NO' : 'TIE';
+                        aiResult.reasoning = `AI uncertain after 5 attempts. Majority vote: ${winningOutcome}`;
+                    }
                 }
                 
                 const xpStakedYES = poll.xpStakedYES || 0;
                 const xpStakedNO = poll.xpStakedNO || 0;
                 const totalXPPot = xpStakedYES + xpStakedNO;
                 
-                // Mark poll as resolved
+                // Mark poll as resolved (including AI metadata and retry counter reset)
                 batch.update(pollDoc.ref, { 
                     isResolved: true,
                     resolvedAt: admin.firestore.FieldValue.serverTimestamp(),
                     winningOutcome: winningOutcome,
                     aiReasoning: aiResult.reasoning,
-                    aiConfidence: aiResult.confidence
+                    aiConfidence: aiResult.confidence,
+                    retryAttempts: retryAttempts // Store final retry count for debugging
                 });
+                batchHasUpdates = true;
                 
                 // Distribute XP to winners
                 if (winningOutcome !== 'TIE' && poll.voters) {
@@ -652,15 +668,21 @@ async function autoResolveQuickPolls() {
                         });
                     }
                     console.log(`  Tie on poll "${poll.question}" - returned all stakes`);
+                    batchHasUpdates = true;
                 }
                 
                 resolvedCount++;
             }
         }
         
-        if (resolvedCount > 0) {
+        // Commit batch if there are any updates (resolutions OR retry increments)
+        if (batchHasUpdates) {
             await batch.commit();
-            console.log(`ORACLE: Resolved ${resolvedCount} Quick Polls and distributed XP`);
+            if (resolvedCount > 0) {
+                console.log(`ORACLE: Resolved ${resolvedCount} Quick Polls and distributed XP`);
+            } else {
+                console.log(`ORACLE: Updated retry counters for uncertain polls`);
+            }
         } else {
             console.log("ORACLE: No Quick Polls ready for resolution yet.");
         }
@@ -699,11 +721,30 @@ async function autoResolveQuickPlays() {
                 // Use AI to verify the actual outcome
                 const aiResult = await verifyOutcomeWithAI(market.title);
                 let winningOutcome = aiResult.outcome;
+                const retryAttempts = market.retryAttempts || 0;
                 
                 // Only resolve if AI is confident
                 if (winningOutcome === 'UNKNOWN' || aiResult.confidence === 'LOW') {
-                    console.log(`  AI uncertain about "${market.title}", skipping for now`);
-                    continue;
+                    if (retryAttempts < 5) {
+                        // Increment retry counter and skip this round
+                        console.log(`  AI uncertain (attempt ${retryAttempts + 1}/5), will retry later`);
+                        await marketDoc.ref.update({
+                            retryAttempts: admin.firestore.FieldValue.increment(1)
+                        });
+                        continue;
+                    } else {
+                        // Max retries reached, mark as unresolvable
+                        console.log(`  AI uncertain after 5 attempts, marking as UNRESOLVABLE`);
+                        await marketDoc.ref.update({
+                            isResolved: true,
+                            resolvedAt: admin.firestore.FieldValue.serverTimestamp(),
+                            winningOutcome: 'UNRESOLVABLE',
+                            aiReasoning: 'AI could not determine outcome after 5 attempts',
+                            aiConfidence: 'LOW'
+                        });
+                        resolvedCount++;
+                        continue;
+                    }
                 }
                 
                 // Mark market as resolved
@@ -728,6 +769,8 @@ async function autoResolveQuickPlays() {
 }
 
 // --- API Endpoint 2: Secure Cron Job Runner ---
+// IMPORTANT: Configure this endpoint to run every 4 hours via external CRON service
+// Example: Use a service like cron-job.org or EasyCron to hit this endpoint every 4h
 app.post('/api/run-jobs', async (req, res) => {
     console.log("Server: /api/run-jobs endpoint hit");
     const { key } = req.body;
