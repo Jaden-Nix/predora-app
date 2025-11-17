@@ -1426,14 +1426,30 @@
 
                 <div id="no-loss-options" class="space-y-4">
                     <h3 class="text-base font-semibold text-gray-200">Yield Protocol</h3>
-                    <div class="ui-panel p-4 space-y-3">
+                    <div class="ui-panel p-4 space-y-2">
                         <div id="yield-protocol-aave" class="flex justify-between items-center p-3 rounded-lg border border-sky-400 bg-sky-500/10 cursor-pointer" onclick="selectYield('aave')">
-                            <span class="font-medium text-white">Aave</span>
+                            <span class="font-medium text-white dark:text-white">Aave</span>
                             <span class="font-bold text-green-400">4.12% APY</span>
                         </div>
                         <div id="yield-protocol-compound" class="flex justify-between items-center p-3 rounded-lg border border-transparent cursor-pointer text-gray-400 hover:border-gray-600" onclick="selectYield('compound')">
                             <span class="font-medium">Compound</span>
                             <span class="font-bold text-green-400">3.88% APY</span>
+                        </div>
+                        <div id="yield-protocol-lido" class="flex justify-between items-center p-3 rounded-lg border border-transparent cursor-pointer text-gray-400 hover:border-gray-600" onclick="selectYield('lido')">
+                            <span class="font-medium">Lido</span>
+                            <span class="font-bold text-green-400">3.2% APY</span>
+                        </div>
+                        <div id="yield-protocol-yearn" class="flex justify-between items-center p-3 rounded-lg border border-transparent cursor-pointer text-gray-400 hover:border-gray-600" onclick="selectYield('yearn')">
+                            <span class="font-medium">Yearn Finance</span>
+                            <span class="font-bold text-green-400">5.8% APY</span>
+                        </div>
+                        <div id="yield-protocol-curve" class="flex justify-between items-center p-3 rounded-lg border border-transparent cursor-pointer text-gray-400 hover:border-gray-600" onclick="selectYield('curve')">
+                            <span class="font-medium">Curve</span>
+                            <span class="font-bold text-green-400">2.9% APY</span>
+                        </div>
+                        <div id="yield-protocol-convex" class="flex justify-between items-center p-3 rounded-lg border border-transparent cursor-pointer text-gray-400 hover:border-gray-600" onclick="selectYield('convex')">
+                            <span class="font-medium">Convex</span>
+                            <span class="font-bold text-green-400">4.5% APY</span>
                         </div>
                     </div>
                     <input type="hidden" id="selected-yield-protocol" value="aave">
@@ -3610,13 +3626,13 @@
 
                     html += `
                         <div class="ui-panel p-4 mb-3">
-                            <p class="text-white font-semibold">${pledge.marketTitle}</p>
+                            <p class="text-gray-900 dark:text-white font-semibold">${pledge.marketTitle}</p>
                             <div class="flex justify-between items-center text-sm mt-2">
-                                <span class="text-gray-400">Your Pick: <span class="${pickClass} font-bold">${pledge.pick}</span></span>
-                                <span class="text-gray-400">Stake: <span class="text-white font-bold">${pledge.amount.toFixed(4)} ${pledge.asset} ($${pledge.amountUsd.toFixed(2)})</span></span>
+                                <span class="text-gray-600 dark:text-gray-400">Your Pick: <span class="${pickClass} font-bold">${pledge.pick}</span></span>
+                                <span class="text-gray-600 dark:text-gray-400">Stake: <span class="text-gray-900 dark:text-white font-bold">${pledge.amount.toFixed(4)} ${pledge.asset} ($${pledge.amountUsd.toFixed(2)})</span></span>
                             </div>
-                            <div class="text-xs text-gray-500 mt-1">
-                                Potential Return: <span class="text-green-400">$${pledge.potentialReturn.toFixed(2)}</span>
+                            <div class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                                Potential Return: <span class="text-green-500 dark:text-green-400">$${pledge.potentialReturn.toFixed(2)}</span>
                             </div>
                             ${txHashHtml}
                         </div>
@@ -3666,10 +3682,10 @@
 
                     html += `
                       <button onclick="showVerdictModal('${doc.id}')" class="ui-panel p-4 mb-3 w-full text-left ${isWinner ? 'border-l-4 border-green-400' : 'border-l-4 border-red-400'}">
-                            <p class="text-white font-semibold">${pledge.marketTitle}</p>
+                            <p class="text-gray-900 dark:text-white font-semibold">${pledge.marketTitle}</p>
                             <div class="flex justify-between items-center text-sm mt-2">
-                                <span class="text-gray-400">Result: <span class="${resultClass} font-bold">${result}</span></span>
-                                <span class="text-gray-400">Net P&L: <span class="${resultClass} font-bold">${payoutText}</span></span>
+                                <span class="text-gray-600 dark:text-gray-400">Result: <span class="${resultClass} font-bold">${result}</span></span>
+                                <span class="text-gray-600 dark:text-gray-400">Net P&L: <span class="${resultClass} font-bold">${payoutText}</span></span>
                             </div>
                             ${txHashHtml}
                         </button>
@@ -4618,23 +4634,39 @@
         }
 
         /**
-         * Handles the Aave/Compound protocol selection.
+         * Get APY for protocol
+         */
+        function getProtocolApy(protocol) {
+            const apyMap = {
+                'aave': 4.12,
+                'compound': 3.88,
+                'lido': 3.2,
+                'yearn': 5.8,
+                'curve': 2.9,
+                'convex': 4.5
+            };
+            return apyMap[protocol] || 0;
+        }
+
+        /**
+         * Handles yield protocol selection.
          */
         window.selectYield = (protocol) => {
             document.getElementById('selected-yield-protocol').value = protocol;
-            const aaveBtn = document.getElementById('yield-protocol-aave');
-            const compoundBtn = document.getElementById('yield-protocol-compound');
-
-            // Toggle styles
-            aaveBtn.classList.toggle('border-sky-400', protocol === 'aave');
-            aaveBtn.classList.toggle('bg-sky-500/10', protocol === 'aave');
-            aaveBtn.classList.toggle('text-gray-400', protocol !== 'aave');
-            aaveBtn.classList.toggle('border-transparent', protocol !== 'aave');
-
-            compoundBtn.classList.toggle('border-sky-400', protocol === 'compound');
-            compoundBtn.classList.toggle('bg-sky-500/10', protocol === 'compound');
-            compoundBtn.classList.toggle('text-gray-400', protocol !== 'compound');
-            compoundBtn.classList.toggle('border-transparent', protocol !== 'compound');
+            
+            const protocols = ['aave', 'compound', 'lido', 'yearn', 'curve', 'convex'];
+            
+            protocols.forEach(p => {
+                const btn = document.getElementById(`yield-protocol-${p}`);
+                if (btn) {
+                    const isSelected = p === protocol;
+                    btn.classList.toggle('border-sky-400', isSelected);
+                    btn.classList.toggle('bg-sky-500/10', isSelected);
+                    btn.classList.toggle('text-gray-400', !isSelected);
+                    btn.classList.toggle('text-white', isSelected);
+                    btn.classList.toggle('border-transparent', !isSelected);
+                }
+            });
         }
 
         /**
@@ -4741,7 +4773,7 @@
 
                     // 3. TRANSACTION WRITE 1: Create the new market
                     const newMarketRef = doc(marketCollectionRef); // Create ref for the new doc
-                    const protocolApy = yieldProtocolFinal === 'aave' ? 4.12 : (yieldProtocolFinal === 'compound' ? 3.88 : 0);
+                    const protocolApy = getProtocolApy(yieldProtocolFinal);
                     transaction.set(newMarketRef, {
                         title,
                         insight,
