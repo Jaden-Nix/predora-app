@@ -1864,10 +1864,10 @@
                 <!-- Quick Polls Content (hidden by default) -->
                 <div id="quick-polls-content" class="hidden space-y-4">
                     <div class="ui-panel p-4 space-y-3 text-sm">
-                            <p class="text-gray-300">
+                            <p class="theme-text-secondary">
                                 <strong class="text-sky-400">Stake XP, win XP!</strong> Vote on community polls using your XP. Winners split the pot.
                             </p>
-                            <ul class="text-xs text-gray-400 space-y-1">
+                            <ul class="text-xs theme-text-secondary space-y-1">
                                 <li>✓ No real money risk</li>
                                 <li>✓ Build XP for future airdrops</li>
                                 <li>✓ Auto-resolves like all markets</li>
@@ -3939,13 +3939,13 @@
                             <div class="flex items-center">
                                 <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/4687.png" class="w-10 h-10 rounded-full mr-3" alt="BUSD">
                                 <div>
-                                    <p class="font-semibold text-white">BUSD (Mock)</p>
-                                    <p class="text-sm text-gray-400">Binance-Peg BUSD</p>
+                                    <p class="font-semibold theme-text-primary">BUSD (Mock)</p>
+                                    <p class="text-sm theme-text-primary">Binance-Peg BUSD</p>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <p class="font-semibold text-white">$${balance.toFixed(2)}</p>
-                                <p class="text-sm text-gray-400">${balance.toFixed(2)} BUSD</p>
+                                <p class="font-semibold theme-text-primary">$${balance.toFixed(2)}</p>
+                                <p class="text-sm theme-text-primary">${balance.toFixed(2)} BUSD</p>
                             </div>
                         </div>
 
@@ -3953,13 +3953,13 @@
                             <div class="flex items-center">
                                 <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png" class="w-10 h-10 rounded-full mr-3" alt="BNB">
                                 <div>
-                                    <p class="font-semibold text-white">BNB (Mock)</p>
-                                    <p class="text-sm text-gray-400">BNB</p>
+                                    <p class="font-semibold theme-text-primary">BNB (Mock)</p>
+                                    <p class="text-sm theme-text-primary">BNB</p>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <p class="font-semibold text-white">$${(bnbBalance * getMockPrice('BNB')).toFixed(2)}</p>
-                                <p class="text-sm text-gray-400">${bnbBalance.toFixed(4)} BNB</p>
+                                <p class="font-semibold theme-text-primary">$${(bnbBalance * getMockPrice('BNB')).toFixed(2)}</p>
+                                <p class="text-sm theme-text-primary">${bnbBalance.toFixed(4)} BNB</p>
                             </div>
                         </div>
 
@@ -3967,13 +3967,13 @@
                             <div class="flex items-center">
                                 <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/7186.png" class="w-10 h-10 rounded-full mr-3" alt="CAKE">
                                 <div>
-                                    <p class="font-semibold text-white">PancakeSwap (Mock)</p>
-                                    <p class="text-sm text-gray-400">CAKE</p>
+                                    <p class="font-semibold theme-text-primary">PancakeSwap (Mock)</p>
+                                    <p class="text-sm theme-text-primary">CAKE</p>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <p class="font-semibold text-white">$${(cakeBalance * getMockPrice('CAKE')).toFixed(2)}</p>
-                                <p class="text-sm text-gray-400">${cakeBalance.toFixed(2)} CAKE</p>
+                                <p class="font-semibold theme-text-primary">$${(cakeBalance * getMockPrice('CAKE')).toFixed(2)}</p>
+                                <p class="text-sm theme-text-primary">${cakeBalance.toFixed(2)} CAKE</p>
                             </div>
                         </div>
                     </div>
@@ -4189,7 +4189,7 @@
             if(principalEl) {
                 principalEl.innerText = `$${principal.toFixed(2)}`;
                 principalEl.classList.remove('text-gray-400');
-                principalEl.classList.add('text-white');
+                principalEl.classList.add('theme-text-primary');
             }
         }
 
@@ -8237,8 +8237,8 @@ ${historyText}`;
                                 <div class="flex items-center space-x-3">
                                     <img src="${user.avatarUrl || LOGO_URL}" class="w-10 h-10 rounded-full" alt="Avatar">
                                     <div>
-                                        <p class="font-semibold text-white">${user.displayName}</p>
-                                        <p class="text-sm text-gray-400">${(user.xp || 0).toLocaleString()} XP</p>
+                                        <p class="font-semibold theme-text-primary">${user.displayName}</p>
+                                        <p class="text-sm theme-text-primary">${(user.xp || 0).toLocaleString()} XP</p>
                                     </div>
                                 </div>
                                 <button onclick="viewUserProfile('${user.userId}')" class="btn btn-secondary" style="width: auto; padding: 0.375rem 1rem; font-size: 0.875rem;">
@@ -8344,7 +8344,7 @@ ${historyText}`;
         async function renderFollowersList() {
             const { collection, getDocs, query, onSnapshot } = window.firebase.firestore;
             const content = document.getElementById('followers-list-content');
-            content.innerHTML = '<p class="text-gray-400 text-center pt-8">Loading followers...</p>';
+            content.innerHTML = '<p class="theme-text-primary text-center pt-8">Loading followers...</p>';
 
             try {
                 const followersCol = collection(db, 'artifacts', APP_ID, 'public', 'data', USER_PROFILE_COLLECTION, currentUserId, 'followers');
@@ -8364,8 +8364,8 @@ ${historyText}`;
                                 <div class="flex items-center space-x-3">
                                     <img src="${user.avatarUrl || LOGO_URL}" class="w-10 h-10 rounded-full" alt="Avatar">
                                     <div>
-                                        <p class="font-semibold text-white">${user.displayName}</p>
-                                        <p class="text-sm text-gray-400">${(user.xp || 0).toLocaleString()} XP</p>
+                                        <p class="font-semibold theme-text-primary">${user.displayName}</p>
+                                        <p class="text-sm theme-text-primary">${(user.xp || 0).toLocaleString()} XP</p>
                                     </div>
                                 </div>
                                 <button onclick="viewUserProfile('${user.userId}')" class="btn btn-secondary" style="width: auto; padding: 0.375rem 1rem; font-size: 0.875rem;">
@@ -8419,8 +8419,8 @@ ${historyText}`;
                                 <div class="flex items-center space-x-3">
                                     <img src="${user.avatarUrl || LOGO_URL}" class="w-10 h-10 rounded-full" alt="Avatar">
                                     <div>
-                                        <p class="font-semibold text-white">${user.displayName}</p>
-                                        <p class="text-sm text-gray-400">${(user.xp || 0).toLocaleString()} XP</p>
+                                        <p class="font-semibold theme-text-primary">${user.displayName}</p>
+                                        <p class="text-sm theme-text-primary">${(user.xp || 0).toLocaleString()} XP</p>
                                     </div>
                                 </div>
                                 <button onclick="viewUserProfile('${user.userId}')" class="btn btn-secondary" style="width: auto; padding: 0.375rem 1rem; font-size: 0.875rem;">
@@ -8983,8 +8983,8 @@ ${historyText}`;
                 const userXP = userProfile.xp || 0;
                 
                 html += `
-                    <div class="p-3 bg-white/5 dark:bg-white/5 light:bg-gray-100 rounded-lg border border-white/10 dark:border-white/10 light:border-gray-300 space-y-2">
-                        <p class="text-sm text-gray-900 dark:text-white font-medium">${poll.question}</p>
+    <div class="ui-panel p-3 space-y-2">
+                        <p class="text-sm theme-text-primary font-medium">${poll.question}</p>
                         ${!userVoted ? `
                             <div class="flex gap-2 items-center">
                                 <input type="number" 
@@ -8993,18 +8993,18 @@ ${historyText}`;
                                        max="${Math.max(10, userXP)}" 
                                        value="10" 
                                        step="10"
-                                       class="w-20 px-2 py-1 bg-white/10 dark:bg-white/10 light:bg-white border border-white/20 dark:border-white/20 light:border-gray-300 rounded text-gray-900 dark:text-white text-xs text-center"
+                                       class="ui-input w-20 px-2 py-1 text-xs text-center"
                                        placeholder="XP">
                                 <button onclick="voteOnPollWithInput('${poll.id}', 'YES')" 
-                                        class="flex-1 px-3 py-2 rounded bg-green-600/20 hover:bg-green-600/40 text-green-600 dark:text-green-400 text-xs font-medium border border-green-500/30 transition-all">
+                                        class="flex-1 px-3 py-2 rounded text-xs font-medium transition-all badge badge-pick-yes">
                                     YES ${yesPercent}%
                                 </button>
                                 <button onclick="voteOnPollWithInput('${poll.id}', 'NO')" 
-                                        class="flex-1 px-3 py-2 rounded bg-red-600/20 hover:bg-red-600/40 text-red-600 dark:text-red-400 text-xs font-medium border border-red-500/30 transition-all">
+                                        class="flex-1 px-3 py-2 rounded text-xs font-medium transition-all badge badge-pick-no">
                                     NO ${noPercent}%
                                 </button>
                             </div>
-                            <p class="text-xs text-gray-600 dark:text-gray-500 text-center">You have ${userXP} XP</p>
+                            <p class="text-xs theme-text-primary text-center">You have ${userXP} XP</p>
                         ` : `
                             <div class="flex gap-2">
                                 <div class="flex-1 px-3 py-2 rounded ${userVoted.vote === 'YES' ? 'bg-green-500 text-white' : 'bg-white/10 dark:bg-white/10 light:bg-gray-200 text-gray-600 dark:text-gray-400'} text-xs font-medium text-center">
@@ -9014,9 +9014,9 @@ ${historyText}`;
                                     NO ${noPercent}%
                                 </div>
                             </div>
-                            <p class="text-xs text-green-600 dark:text-green-400 text-center">You staked ${userVoted.xpStaked || 10} XP on ${userVoted.vote}!</p>
+                            <p class="text-xs badge-green text-center">You staked ${userVoted.xpStaked || 10} XP on ${userVoted.vote}!</p>
                         `}
-                        <p class="text-xs text-gray-600 dark:text-gray-500">${total} votes • ${totalXPPot} XP pot • ${poll.createdBy || 'Anonymous'}</p>
+                        <p class="text-xs theme-text-secondary">${total} votes • ${totalXPPot} XP pot • ${poll.createdBy || 'Anonymous'}</p>
                     </div>
                 `;
             });
