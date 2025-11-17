@@ -7433,6 +7433,20 @@ ${historyText}`;
                         timestamp: serverTimestamp()
                     });
                     
+                    // Create notification for the comment author (if replying to someone else)
+                    if (replyingTo.userId !== currentUserId) {
+                        const notificationsRef = collection(db, 'artifacts', APP_ID, 'public', 'data', USER_PROFILE_COLLECTION, replyingTo.userId, 'notifications');
+                        await addDoc(notificationsRef, {
+                            type: 'comment_reply',
+                            message: `${userProfile.displayName} replied to your comment`,
+                            fromUserId: currentUserId,
+                            fromUserName: userProfile.displayName,
+                            marketId: currentMarketId,
+                            timestamp: serverTimestamp(),
+                            read: false
+                        });
+                    }
+                    
                     console.log('Reply posted successfully');
                     showToast('Reply posted!', "success");
                     cancelReply();
@@ -7971,6 +7985,18 @@ ${historyText}`;
                         followedAt: serverTimestamp()
                     });
                     await batch.commit();
+
+                    // Create notification for the person being followed
+                    const { addDoc, collection } = window.firebase.firestore;
+                    const notificationsRef = collection(db, 'artifacts', APP_ID, 'public', 'data', USER_PROFILE_COLLECTION, targetUserId, 'notifications');
+                    await addDoc(notificationsRef, {
+                        type: 'new_follower',
+                        message: `${userProfile.displayName} started following you`,
+                        fromUserId: currentUserId,
+                        fromUserName: userProfile.displayName,
+                        timestamp: serverTimestamp(),
+                        read: false
+                    });
 
                     showToast(`You are now following ${targetUserName}`, "success");
                     updateFollowButton(true);
