@@ -7762,11 +7762,11 @@ ${historyText}`;
             // STATS CARD WITH GLASSMORPHISM
             yPos += 30;
             ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-            roundRect(ctx, 120, yPos - 20, 960, 140, 20);
+            roundRect(ctx, 120, yPos - 20, 960, 130, 20);
             ctx.fill();
             
             // STATS CONTENT
-            yPos += 35;
+            yPos += 30;
             ctx.font = 'bold 52px Inter, Arial, sans-serif';
             
             if (type === 'win' || type === 'loss') {
@@ -7808,18 +7808,35 @@ ${historyText}`;
                 const marketType = data.isNoLoss ? '🛡️ NO-LOSS' : '⚡ CLASSIC';
                 ctx.fillStyle = '#ffffff';
                 ctx.font = 'bold 48px Inter, Arial, sans-serif';
-                ctx.fillText(marketType, 150, yPos + 35);
+                ctx.fillText(marketType, 150, yPos + 30);
             }
             
-            // FOOTER BADGE
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-            roundRect(ctx, 420, 590, 360, 50, 25);
-            ctx.fill();
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 28px Inter, Arial, sans-serif';
-            ctx.fillText('🔮 predora-app.vercel.app', 450, 625);
+            // FOOTER INSIDE CARD (at bottom of glass card)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.font = 'bold 24px Inter, Arial, sans-serif';
+            const footerText = 'predora-app.vercel.app';
+            const footerWidth = ctx.measureText(footerText).width;
+            const footerX = 600 - footerWidth / 2; // Center horizontally
+            ctx.fillText(footerText, footerX, 560);
             
-            return canvas;
+            // LOAD AND DRAW LOGO
+            return new Promise((resolve) => {
+                const logoImg = new Image();
+                logoImg.crossOrigin = 'anonymous';
+                logoImg.onload = () => {
+                    // Draw semi-transparent logo in top-right corner
+                    ctx.globalAlpha = 0.15;
+                    const logoSize = 120;
+                    ctx.drawImage(logoImg, 950, 100, logoSize, logoSize);
+                    ctx.globalAlpha = 1;
+                    resolve(canvas);
+                };
+                logoImg.onerror = () => {
+                    // If logo fails to load, just return canvas without logo
+                    resolve(canvas);
+                };
+                logoImg.src = 'https://res.cloudinary.com/djslxbghy/image/upload/Predora-app.png';
+            });
         };
         
         /**
