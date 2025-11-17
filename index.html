@@ -3376,6 +3376,11 @@
                     // Hide  "Logging in..." spinner
                     showLoadingOverlay(false); 
 
+                    // Transition to home screen before showing avatar modal
+                    showScreen('home-screen');
+                    dom.topNav.classList.remove('hidden');
+                    dom.bottomNav.classList.remove('hidden');
+
                     // Show the avatar picker
                     showAvatarModal();
 
@@ -7982,7 +7987,7 @@ ${historyText}`;
                     await addDoc(repliesCol, {
                         userId: currentUserId,
                         displayName: userProfile.displayName,
-                        avatarUrl: userProfile.avatarUrl || YOUR_LOGO_URL,
+                        avatarUrl: userProfile.avatarUrl || LOGO_URL,
                         commentText: commentText,
                         replyingTo: replyingTo.displayName, // Store who they're replying to
                         replyingToUserId: replyingTo.userId,
@@ -8020,7 +8025,7 @@ ${historyText}`;
                         marketId: currentMarketId,
                         userId: currentUserId,
                         displayName: userProfile.displayName,
-                        avatarUrl: userProfile.avatarUrl || YOUR_LOGO_URL,
+                        avatarUrl: userProfile.avatarUrl || LOGO_URL,
                         pick: null,
                         commentText: commentText,
                         timestamp: serverTimestamp()
@@ -9642,9 +9647,23 @@ ${historyText}`;
             dom.showTickerBtn.addEventListener('click', showTickerModal);
 
             dom.followBtn.addEventListener('click', toggleFollow);
-            dom.tickerPostBtn.addEventListener('click', postComment);
 
-dom.searchBarInput.addEventListener('input', handleSearch);
+            // Ticker chat: button click
+            if (dom.tickerPostBtn) {
+                dom.tickerPostBtn.addEventListener('click', postComment);
+            }
+
+            // Ticker chat: Enter key support
+            if (dom.tickerCommentInput) {
+                dom.tickerCommentInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        postComment();
+                    }
+                });
+            }
+
+            dom.searchBarInput.addEventListener('input', handleSearch);
 
             // Use event delegation for the stake buttons (since they are in a dynamic panel)
             if (dom.stakeSection) {
