@@ -4091,8 +4091,8 @@
                     const isCurrentUser = profile.userId === currentUserId;
                     if (isCurrentUser) userRank = rank;
 
-                    let rankStyle = 'text-white font-medium';
-                    let scoreStyle = 'text-white font-semibold';
+                    let rankStyle = 'theme-text-primary font-medium';
+                    let scoreStyle = 'theme-text-primary font-semibold';
                     let name = profile.displayName || truncateAddress(profile.walletAddress) || 'Anonymous';
 
                     // Special styles for top 3
@@ -4109,7 +4109,7 @@
                                 ${isCurrentUser ? `
     <span class="gradient-text font-extrabold">${name}</span>
 ` : `
-    <button onclick="viewUserProfile('${profile.userId}')" class="text-white hover:text-sky-400 font-semibold transition-colors">
+    <button onclick="viewUserProfile('${profile.userId}')" class="theme-text-primary hover:text-sky-400 font-semibold transition-colors">
         ${name}
     </button>
 `}
@@ -4121,9 +4121,9 @@
 
                 // Update the user's personal rank panel
                 dom.userRankPanel.innerHTML = `
-                    <p class="text-xs text-gray-400 mb-2">Your Current Rank (${timeframeText})</p>
-                    <div class="text-5xl font-extrabold ${userRank === 1 ? 'gradient-text' : 'text-white'}">${userRank > 0 ? `#${userRank}` : 'N/A'}</div>
-                    <p class="text-sm text-gray-300 mt-2">Score: ${userProfileData.xp.toLocaleString()} XP</p>
+                    <p class="text-xs theme-text-secondary mb-2">Your Current Rank (${timeframeText})</p>
+                    <div class="text-5xl font-extrabold ${userRank === 1 ? 'gradient-text' : 'theme-text-primary'}">${userRank > 0 ? `#${userRank}` : 'N/A'}</div>
+                    <p class="text-sm theme-text-secondary mt-2">Score: ${userProfileData.xp.toLocaleString()} XP</p>
                 `;
                 // Update the full ranking list
                 if (rankHtml === '') {
