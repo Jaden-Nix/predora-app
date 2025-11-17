@@ -3285,11 +3285,33 @@
             if (!actionUrl) return;
             
             // Parse actionUrl and navigate accordingly
-            // Format: screen:market-detail:marketId or screen:profile:userId
+            // Format: screen:market-detail:marketId or screen:market-detail:marketId:chat
             const parts = actionUrl.split(':');
             if (parts.length >= 2 && parts[0] === 'screen') {
-                showScreen(parts[1] + '-screen');
-                // Additional logic for screen parameters can go here
+                const screenName = parts[1];
+                
+                if (screenName === 'market-detail' && parts.length >= 3) {
+                    const marketId = parts[2];
+                    const shouldOpenChat = parts.length >= 4 && parts[3] === 'chat';
+                    
+                    // Navigate to market detail screen
+                    showScreen('market-detail-screen');
+                    
+                    // Load market detail data
+                    loadMarketDetail(marketId);
+                    
+                    // If chat flag is present, open ticker chat after market loads
+                    if (shouldOpenChat) {
+                        setTimeout(() => {
+                            const tickerTab = document.querySelector('#market-ticker-tab');
+                            if (tickerTab) {
+                                tickerTab.click();
+                            }
+                        }, 300);
+                    }
+                } else {
+                    showScreen(screenName + '-screen');
+                }
             }
         };
         
@@ -7562,6 +7584,7 @@ ${historyText}`;
                             fromUserId: currentUserId,
                             fromUserName: userProfile.displayName,
                             marketId: currentMarketId,
+                            actionUrl: `screen:market-detail:${currentMarketId}:chat`,
                             timestamp: serverTimestamp(),
                             read: false
                         });
@@ -7628,26 +7651,55 @@ ${historyText}`;
             canvas.height = 675;
             const ctx = canvas.getContext('2d');
             
-            // VIBRANT MULTI-COLOR GRADIENT BACKGROUND
+            // DETECT THEME (light-mode class is added in light mode, absent in dark mode)
+            const isDarkMode = !document.documentElement.classList.contains('light-mode');
+            
+            // VIBRANT MULTI-COLOR GRADIENT BACKGROUND (theme-aware)
             const gradient = ctx.createLinearGradient(0, 0, 1200, 675);
             if (type === 'win') {
-                gradient.addColorStop(0, '#10b981');
-                gradient.addColorStop(0.3, '#059669');
-                gradient.addColorStop(0.6, '#0891b2');
-                gradient.addColorStop(1, '#0e7490');
+                if (isDarkMode) {
+                    gradient.addColorStop(0, '#10b981');
+                    gradient.addColorStop(0.3, '#059669');
+                    gradient.addColorStop(0.6, '#0891b2');
+                    gradient.addColorStop(1, '#0e7490');
+                } else {
+                    gradient.addColorStop(0, '#34d399');
+                    gradient.addColorStop(0.3, '#10b981');
+                    gradient.addColorStop(0.6, '#14b8a6');
+                    gradient.addColorStop(1, '#06b6d4');
+                }
             } else if (type === 'loss') {
-                gradient.addColorStop(0, '#f43f5e');
-                gradient.addColorStop(0.5, '#e11d48');
-                gradient.addColorStop(1, '#9f1239');
+                if (isDarkMode) {
+                    gradient.addColorStop(0, '#f43f5e');
+                    gradient.addColorStop(0.5, '#e11d48');
+                    gradient.addColorStop(1, '#9f1239');
+                } else {
+                    gradient.addColorStop(0, '#fb7185');
+                    gradient.addColorStop(0.5, '#f43f5e');
+                    gradient.addColorStop(1, '#be123c');
+                }
             } else if (type === 'stake') {
-                gradient.addColorStop(0, '#8b5cf6');
-                gradient.addColorStop(0.3, '#7c3aed');
-                gradient.addColorStop(0.6, '#3b82f6');
-                gradient.addColorStop(1, '#2563eb');
+                if (isDarkMode) {
+                    gradient.addColorStop(0, '#8b5cf6');
+                    gradient.addColorStop(0.3, '#7c3aed');
+                    gradient.addColorStop(0.6, '#3b82f6');
+                    gradient.addColorStop(1, '#2563eb');
+                } else {
+                    gradient.addColorStop(0, '#a78bfa');
+                    gradient.addColorStop(0.3, '#8b5cf6');
+                    gradient.addColorStop(0.6, '#60a5fa');
+                    gradient.addColorStop(1, '#3b82f6');
+                }
             } else {
-                gradient.addColorStop(0, '#f59e0b');
-                gradient.addColorStop(0.5, '#d97706');
-                gradient.addColorStop(1, '#ea580c');
+                if (isDarkMode) {
+                    gradient.addColorStop(0, '#f59e0b');
+                    gradient.addColorStop(0.5, '#d97706');
+                    gradient.addColorStop(1, '#ea580c');
+                } else {
+                    gradient.addColorStop(0, '#fbbf24');
+                    gradient.addColorStop(0.5, '#f59e0b');
+                    gradient.addColorStop(1, '#f97316');
+                }
             }
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, 1200, 675);
@@ -7814,16 +7866,23 @@ ${historyText}`;
          */
         window.downloadShareImage = (canvas, filename) => {
             canvas.toBlob((blob) => {
+                if (!blob) {
+                    showToast('Failed to create image', 'error');
+                    return;
+                }
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = filename;
+                a.style.display = 'none';
                 document.body.appendChild(a);
                 a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
                 showToast('Image downloaded! 📸', 'success');
-            });
+            }, 'image/png', 1.0);
         };
         
         /**
@@ -8343,10 +8402,10 @@ ${historyText}`;
                     const pickClass = pledge.pick === 'YES' ? 'text-green-400' : 'text-red-400';
                     html += `
                         <div class="ui-panel p-4 mb-3 opacity-80">
-                            <p class="text-white font-semibold">${pledge.marketTitle}</p>
+                            <p class="theme-text-primary font-semibold">${pledge.marketTitle}</p>
                             <div class="flex justify-between items-center text-sm mt-2">
-                                <span class="text-gray-400">Their Pick: <span class="${pickClass} font-bold">${pledge.pick}</span></span>
-                                <span class="text-gray-400">Stake: <span class="text-white font-bold">$${pledge.amountUsd.toFixed(2)}</span></span>
+                                <span class="theme-text-secondary">Their Pick: <span class="${pickClass} font-bold">${pledge.pick}</span></span>
+                                <span class="theme-text-secondary">Stake: <span class="theme-text-primary font-bold">$${pledge.amountUsd.toFixed(2)}</span></span>
                             </div>
                         </div>
                     `;
@@ -8389,10 +8448,10 @@ ${historyText}`;
 
                     html += `
                         <button onclick="showVerdictModal('${doc.id}')" class="ui-panel p-4 mb-3 w-full text-left ${isWinner ? 'border-l-4 border-green-400' : 'border-l-4 border-red-400'} opacity-80">
-                            <p class="text-white font-semibold">${pledge.marketTitle}</p>
+                            <p class="theme-text-primary font-semibold">${pledge.marketTitle}</p>
                             <div class="flex justify-between items-center text-sm mt-2">
-                                <span class="text-gray-400">Result: <span class="${resultClass} font-bold">${result}</span></span>
-                                <span class="text-gray-400">Net P&L: <span class="${resultClass} font-bold">${payoutText}</span></span>
+                                <span class="theme-text-secondary">Result: <span class="${resultClass} font-bold">${result}</span></span>
+                                <span class="theme-text-secondary">Net P&L: <span class="${resultClass} font-bold">${payoutText}</span></span>
                             </div>
                         </button>
                     `;
