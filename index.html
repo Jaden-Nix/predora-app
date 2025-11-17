@@ -8877,13 +8877,20 @@ ${historyText}`;
             try {
                 const { collection, query, orderBy, limit, getDocs } = window.firebase.firestore;
                 const pollsRef = collection(db, 'artifacts', APP_ID, 'public', 'data', 'quick_polls');
-                const q = query(pollsRef, orderBy('createdAt', 'desc'), limit(3));
+                const q = query(pollsRef, orderBy('createdAt', 'desc'), limit(10));
                 const snapshot = await getDocs(q);
                 
                 quickPollsCache = [];
                 snapshot.forEach(doc => {
-                    quickPollsCache.push({ id: doc.id, ...doc.data() });
+                    const pollData = doc.data();
+                    // Filter out resolved polls in JavaScript
+                    if (!pollData.isResolved) {
+                        quickPollsCache.push({ id: doc.id, ...pollData });
+                    }
                 });
+                
+                // Only keep first 3 unresolved polls
+                quickPollsCache = quickPollsCache.slice(0, 3);
                 
                 renderQuickPolls();
             } catch (error) {
@@ -8914,31 +8921,41 @@ ${historyText}`;
                 const xpStakedNO = poll.xpStakedNO || 0;
                 const totalXPPot = xpStakedYES + xpStakedNO;
                 
+                const userXP = userProfile.xp || 0;
+                
                 html += `
                     <div class="p-3 bg-white/5 rounded-lg border border-white/10 space-y-2">
                         <p class="text-sm text-white font-medium">${poll.question}</p>
                         ${!userVoted ? `
-                            <div class="flex gap-2">
-                                <button onclick="voteOnPoll('${poll.id}', 'YES', 10)" 
-                                        class="flex-1 px-3 py-2 rounded bg-green-600/20 hover:bg-green-600/40 text-green-400 text-xs font-medium border border-green-500/30">
+                            <div class="flex gap-2 items-center">
+                                <input type="number" 
+                                       id="poll-xp-${poll.id}" 
+                                       min="10" 
+                                       max="${Math.max(10, userXP)}" 
+                                       value="10" 
+                                       step="10"
+                                       class="w-20 px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-xs text-center"
+                                       placeholder="XP">
+                                <button onclick="voteOnPollWithInput('${poll.id}', 'YES')" 
+                                        class="flex-1 px-3 py-2 rounded bg-green-600/20 hover:bg-green-600/40 text-green-400 text-xs font-medium border border-green-500/30 transition-all">
                                     YES ${yesPercent}%
                                 </button>
-                                <button onclick="voteOnPoll('${poll.id}', 'NO', 10)" 
-                                        class="flex-1 px-3 py-2 rounded bg-red-600/20 hover:bg-red-600/40 text-red-400 text-xs font-medium border border-red-500/30">
+                                <button onclick="voteOnPollWithInput('${poll.id}', 'NO')" 
+                                        class="flex-1 px-3 py-2 rounded bg-red-600/20 hover:bg-red-600/40 text-red-400 text-xs font-medium border border-red-500/30 transition-all">
                                     NO ${noPercent}%
                                 </button>
                             </div>
-                            <p class="text-xs text-gray-500 text-center">Stake 10 XP to vote</p>
+                            <p class="text-xs text-gray-500 text-center">You have ${userXP} XP</p>
                         ` : `
                             <div class="flex gap-2">
-                                <div class="flex-1 px-3 py-2 rounded ${userVoted === 'YES' ? 'bg-green-500 text-white' : 'bg-white/10 text-gray-400'} text-xs font-medium text-center">
+                                <div class="flex-1 px-3 py-2 rounded ${userVoted.vote === 'YES' ? 'bg-green-500 text-white' : 'bg-white/10 text-gray-400'} text-xs font-medium text-center">
                                     YES ${yesPercent}%
                                 </div>
-                                <div class="flex-1 px-3 py-2 rounded ${userVoted === 'NO' ? 'bg-red-500 text-white' : 'bg-white/10 text-gray-400'} text-xs font-medium text-center">
+                                <div class="flex-1 px-3 py-2 rounded ${userVoted.vote === 'NO' ? 'bg-red-500 text-white' : 'bg-white/10 text-gray-400'} text-xs font-medium text-center">
                                     NO ${noPercent}%
                                 </div>
                             </div>
-                            <p class="text-xs text-green-400 text-center">You voted ${userVoted}!</p>
+                            <p class="text-xs text-green-400 text-center">You staked ${userVoted.xpStaked || 10} XP on ${userVoted.vote}!</p>
                         `}
                         <p class="text-xs text-gray-500">${total} votes • ${totalXPPot} XP pot • ${poll.createdBy || 'Anonymous'}</p>
                     </div>
@@ -8947,6 +8964,27 @@ ${historyText}`;
             
             container.innerHTML = html;
         }
+        
+        window.voteOnPollWithInput = async (pollId, vote) => {
+            const input = document.getElementById(`poll-xp-${pollId}`);
+            if (!input) {
+                showToast("Error reading XP amount", "error");
+                return;
+            }
+            
+            let stakeXP = parseInt(input.value);
+            if (isNaN(stakeXP) || stakeXP < 10) {
+                showToast("Minimum stake is 10 XP", "warning");
+                return;
+            }
+            
+            if (stakeXP > (userProfile.xp || 0)) {
+                showToast(`You only have ${userProfile.xp || 0} XP`, "error");
+                return;
+            }
+            
+            await voteOnPoll(pollId, vote, stakeXP);
+        };
         
         window.voteOnPoll = async (pollId, vote, stakeXP = 10) => {
             if (!currentUserId) {
@@ -9037,7 +9075,10 @@ ${historyText}`;
                     question: question,
                     yesVotes: 0,
                     noVotes: 0,
+                    xpStakedYES: 0,
+                    xpStakedNO: 0,
                     voters: {},
+                    isResolved: false,
                     createdBy: userProfile.displayName || 'Anonymous',
                     createdAt: serverTimestamp()
                 });

@@ -474,6 +474,117 @@ async function autoGenerateQuickPlays() {
     console.log("ORACLE: Finished auto-generating Quick Play events.");
 }
 
+// --- Oracle Job 4: Auto-Resolve Quick Polls (Runs Daily) ---
+async function autoResolveQuickPolls() {
+    console.log("ORACLE: Auto-resolving expired Quick Polls...");
+    
+    try {
+        const pollsRef = db.collection(`artifacts/${APP_ID}/public/data/quick_polls`);
+        const now = new Date();
+        const expiryThreshold = new Date(now.getTime() - (24 * 60 * 60 * 1000)); // 24 hours ago
+        
+        // Get all unresolved polls
+        const snapshot = await pollsRef.where('isResolved', '==', false).get();
+        
+        if (snapshot.empty) {
+            console.log("ORACLE: No Quick Polls to resolve.");
+            return;
+        }
+        
+        let resolvedCount = 0;
+        const batch = db.batch();
+        
+        for (const pollDoc of snapshot.docs) {
+            const poll = pollDoc.data();
+            const createdAt = poll.createdAt?.toDate() || new Date(0);
+            
+            // Resolve polls older than 24 hours
+            if (createdAt < expiryThreshold) {
+                const yesVotes = poll.yesVotes || 0;
+                const noVotes = poll.noVotes || 0;
+                const totalVotes = yesVotes + noVotes;
+                
+                if (totalVotes === 0) {
+                    // No votes, just mark as resolved
+                    batch.update(pollDoc.ref, { 
+                        isResolved: true,
+                        resolvedAt: admin.firestore.FieldValue.serverTimestamp(),
+                        winningOutcome: 'NO_VOTES'
+                    });
+                    resolvedCount++;
+                    continue;
+                }
+                
+                // Determine winning outcome
+                const winningOutcome = yesVotes > noVotes ? 'YES' : yesVotes < noVotes ? 'NO' : 'TIE';
+                const xpStakedYES = poll.xpStakedYES || 0;
+                const xpStakedNO = poll.xpStakedNO || 0;
+                const totalXPPot = xpStakedYES + xpStakedNO;
+                
+                // Mark poll as resolved
+                batch.update(pollDoc.ref, { 
+                    isResolved: true,
+                    resolvedAt: admin.firestore.FieldValue.serverTimestamp(),
+                    winningOutcome: winningOutcome
+                });
+                
+                // Distribute XP to winners
+                if (winningOutcome !== 'TIE' && poll.voters) {
+                    for (const [userId, voterData] of Object.entries(poll.voters)) {
+                        const isWinner = voterData.vote === winningOutcome;
+                        const xpStaked = voterData.xpStaked || 10;
+                        
+                        if (isWinner) {
+                            // Calculate winnings: get back stake + proportional share of loser pot
+                            const winnerPot = winningOutcome === 'YES' ? xpStakedYES : xpStakedNO;
+                            const loserPot = winningOutcome === 'YES' ? xpStakedNO : xpStakedYES;
+                            const winnerShare = winnerPot > 0 ? (xpStaked / winnerPot) : 0;
+                            const winnings = Math.floor(xpStaked + (loserPot * winnerShare));
+                            
+                            // Update user profile
+                            const profileRef = db.doc(`artifacts/${APP_ID}/public/data/profile/${userId}`);
+                            batch.update(profileRef, {
+                                xp: admin.firestore.FieldValue.increment(winnings),
+                                streak: admin.firestore.FieldValue.increment(1)
+                            });
+                            
+                            console.log(`  Awarded ${winnings} XP to ${userId} for winning poll "${poll.question}"`);
+                        } else {
+                            // Loser gets nothing (XP was already deducted when voting)
+                            const profileRef = db.doc(`artifacts/${APP_ID}/public/data/profile/${userId}`);
+                            batch.update(profileRef, {
+                                streak: 0 // Reset streak
+                            });
+                        }
+                    }
+                } else if (winningOutcome === 'TIE' && poll.voters) {
+                    // Return all stakes on a tie
+                    for (const [userId, voterData] of Object.entries(poll.voters)) {
+                        const xpStaked = voterData.xpStaked || 10;
+                        const profileRef = db.doc(`artifacts/${APP_ID}/public/data/profile/${userId}`);
+                        batch.update(profileRef, {
+                            xp: admin.firestore.FieldValue.increment(xpStaked)
+                        });
+                    }
+                    console.log(`  Tie on poll "${poll.question}" - returned all stakes`);
+                }
+                
+                resolvedCount++;
+            }
+        }
+        
+        if (resolvedCount > 0) {
+            await batch.commit();
+            console.log(`ORACLE: Resolved ${resolvedCount} Quick Polls and distributed XP`);
+        } else {
+            console.log("ORACLE: No Quick Polls ready for resolution yet.");
+        }
+        
+    } catch (error) {
+        console.error("ORACLE: Error resolving Quick Polls:", error);
+    }
+}
+
 // --- API Endpoint 2: Secure Cron Job Runner ---
 app.post('/api/run-jobs', async (req, res) => {
     console.log("Server: /api/run-jobs endpoint hit");
@@ -488,6 +599,7 @@ app.post('/api/run-jobs', async (req, res) => {
         await autoResolveMarkets();
         await createDailyMarkets();
         await autoGenerateQuickPlays(); // NEW: Generate 2 Quick Play events
+        await autoResolveQuickPolls(); // NEW: Resolve expired Quick Polls
         res.status(200).json({ success: true, message: "Oracle jobs ran successfully." });
     } catch (e) {
         console.error("ORACLE: A job failed to run.", e);

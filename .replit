@@ -5,13 +5,37 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 43085
-externalPort = 3001
-
-[[ports]]
 localPort = 43535
 externalPort = 3002
 
+[[ports]]
+localPort = 46765
+externalPort = 3000
+
 [agent]
 expertMode = true
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "predora-server"
+
+[[workflows.workflow]]
+name = "predora-server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node index.js"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
 
