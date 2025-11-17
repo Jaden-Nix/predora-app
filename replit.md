@@ -23,10 +23,13 @@ Preferred communication style: Simple, everyday language.
 - **Responsive Strategy**: Mobile-first approach with distinct navigation patterns:
   - Desktop: Persistent top navigation with glassmorphism (backdrop blur, gradient backgrounds, glowing borders)
   - Mobile: Minimalist centered header showing only the Predora logo with clean gradients
-- **UI Components**: Toast notification system with four types (Success, Error, Warning, Info), glassmorphism effects, auto-dismissal, and stacking support
+- **UI Components**: 
+  - Toast notification system with four types (Success, Error, Warning, Info), glassmorphism effects, auto-dismissal, and stacking support
+  - Share modal with canvas-based image generation for social media sharing
 - **Create Market UX**: Redesigned screen featuring collapsible AI Assistant, consolidated market configuration panel, and compact form fields for reduced clutter
+- **Social Sharing**: Canvas-based shareable image generator allowing users to create and share branded cards for wins, losses, stakes, and markets on X/Twitter with download functionality
 
-**Rationale**: CDN-based dependencies eliminate build tooling complexity while maintaining modern aesthetics. Theme system provides accessibility and user preference support. Glassmorphism creates depth and modern feel appealing to GenZ demographic.
+**Rationale**: CDN-based dependencies eliminate build tooling complexity while maintaining modern aesthetics. Theme system provides accessibility and user preference support. Glassmorphism creates depth and modern feel appealing to GenZ demographic. Social sharing drives organic growth through user-generated content.
 
 ### Backend Architecture
 
@@ -40,13 +43,14 @@ Preferred communication style: Simple, everyday language.
 - API endpoints prefixed with `/api`
 - Static file serving for frontend assets
 - Port flexibility via environment variable (default 5000)
+- Cache control headers (Cache-Control, Pragma, Expires) prevent browser caching of stale assets
 
 **Security Model**
 - API keys stored as environment variables (GEMINI_API_KEY, CRON_SECRET)
 - Backend acts as secure proxy to protect credentials from client exposure
 - Firebase Admin SDK credentials via GOOGLE_APPLICATION_CREDENTIALS environment variable
 
-**Rationale**: Proxy pattern prevents API key exposure in client-side code. Express provides minimal overhead for simple proxy needs. ES Modules align with modern JavaScript standards.
+**Rationale**: Proxy pattern prevents API key exposure in client-side code. Express provides minimal overhead for simple proxy needs. ES Modules align with modern JavaScript standards. No-cache headers ensure users always receive latest application updates.
 
 ### Data Storage & Authentication
 
