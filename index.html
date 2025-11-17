@@ -7295,6 +7295,10 @@ ${historyText}`;
                         repliesSnapshot.forEach(replyDoc => {
                             const reply = replyDoc.data();
                             const replyTimeAgo = reply.timestamp ? getTimeAgo(reply.timestamp.seconds) : 'just now';
+                            
+                            // Show who this reply is to (if it's a reply to another reply)
+                            const replyingToTag = reply.replyingTo ? `<span class="text-sky-500 dark:text-sky-400">@${reply.replyingTo}</span> ` : '';
+                            
                             repliesHtml += `
                                 <div class="flex space-x-2 text-sm">
                                     <img src="${reply.avatarUrl || YOUR_LOGO_URL}" class="w-6 h-6 rounded-full" alt="Avatar">
@@ -7303,7 +7307,7 @@ ${historyText}`;
                                             <span class="font-semibold text-gray-900 dark:text-gray-200 text-xs">${reply.displayName}</span>
                                             <span class="text-xs text-gray-500 dark:text-gray-400">${replyTimeAgo}</span>
                                         </div>
-                                        <p class="text-gray-700 dark:text-gray-300 text-xs mt-0.5">${reply.commentText}</p>
+                                        <p class="text-gray-700 dark:text-gray-300 text-xs mt-0.5">${replyingToTag}${reply.commentText}</p>
                                         <button onclick="startReply('${commentId}', '${reply.displayName.replace(/'/g, "\\'")}', '${reply.userId}')" class="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-500 mt-1 flex items-center space-x-1">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
@@ -7451,6 +7455,8 @@ ${historyText}`;
                         displayName: userProfile.displayName,
                         avatarUrl: userProfile.avatarUrl || YOUR_LOGO_URL,
                         commentText: commentText,
+                        replyingTo: replyingTo.displayName, // Store who they're replying to
+                        replyingToUserId: replyingTo.userId,
                         timestamp: serverTimestamp()
                     });
                     
