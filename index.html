@@ -814,27 +814,27 @@
             cursor: not-allowed;
         }
 
-        /* --- Auto-hide Desktop Navigation --- */
+        /* --- Enhanced Desktop Navigation --- */
         @media (min-width: 768px) {
             #top-nav {
-                transform: translateY(-100%);
-                transition: transform 0.3s ease-in-out;
+                background: linear-gradient(135deg, rgba(13, 17, 23, 0.95) 0%, rgba(22, 27, 34, 0.95) 100%);
+                backdrop-filter: blur(12px);
+                border-bottom: 1px solid rgba(56, 189, 248, 0.2);
             }
-            #top-nav:hover,
-            #top-nav.nav-visible {
-                transform: translateY(0);
+            #top-nav::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.03), transparent);
+                pointer-events: none;
             }
         }
         
-        /* Hover zone at top of screen to reveal nav on desktop */
-        .nav-hover-zone {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            z-index: 48;
-            pointer-events: auto;
+        /* Light mode navigation */
+        :root.light-mode #top-nav,
+        body.light-mode #top-nav {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.98) 100%);
+            border-bottom: 1px solid rgba(3, 105, 161, 0.2);
         }
 
         /* Mobile header visibility handled by Tailwind md:hidden class */
@@ -1137,22 +1137,17 @@
         </div>
     </header>
 
-    <!-- Desktop Navigation Container (hidden on mobile) -->
-    <div class="hidden md:block">
-        <!-- Desktop hover zone to reveal navigation -->
-        <div class="nav-hover-zone"></div>
-        
-        <!-- Modern Top Navigation Bar (Desktop - Auto-hide with hover) -->
-        <nav id="top-nav" class="sticky top-0 z-50 shadow-lg shadow-black/20">
-            <div class="max-w-7xl mx-auto px-4 py-3 md:py-4">
-                <div class="flex justify-between items-center">
+    <!-- Desktop Navigation (hidden on mobile) -->
+    <nav id="top-nav" class="hidden md:block sticky top-0 z-50 shadow-lg shadow-black/20">
+            <div class="max-w-7xl mx-auto px-6 py-4">
+                <div class="flex justify-between items-center gap-8">
                     <!-- Logo -->
                     <div>
                         <h1 id="app-title" class="text-2xl md:text-3xl font-extrabold gradient-text tracking-tight cursor-pointer" onclick="showScreen('home-screen')">Predora</h1>
                     </div>
 
                     <!-- Desktop Navigation - Centered Pill Style -->
-                    <div class="flex items-center space-x-1 md:space-x-2 bg-[#161B22]/80 backdrop-blur-lg px-2 md:px-3 py-2 rounded-full border border-[#30363D]">
+                    <div class="flex items-center gap-2 bg-[#161B22]/60 backdrop-blur-xl px-4 py-2.5 rounded-full border border-[#30363D]/50 shadow-lg shadow-black/10">
                         <button data-screen="home-screen" class="top-nav-btn px-2 md:px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-300">
                             <svg class="w-4 h-4 inline-block mr-0.5 md:mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6-4v4m0-4h4"></path></svg>
                             <span class="hidden sm:inline">Home</span>
@@ -1172,7 +1167,7 @@
                     </div>
 
                     <!-- Right Side: Live Counter + Notifications + Theme + Profile -->
-                    <div class="flex items-center space-x-2 md:space-x-3">
+                    <div class="flex items-center gap-3">
                         <div id="live-user-counter" class="hidden sm:flex items-center text-xs md:text-sm text-gray-300">
                             <span class="w-2 h-2 bg-green-400 rounded-full mr-2 live-dot"></span>
                             <span id="live-user-count-text">147</span>
@@ -1205,8 +1200,6 @@
                 </div>
             </div>
         </nav>
-    </div>
-    <!-- End Desktop Navigation Container -->
 
     <div class="min-h-screen relative">
 
@@ -5129,39 +5122,6 @@ ${historyText}`;
         // --- ADMIN PANEL ---
         // =====================================================================
 
-        /**
-         * Setup desktop navigation auto-hide with hover reveal
-         */
-        function setupDesktopNavAutoHide() {
-            const hoverZone = document.querySelector('.nav-hover-zone');
-            const topNav = document.getElementById('top-nav');
-            
-            if (!hoverZone || !topNav) return;
-            
-            // Show nav when hovering the top zone
-            hoverZone.addEventListener('mouseenter', () => {
-                topNav.classList.add('nav-visible');
-            });
-            
-            // Keep nav visible while hovering it
-            topNav.addEventListener('mouseenter', () => {
-                topNav.classList.add('nav-visible');
-            });
-            
-            // Hide nav when leaving both zones
-            topNav.addEventListener('mouseleave', () => {
-                topNav.classList.remove('nav-visible');
-            });
-            
-            hoverZone.addEventListener('mouseleave', () => {
-                // Small delay to allow moving from zone to nav
-                setTimeout(() => {
-                    if (!topNav.matches(':hover')) {
-                        topNav.classList.remove('nav-visible');
-                    }
-                }, 100);
-            });
-        }
 
         let adminTapCount = 0;
         let adminTapTimer = null;
@@ -7068,9 +7028,8 @@ ${historyText}`;
             window.handlePublicProfileTab = handlePublicProfileTab;
             window.handleNetworkingTab = handleNetworkingTab;
 
-            // Setup admin features and nav auto-hide FIRST (before other listeners that might fail)
+            // Setup admin features
             setupAdminFeatures();
-            setupDesktopNavAutoHide();
             
             // Attach listeners to static buttons
             const aiGenerateBtn = document.getElementById('ai-generate-btn');
