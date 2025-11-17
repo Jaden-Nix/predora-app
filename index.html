@@ -3836,13 +3836,13 @@
 
                     html += `
                         <div class="ui-panel p-4 mb-3">
-                            <p class="text-gray-900 dark:text-white font-semibold">${pledge.marketTitle}</p>
+                            <p class="text-gray-900 dark:text-white font-semibold">${pledge.marketTitle || 'Market'}</p>
                             <div class="flex justify-between items-center text-sm mt-2">
                                 <span class="text-gray-600 dark:text-gray-400">Your Pick: <span class="${pickClass} font-bold">${pledge.pick}</span></span>
                                 <span class="text-gray-600 dark:text-gray-400">Stake: <span class="text-gray-900 dark:text-white font-bold">${pledge.amount.toFixed(4)} ${pledge.asset} ($${pledge.amountUsd.toFixed(2)})</span></span>
                             </div>
-                            <div class="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                                Potential Return: <span class="text-green-500 dark:text-green-400">$${pledge.potentialReturn.toFixed(2)}</span>
+                            <div class="text-xs text-gray-500 mt-1">
+                                Potential Return: <span class="text-green-600 dark:text-green-400">$${pledge.potentialReturn.toFixed(2)}</span>
                             </div>
                             ${txHashHtml}
                         </div>
@@ -3892,7 +3892,7 @@
 
                     html += `
                       <button onclick="showVerdictModal('${doc.id}')" class="ui-panel p-4 mb-3 w-full text-left ${isWinner ? 'border-l-4 border-green-400' : 'border-l-4 border-red-400'}">
-                            <p class="text-gray-900 dark:text-white font-semibold">${pledge.marketTitle}</p>
+                            <p class="text-gray-900 dark:text-white font-semibold">${pledge.marketTitle || 'Market'}</p>
                             <div class="flex justify-between items-center text-sm mt-2">
                                 <span class="text-gray-600 dark:text-gray-400">Result: <span class="${resultClass} font-bold">${result}</span></span>
                                 <span class="text-gray-600 dark:text-gray-400">Net P&L: <span class="${resultClass} font-bold">${payoutText}</span></span>
@@ -4122,6 +4122,9 @@
 
                             // 4. Reload and draw the chart
                             loadAndDrawChart(currentMarketId, currentMarket.createdAt);
+                            
+                            // 4.5 Update social sentiment in real-time
+                            updateSocialSentiment(marketId);
 
                             // 5. Check if the market was resolved *while* we were watching
                             if (currentMarket.isResolved) {
