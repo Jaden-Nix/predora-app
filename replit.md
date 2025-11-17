@@ -44,9 +44,9 @@ Preferred communication style: Simple, everyday language.
 ### AI Integration Architecture
 
 **Gemini API Integration**:
-- Model: `gemini-2.5-flash-preview-09-2025`.
+- Model: `gemini-2.5-flash-preview-09-2025` (latest September 2025 preview - 89.7% on MATH benchmark, 92.9% on coding, 2× faster than 1.5 Pro).
 - Endpoint: `/api/gemini` (proxied).
-- Capabilities: Tools integration (for Search), JSON Schema mode for structured outputs.
+- Capabilities: Tools integration (for Search), JSON Schema mode for structured outputs, superior reasoning for market analysis.
 
 ### Deployment Architecture
 
@@ -61,8 +61,8 @@ Preferred communication style: Simple, everyday language.
 - **Notification System**: Comprehensive infrastructure with UI components (bell icon in desktop nav and bottom nav, Alerts tab in profile), multiple notification types (`market_resolved`, `market_disputed`, `new_follower`, `comment_reply`), real-time updates via Firestore, and "Mark all read" functionality.
 - **Admin Panel Access**: Hidden 5-tap gesture on both desktop and mobile "Predora" titles to access admin features (secure, non-obvious entry point).
 - **Admin Market Controls**: Admins can reopen and re-resolve already-resolved markets with full audit trail tracking (adminEvents array with admin ID, timestamp, previous outcome).
-- **Fixed Pot Yield Markets**: Revolutionary no-loss system where users stake before a deadline, market locks, all principal goes to yield vault and is returned to everyone, only the yield is distributed to winners proportionally. Supports 6 yield protocols: Aave (4.12%), Compound (3.88%), Lido (3.2%), Yearn Finance (5.8%), Curve (2.9%), and Convex (4.5%). Eliminates early/late advantage - only stake amount and side selection matter.
-- **Staking Deadline System**: Both market types now support staking deadlines. Markets lock after deadline preventing new stakes while keeping view-only access until resolution. Countdown timers show remaining time.
+- **Fixed Pot Yield Markets**: Revolutionary no-loss system where users stake before a deadline, market locks, all principal goes to yield vault and is returned to everyone, only the yield is distributed to winners proportionally. Supports 6 yield protocols via dropdown selector: Aave (4.12%), Compound (3.88%), Lido (3.2%), Yearn Finance (5.8%), Curve (2.9%), and Convex (4.5%). Eliminates early/late advantage - only stake amount and side selection matter.
+- **Staking Deadline System**: Fixed Pot Yield markets include mandatory staking deadlines (not needed for traditional AMM markets). Markets lock after deadline preventing new stakes while keeping view-only access until resolution. Countdown timers show remaining time.
 - **Enhanced AI Prefill**: AI Assistant now fills entire create market form including title, insight, category (with new GenZ categories), resolution date (properly parsed from context like "Q2 2026" → "2026-06-30"), market type recommendation, and staking deadline suggestion.
 - **Market Type Clarification**: Clear differentiation between Traditional AMM (liquidity pool-based) and Fixed Pot Yield (principal safe, yield-only distribution) markets with contextual help text that updates based on selection.
 - **Improved UX**: Removed XP gain notifications for cleaner UI while maintaining backend XP tracking.
