@@ -3480,6 +3480,8 @@
                     break;
                 case 'profile-screen':
                     handleProfileTab(document.querySelector('.profile-tab.active')?.id.split('-')[1] || 'active');
+                    // Load active stakes to populate staking summary
+                    if (!activeStakesUnsubscribe) renderActiveStakes();
                     if (!historyStakesUnsubscribe) renderHistoryStakes();
                     break;
                 case 'pledge-pool-screen': 
@@ -7811,28 +7813,29 @@ ${historyText}`;
                 ctx.fillText(marketType, 150, yPos + 30);
             }
             
-            // FOOTER INSIDE CARD (at bottom of glass card)
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            // FOOTER INSIDE CARD (at bottom of glass card) - READABLE
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
             ctx.font = 'bold 24px Inter, Arial, sans-serif';
             const footerText = 'predora-app.vercel.app';
             const footerWidth = ctx.measureText(footerText).width;
             const footerX = 600 - footerWidth / 2; // Center horizontally
             ctx.fillText(footerText, footerX, 560);
             
-            // LOAD AND DRAW LOGO
+            // LOAD AND DRAW LOGO - VISIBLE WATERMARK
             return new Promise((resolve) => {
                 const logoImg = new Image();
                 logoImg.crossOrigin = 'anonymous';
                 logoImg.onload = () => {
-                    // Draw semi-transparent logo in top-right corner
-                    ctx.globalAlpha = 0.15;
-                    const logoSize = 120;
-                    ctx.drawImage(logoImg, 950, 100, logoSize, logoSize);
+                    // Draw visible logo watermark in top-right corner
+                    ctx.globalAlpha = 0.4;
+                    const logoSize = 140;
+                    ctx.drawImage(logoImg, 930, 90, logoSize, logoSize);
                     ctx.globalAlpha = 1;
                     resolve(canvas);
                 };
                 logoImg.onerror = () => {
                     // If logo fails to load, just return canvas without logo
+                    console.warn('Logo failed to load from Cloudinary');
                     resolve(canvas);
                 };
                 logoImg.src = 'https://res.cloudinary.com/djslxbghy/image/upload/Predora-app.png';
