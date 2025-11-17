@@ -1143,7 +1143,7 @@
         <div class="nav-hover-zone"></div>
         
         <!-- Modern Top Navigation Bar (Desktop - Auto-hide with hover) -->
-        <nav id="top-nav" class="sticky top-0 z-50 shadow-lg shadow-black/20 hidden md:block">
+        <nav id="top-nav" class="sticky top-0 z-50 shadow-lg shadow-black/20">
             <div class="max-w-7xl mx-auto px-4 py-3 md:py-4">
                 <div class="flex justify-between items-center">
                     <!-- Logo -->
@@ -5136,12 +5136,7 @@ ${historyText}`;
             const hoverZone = document.querySelector('.nav-hover-zone');
             const topNav = document.getElementById('top-nav');
             
-            console.log('setupDesktopNavAutoHide called', { hoverZone, topNav });
-            
-            if (!hoverZone || !topNav) {
-                console.error('Missing elements for nav auto-hide:', { hoverZone, topNav });
-                return;
-            }
+            if (!hoverZone || !topNav) return;
             
             // Show nav when hovering the top zone
             hoverZone.addEventListener('mouseenter', () => {
