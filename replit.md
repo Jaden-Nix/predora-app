@@ -76,10 +76,13 @@ Preferred communication style: Simple, everyday language.
   - **Quick Play** (Left): Fast binary predictions with real money stakes from the pledge pool
   - **Quick Polls** (Right): XP staking system where users stake minimum 10 XP per vote, winners split the total XP pot proportionally. Creates XP demand and practice ground for real markets, building XP economy for future airdrops. No real money risk.
 - **XP Economy**: Users earn XP from tasks (creating markets, voting, winning predictions), can stake it on polls, and build toward future airdrop. XP is both a reward and a stakeable asset.
+- **AI-Generated Event Images**: Market creators can upload custom images or use AI to generate eye-catching event images with gradient backgrounds and overlaid titles. Enhances visual appeal and engagement.
+- **Auto-Generated Quick Play Events**: Backend Oracle automatically generates 2 new Quick Play events every 4 hours using AI. Ensures fresh content without manual curation. AI selects topics from 10 categories (politics, crypto, sports, gaming, etc.) and creates timely 24-48 hour predictions with balanced odds.
+- **Mobile-Optimized Market Cards**: Compact Polymarket-style card design on mobile with smaller text, tighter spacing, and reduced padding for better information density. Desktop remains spacious and visual.
 
-## Multi-Option Markets (Polymarket-Style) - In Development
+## Multi-Option Markets (Polymarket-Style) - ✅ COMPLETE
 
-**Current Status**: Creation UI completed, display and resolution in progress.
+**Status**: Fully implemented and production-ready.
 
 **Concept**: Instead of binary YES/NO predictions, users can choose from multiple price ranges or outcomes.
 
@@ -101,11 +104,13 @@ Preferred communication style: Simple, everyday language.
 - Better for price ranges, election candidates, multiple teams
 - Higher engagement (users can pick their confidence level)
 
-**Technical Implementation** (when built):
-- Each option has its own liquidity pool
-- Odds automatically adjust based on stake distribution
-- Resolution requires selecting exactly one winning option
+**Technical Implementation** (COMPLETED):
+- Dynamic option builder UI (add/remove 3-6 options)
+- Each option has dedicated stake button and pool tracking
+- Admin panel shows individual resolution buttons for each option
+- Payout calculation uses correct option odds
 - Compatible with both Fixed Pot Yield and Traditional AMM market types
+- Full staking flow: saves option ID and label to pledge documents
 
 ## External Dependencies
 

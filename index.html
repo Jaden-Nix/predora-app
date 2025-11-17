@@ -854,6 +854,43 @@
         #mobile-app-title:active {
             transform: scale(0.97);
         }
+        
+        /* --- Compact Mobile Market Cards (Polymarket-style) --- */
+        @media (max-width: 768px) {
+            #standard-markets-feed .ui-panel {
+                padding: 0.75rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+            
+            #standard-markets-feed .ui-panel h3 {
+                font-size: 0.875rem !important;
+                line-height: 1.25rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+            
+            #standard-markets-feed .ui-panel .text-4xl {
+                font-size: 1.5rem !important;
+                line-height: 2rem !important;
+            }
+            
+            #standard-markets-feed .ui-panel .mb-5 {
+                margin-bottom: 0.75rem !important;
+            }
+            
+            #standard-markets-feed .ui-panel .btn {
+                padding: 0.5rem 0.75rem !important;
+                font-size: 0.875rem !important;
+            }
+            
+            #standard-markets-feed .ui-panel .badge {
+                font-size: 0.625rem !important;
+                padding: 0.125rem 0.375rem !important;
+            }
+            
+            #standard-markets-feed .ui-panel .text-xs {
+                font-size: 0.625rem !important;
+            }
+        }
 
         /* --- Profile Page Tabs --- */
         .profile-tab {
@@ -1551,7 +1588,9 @@
 
                 <div class="ui-panel">
                     <p id="detail-insight" class="text-gray-300 text-sm mb-6">...</p>
-                    <div class="flex justify-around mb-6">
+                    
+                    <!-- Binary YES/NO Display -->
+                    <div id="binary-odds-display" class="flex justify-around mb-6">
                         <div class="text-center">
                             <div id="detail-yes-percent" class="text-5xl font-bold text-green-400">--%</div>
                             <div class="text-sm text-gray-300">YES</div>
@@ -1561,6 +1600,12 @@
                             <div class="text-sm text-gray-300">NO</div>
                         </div>
                     </div>
+                    
+                    <!-- Multi-Option Display -->
+                    <div id="multi-option-display" class="hidden mb-6">
+                        <!-- Populated dynamically by renderMultiOptionDisplay() -->
+                    </div>
+                    
                     <button id="ai-explain-btn" class="btn btn-secondary w-full">
                         ✨ Explain these Odds (AI)
                     </button>

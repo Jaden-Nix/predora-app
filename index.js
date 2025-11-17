@@ -168,21 +168,54 @@ async function autoResolveMarkets() {
         const marketId = doc.id;
         const marketTitle = market.title;
 
-        // This job ONLY needs Google Search
-        const systemPrompt = `As of ${today}, what was the outcome of "[Market Title]"? Respond ONLY 'YES', 'NO', 'AMBIGUOUS'.`;
-        const userPrompt = `Market Title: "${marketTitle}"`;
-        const payload = {
-            systemInstruction: { parts: [{ text: systemPrompt }] },
-            contents: [{ parts: [{ text: userPrompt }] }],
-            tools: [{ "google_search": {} }]
-        };
-
+        let winningOutcome;
+        
         try {
+            // Check if this is a multi-option market
+            if (market.marketStructure === 'multi-option' && market.options && market.options.length > 0) {
+            // Multi-option market resolution
+            const optionsText = market.options.map(opt => `"${opt.id}": ${opt.label}`).join(', ');
+            const systemPrompt = `As of ${today}, determine which ONE option is the correct outcome for this prediction market. Respond ONLY with the option ID (like "opt_0", "opt_1", etc.) or "AMBIGUOUS" if unclear.`;
+            const userPrompt = `Market: "${marketTitle}"\n\nOptions: ${optionsText}`;
+            
+            const payload = {
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                contents: [{ parts: [{ text: userPrompt }] }],
+                tools: [{ "google_search": {} }]
+            };
+            
             const response = await callGoogleApi(payload);
             const outcome = response.candidates[0].content.parts[0].text;
-            const winningOutcome = outcome.trim().toUpperCase();
+            // Strip quotes and whitespace from Gemini response
+            winningOutcome = outcome.trim().replace(/^["']|["']$/g, '');
+            
+            // Validate that the outcome is one of the valid option IDs
+            const validOptionIds = market.options.map(opt => opt.id);
+            if (!validOptionIds.includes(winningOutcome) && winningOutcome.toUpperCase() !== 'AMBIGUOUS') {
+                console.log(`ORACLE: Invalid multi-option outcome "${winningOutcome}" for market ${marketId}. Setting to AMBIGUOUS.`);
+                winningOutcome = 'AMBIGUOUS';
+            }
+        } else {
+            // Binary YES/NO market resolution
+            const systemPrompt = `As of ${today}, what was the outcome of "[Market Title]"? Respond ONLY 'YES', 'NO', 'AMBIGUOUS'.`;
+            const userPrompt = `Market Title: "${marketTitle}"`;
+            const payload = {
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                contents: [{ parts: [{ text: userPrompt }] }],
+                tools: [{ "google_search": {} }]
+            };
 
-            if (winningOutcome === 'YES' || winningOutcome === 'NO') {
+            const response = await callGoogleApi(payload);
+            const outcome = response.candidates[0].content.parts[0].text;
+            winningOutcome = outcome.trim().toUpperCase();
+            }
+
+            // Check if we have a valid resolution (YES/NO for binary, or option ID for multi-option)
+            const isBinaryResolution = winningOutcome === 'YES' || winningOutcome === 'NO';
+            const isMultiOptionResolution = market.marketStructure === 'multi-option' && 
+                                           market.options.some(opt => opt.id === winningOutcome);
+            
+            if (isBinaryResolution || isMultiOptionResolution) {
                 console.log(`ORACLE: Resolving market ${marketId} as ${winningOutcome}. Now processing payouts...`);
 
                 const pledgeCollectionPath = `artifacts/${APP_ID}/public/data/pledges`;
@@ -203,9 +236,16 @@ async function autoResolveMarkets() {
                         const pledge = pledgeDoc.data();
                         const isWinner = pledge.pick === winningOutcome;
 
-                        const winningOdds = winningOutcome === 'YES' 
-                            ? (market.yesPercent || 60) 
-                            : (market.noPercent || 40);
+                        // Get correct winning odds for multi-option or binary markets
+                        let winningOdds = 50; // Default fallback
+                        if (market.marketStructure === 'multi-option') {
+                            const winningOption = market.options.find(opt => opt.id === winningOutcome);
+                            winningOdds = winningOption ? winningOption.odds : 100;
+                        } else {
+                            winningOdds = winningOutcome === 'YES' 
+                                ? (market.yesPercent || 60) 
+                                : (market.noPercent || 40);
+                        }
 
                         const payoutUsd = isWinner ? (pledge.amountUsd / (winningOdds / 100)) : 0;
                         const principalReturn = market.isNoLoss ? pledge.amountUsd : 0;
