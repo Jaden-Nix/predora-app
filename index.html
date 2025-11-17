@@ -696,37 +696,70 @@
 
         /* === LOGIN PAGE ANIMATIONS === */
 
+        /* Wide Screen Layout */
+        @media (min-width: 1024px) {
+            #login-screen .login-content-wrapper {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 4rem;
+                max-width: 1400px;
+                align-items: center;
+            }
+
+            #login-screen .login-hero-side {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                padding: 3rem;
+            }
+
+            #login-screen .login-form-side {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                padding: 3rem;
+                max-width: 500px;
+            }
+        }
+
+        @media (min-width: 1536px) {
+            #login-screen .login-content-wrapper {
+                max-width: 1600px;
+                gap: 6rem;
+            }
+        }
+
         /* Floating Orbs */
         .login-orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.3;
+            filter: blur(100px);
+            opacity: 0.25;
             pointer-events: none;
             z-index: 0;
         }
 
         .login-orb-1 {
-            width: 300px;
-            height: 300px;
+            width: 500px;
+            height: 500px;
             background: linear-gradient(135deg, #38BDF8, #6366F1);
-            top: -100px;
-            right: -100px;
+            top: -150px;
+            right: -150px;
             animation: float-orb-1 20s ease-in-out infinite;
         }
 
         .login-orb-2 {
-            width: 400px;
-            height: 400px;
+            width: 600px;
+            height: 600px;
             background: linear-gradient(135deg, #6366F1, #A855F7);
-            bottom: -150px;
-            left: -150px;
+            bottom: -200px;
+            left: -200px;
             animation: float-orb-2 25s ease-in-out infinite;
         }
 
         .login-orb-3 {
-            width: 250px;
-            height: 250px;
+            width: 350px;
+            height: 350px;
             background: linear-gradient(135deg, #EC4899, #EF4444);
             top: 50%;
             left: 50%;
@@ -815,6 +848,11 @@
         }
 
         /* Login Button Hover Effects */
+        .login-btn-hover {
+            position: relative;
+            overflow: hidden;
+        }
+
         .login-btn-hover::before {
             content: '';
             position: absolute;
@@ -822,12 +860,32 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
             transition: left 0.5s ease;
         }
 
         .login-btn-hover:hover::before {
             left: 100%;
+        }
+
+        .login-btn-hover:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .login-btn-hover:disabled::before {
+            display: none;
+        }
+
+        /* Loading Spinner Inside Button */
+        .btn-spinner {
+            display: inline-block;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
 
         /* Login Theme Toggle Button */
@@ -1438,7 +1496,7 @@
 
             <main class="max-w-md md:max-w-xl lg:max-w-7xl mx-auto relative p-4">
 
-            <div id="login-screen" class="screen screen-active space-y-6 max-w-md mx-auto lg:max-w-xl xl:max-w-2xl 2xl:max-w-3xl lg:space-y-8 xl:space-y-10 fixed inset-0 overflow-hidden flex items-center justify-center theme-bg">
+            <div id="login-screen" class="screen screen-active fixed inset-0 overflow-hidden flex items-center justify-center theme-bg">
 
                 <!-- Floating orbs background -->
                 <div class="login-orb login-orb-1"></div>
@@ -1446,71 +1504,162 @@
                 <div class="login-orb login-orb-3"></div>
 
                 <!-- Theme Toggle - Fixed Top Right -->
-                <button id="login-theme-toggle" onclick="toggleTheme()" class="fixed top-6 right-6 lg:top-8 lg:right-8 xl:top-10 xl:right-10 z-50 w-12 h-12 lg:w-14 lg:h-14 xl:w-16 xl:h-16 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 backdrop-blur-md border login-theme-btn shadow-xl" title="Toggle theme">
-                    <svg id="login-theme-icon-sun" class="w-6 h-6 lg:w-7 lg:h-7 xl:w-8 xl:h-8 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button id="login-theme-toggle" onclick="toggleTheme()" class="fixed top-6 right-6 lg:top-8 lg:right-8 z-50 w-12 h-12 lg:w-14 lg:h-14 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 backdrop-blur-md border login-theme-btn shadow-xl" title="Toggle theme">
+                    <svg id="login-theme-icon-sun" class="w-6 h-6 lg:w-7 lg:h-7 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                     </svg>
-                    <svg id="login-theme-icon-moon" class="w-6 h-6 lg:w-7 lg:h-7 xl:w-8 xl:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg id="login-theme-icon-moon" class="w-6 h-6 lg:w-7 lg:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                     </svg>
                 </button>
 
-                <div class="relative z-10 w-full px-4 lg:px-8 xl:px-12 max-w-md lg:max-w-xl xl:max-w-2xl 2xl:max-w-3xl mx-auto">
-                    <!-- Logo -->
-                    <div class="flex justify-center mb-4 sm:mb-6 lg:mb-10 xl:mb-12">
-                        <div class="w-24 h-24 sm:w-32 sm:h-32 lg:w-44 lg:h-44 xl:w-52 xl:h-52 2xl:w-60 2xl:h-60 rounded-3xl lg:rounded-[2.5rem] xl:rounded-[3rem] overflow-hidden shadow-2xl login-logo-bounce transform hover:scale-105 transition-transform duration-500 flex items-center justify-center ring-4 lg:ring-6 xl:ring-8 ring-sky-500/20">
-                            <img src="https://res.cloudinary.com/djslxbghy/image/upload/Predora-app.png" alt="Predora Logo" class="w-full h-full object-cover">
+                <div class="relative z-10 w-full px-4 lg:px-8 max-w-md lg:max-w-none mx-auto">
+                    <!-- Mobile & Tablet View (< 1024px) -->
+                    <div class="lg:hidden space-y-6">
+                        <div class="flex justify-center mb-6">
+                            <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl overflow-hidden shadow-2xl login-logo-bounce transform hover:scale-105 transition-transform duration-500 flex items-center justify-center ring-4 ring-sky-500/20">
+                                <img src="https://res.cloudinary.com/djslxbghy/image/upload/Predora-app.png" alt="Predora Logo" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+
+                        <h1 class="text-4xl sm:text-5xl font-extrabold gradient-text text-center mb-3 login-slide-up tracking-tight">Predora</h1>
+                        <p class="text-center theme-text-secondary text-lg sm:text-xl mb-3 login-slide-up-delay-1 font-semibold">Where Opinions Have Liquidity</p>
+                        <p class="text-center theme-text-secondary text-base mb-8 login-slide-up-delay-2 opacity-80">Predict. Stake. Win. 🚀</p>
+
+                        <div class="space-y-3 login-slide-up-delay-3">
+                            <button id="judge-btn" onclick="mockLogin('judge-123', 'Judge')" class="btn btn-primary text-lg py-4 login-btn-hover group shadow-2xl hover:shadow-sky-500/50 transition-all duration-300 rounded-xl">
+                                <span class="btn-content flex items-center justify-center gap-3">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                    </svg>
+                                    <span class="font-bold">Sign in as Judge</span>
+                                </span>
+                            </button>
+                            <button id="alice-btn" onclick="mockLogin('alice-456', 'Alice')" class="btn btn-secondary text-lg py-4 login-btn-hover group shadow-xl hover:shadow-indigo-500/30 transition-all duration-300 rounded-xl">
+                                <span class="btn-content flex items-center justify-center gap-3">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span class="font-bold">Sign in as Alice</span>
+                                </span>
+                            </button>
+                            <button id="bob-btn" onclick="mockLogin('bob-789', 'Bob')" class="btn btn-secondary text-lg py-4 login-btn-hover group shadow-xl hover:shadow-indigo-500/30 transition-all duration-300 rounded-xl">
+                                <span class="btn-content flex items-center justify-center gap-3">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span class="font-bold">Sign in as Bob</span>
+                                </span>
+                            </button>
+                        </div>
+
+                        <div class="my-6 flex items-center justify-center login-slide-up-delay-4">
+                            <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-500 to-transparent"></div>
+                            <span class="px-6 text-sm theme-text-secondary font-medium uppercase tracking-wider">or</span>
+                            <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-500 to-transparent"></div>
+                        </div>
+
+                        <div class="ui-panel space-y-4 login-slide-up-delay-5 backdrop-blur-sm p-6 rounded-xl">
+                            <p class="text-center theme-text-secondary text-sm font-medium">Test the OTP Flow</p>
+                            <input id="mock-email-input" type="email" class="ui-input text-base py-3 rounded-xl" placeholder="your-email@gmail.com">
+                            <button onclick="validateAndShowOtp()" class="btn btn-secondary w-full text-base py-4 login-btn-hover group shadow-xl hover:shadow-indigo-500/30 transition-all duration-300 rounded-xl">
+                                <span class="relative z-10 flex items-center justify-center gap-3">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <span class="font-bold">Continue with Email</span>
+                                </span>
+                            </button>
                         </div>
                     </div>
 
-                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-extrabold gradient-text text-center mb-2 sm:mb-3 lg:mb-5 xl:mb-6 login-slide-up tracking-tight">Predora</h1>
-                    <p class="text-center theme-text-secondary text-base sm:text-lg lg:text-2xl xl:text-3xl mb-2 sm:mb-3 lg:mb-4 xl:mb-5 login-slide-up-delay-1 font-semibold">Where Opinions Have Liquidity</p>
-                    <p class="text-center theme-text-secondary text-sm sm:text-base lg:text-xl xl:text-2xl mb-6 sm:mb-8 lg:mb-12 xl:mb-14 login-slide-up-delay-2 opacity-80">Predict. Stake. Win. 🚀</p>
+                    <!-- Desktop View (≥ 1024px) - Split Screen -->
+                    <div class="hidden lg:block login-content-wrapper">
+                        <!-- Left Side: Hero/Branding -->
+                        <div class="login-hero-side">
+                            <div class="login-slide-up">
+                                <div class="flex justify-start mb-8">
+                                    <div class="w-32 h-32 xl:w-40 xl:h-40 rounded-3xl overflow-hidden shadow-2xl login-logo-bounce transform hover:scale-105 transition-transform duration-500 flex items-center justify-center ring-4 ring-sky-500/20">
+                                        <img src="https://res.cloudinary.com/djslxbghy/image/upload/Predora-app.png" alt="Predora Logo" class="w-full h-full object-cover">
+                                    </div>
+                                </div>
+                                <h1 class="text-6xl xl:text-7xl 2xl:text-8xl font-extrabold gradient-text mb-4 tracking-tight">Predora</h1>
+                                <p class="theme-text-secondary text-2xl xl:text-3xl mb-3 font-semibold login-slide-up-delay-1">Where Opinions Have Liquidity</p>
+                                <p class="theme-text-secondary text-lg xl:text-xl mb-12 opacity-80 login-slide-up-delay-2">Predict. Stake. Win. 🚀</p>
 
-                    <div class="space-y-2.5 sm:space-y-3 lg:space-y-5 xl:space-y-6 login-slide-up-delay-3">
-                        <button onclick="mockLogin('judge-123', 'Judge')" class="btn btn-primary text-base sm:text-lg lg:text-2xl xl:text-3xl py-3 sm:py-4 lg:py-6 xl:py-7 2xl:py-8 login-btn-hover group relative overflow-hidden shadow-2xl hover:shadow-sky-500/50 transition-all duration-300 rounded-xl lg:rounded-2xl xl:rounded-3xl">
-                            <span class="relative z-10 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4 xl:gap-5">
-                                <svg class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 xl:w-9 xl:h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                                </svg>
-                                <span class="font-bold">Sign in as Judge</span>
-                            </span>
-                        </button>
-                        <button onclick="mockLogin('alice-456', 'Alice')" class="btn btn-secondary text-base sm:text-lg lg:text-2xl xl:text-3xl py-3 sm:py-4 lg:py-6 xl:py-7 2xl:py-8 login-btn-hover group relative overflow-hidden shadow-xl hover:shadow-indigo-500/30 transition-all duration-300 rounded-xl lg:rounded-2xl xl:rounded-3xl">
-                            <span class="relative z-10 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4 xl:gap-5">
-                                <svg class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 xl:w-9 xl:h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <span class="font-bold">Sign in as Alice</span>
-                            </span>
-                        </button>
-                        <button onclick="mockLogin('bob-789', 'Bob')" class="btn btn-secondary text-base sm:text-lg lg:text-2xl xl:text-3xl py-3 sm:py-4 lg:py-6 xl:py-7 2xl:py-8 login-btn-hover group relative overflow-hidden shadow-xl hover:shadow-indigo-500/30 transition-all duration-300 rounded-xl lg:rounded-2xl xl:rounded-3xl">
-                            <span class="relative z-10 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4 xl:gap-5">
-                                <svg class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 xl:w-9 xl:h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <span class="font-bold">Sign in as Bob</span>
-                            </span>
-                        </button>
-                    </div>
+                                <div class="space-y-4 login-slide-up-delay-3">
+                                    <div class="flex items-center gap-3 theme-text-secondary">
+                                        <div class="w-10 h-10 rounded-full bg-sky-500/20 flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                        </div>
+                                        <span class="text-base xl:text-lg">Lightning-fast predictions</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 theme-text-secondary">
+                                        <div class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        </div>
+                                        <span class="text-base xl:text-lg">Earn on your insights</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 theme-text-secondary">
+                                        <div class="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                        </div>
+                                        <span class="text-base xl:text-lg">Join the community</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="my-4 sm:my-6 lg:my-10 xl:my-12 flex items-center justify-center login-slide-up-delay-4">
-                        <div class="flex-1 h-px lg:h-0.5 bg-gradient-to-r from-transparent via-gray-500 to-transparent"></div>
-                        <span class="px-4 sm:px-6 lg:px-8 xl:px-10 text-xs sm:text-sm lg:text-lg xl:text-xl theme-text-secondary font-medium uppercase tracking-wider">or</span>
-                        <div class="flex-1 h-px lg:h-0.5 bg-gradient-to-r from-transparent via-gray-500 to-transparent"></div>
-                    </div>
+                        <!-- Right Side: Login Form -->
+                        <div class="login-form-side">
+                            <div class="space-y-4 login-slide-up-delay-3">
+                                <h2 class="text-3xl xl:text-4xl font-bold theme-text-primary mb-6">Get Started</h2>
 
-                    <div class="ui-panel space-y-3 sm:space-y-4 lg:space-y-6 xl:space-y-7 login-slide-up-delay-5 backdrop-blur-sm p-4 sm:p-6 lg:p-10 xl:p-12 rounded-xl lg:rounded-2xl xl:rounded-3xl">
-                        <p class="text-center theme-text-secondary text-xs sm:text-sm lg:text-xl xl:text-2xl font-medium">Test the OTP Flow</p>
-                        <input id="mock-email-input" type="email" class="ui-input text-sm sm:text-base lg:text-xl xl:text-2xl py-3 sm:py-4 lg:py-5 xl:py-6 rounded-xl lg:rounded-2xl" placeholder="your-email@gmail.com">
-                        <button onclick="validateAndShowOtp()" class="btn btn-secondary w-full text-base sm:text-lg lg:text-2xl xl:text-3xl py-3 sm:py-4 lg:py-6 xl:py-7 2xl:py-8 login-btn-hover group relative overflow-hidden shadow-xl hover:shadow-indigo-500/30 transition-all duration-300 rounded-xl lg:rounded-2xl xl:rounded-3xl">
-                            <span class="relative z-10 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4 xl:gap-5">
-                                <svg class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 xl:w-9 xl:h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                </svg>
-                                <span class="font-bold">Continue with Email</span>
-                            </span>
-                        </button>
+                                <button id="judge-btn-desktop" onclick="mockLogin('judge-123', 'Judge')" class="btn btn-primary text-xl py-5 login-btn-hover group shadow-2xl hover:shadow-sky-500/50 transition-all duration-300 rounded-2xl">
+                                    <span class="btn-content flex items-center justify-center gap-3">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                        </svg>
+                                        <span class="font-bold">Sign in as Judge</span>
+                                    </span>
+                                </button>
+                                <button id="alice-btn-desktop" onclick="mockLogin('alice-456', 'Alice')" class="btn btn-secondary text-xl py-5 login-btn-hover group shadow-xl hover:shadow-indigo-500/30 transition-all duration-300 rounded-2xl">
+                                    <span class="btn-content flex items-center justify-center gap-3">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <span class="font-bold">Sign in as Alice</span>
+                                    </span>
+                                </button>
+                                <button id="bob-btn-desktop" onclick="mockLogin('bob-789', 'Bob')" class="btn btn-secondary text-xl py-5 login-btn-hover group shadow-xl hover:shadow-indigo-500/30 transition-all duration-300 rounded-2xl">
+                                    <span class="btn-content flex items-center justify-center gap-3">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <span class="font-bold">Sign in as Bob</span>
+                                    </span>
+                                </button>
+
+                                <div class="my-6 flex items-center justify-center login-slide-up-delay-4">
+                                    <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-500 to-transparent"></div>
+                                    <span class="px-6 text-sm theme-text-secondary font-medium uppercase tracking-wider">or</span>
+                                    <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-500 to-transparent"></div>
+                                </div>
+
+                                <div class="ui-panel space-y-4 login-slide-up-delay-5 backdrop-blur-sm p-6 rounded-2xl">
+                                    <p class="text-center theme-text-secondary text-base font-medium">Test the OTP Flow</p>
+                                    <input id="mock-email-input-desktop" type="email" class="ui-input text-lg py-4 rounded-xl" placeholder="your-email@gmail.com">
+                                    <button onclick="validateAndShowOtp()" class="btn btn-secondary w-full text-lg py-4 login-btn-hover group shadow-xl hover:shadow-indigo-500/30 transition-all duration-300 rounded-xl">
+                                        <span class="relative z-10 flex items-center justify-center gap-3">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                            </svg>
+                                            <span class="font-bold">Continue with Email</span>
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3285,19 +3434,38 @@
             currentUserId = userId;
             userProfile.displayName = displayName;
 
-            showLoadingOverlay(true, `Logging in as ${displayName}...`);
+            const buttonIds = ['judge-btn', 'alice-btn', 'bob-btn', 'judge-btn-desktop', 'alice-btn-desktop', 'bob-btn-desktop'];
+            const clickedButton = event && event.currentTarget;
+
+            buttonIds.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.disabled = true;
+                    if (btn === clickedButton || btn.onclick.toString().includes(userId)) {
+                        const contentSpan = btn.querySelector('.btn-content');
+                        if (contentSpan) {
+                            contentSpan.innerHTML = `
+                                <div class="btn-spinner"></div>
+                                <span class="font-bold">Signing in...</span>
+                            `;
+                        }
+                    }
+                }
+            });
 
             const { signInAnonymously } = window.firebase.auth;
 
             signInAnonymously(auth)
                 .then((userCredential) => {
                     console.log("Firebase Auth UID (Anonymous):", userCredential.user.uid);
-                    // initializeUserProfile will now handle all navigation
                     return initializeUserProfile(); 
                 })
                 .catch(err => {
                     console.error("Firebase auth for demo failed:", err);
-                    showLoadingOverlay(false);
+                    buttonIds.forEach(id => {
+                        const btn = document.getElementById(id);
+                        if (btn) btn.disabled = false;
+                    });
                     alert(`Error: ${err.message}`); 
                 });
         }
