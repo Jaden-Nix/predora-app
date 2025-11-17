@@ -3127,9 +3127,16 @@
                 // Filter notifications in JavaScript based on selected tab
                 let filteredDocs = snapshot.docs;
                 if (currentNotificationFilter === 'markets') {
-                    filteredDocs = snapshot.docs.filter(doc => doc.data().type === 'market_resolved');
+                    filteredDocs = snapshot.docs.filter(doc => {
+                        const type = doc.data().type;
+                        return type === 'market_resolved' || type === 'market_disputed';
+                    });
                 } else if (currentNotificationFilter === 'social') {
-                    filteredDocs = snapshot.docs.filter(doc => doc.data().type === 'social');
+                    filteredDocs = snapshot.docs.filter(doc => {
+                        const type = doc.data().type;
+                        // Support both old and new notification types
+                        return type === 'social' || type === 'new_follower' || type === 'comment_reply';
+                    });
                 }
                 
                 // Display filtered notifications
