@@ -2903,7 +2903,7 @@
             if (otp === '123456') {
                 const email = document.getElementById('mock-email-input').value || 'demo-user@predora.io';
                 const userId = email.split('@')[0];
-                const displayName = `@${userId}`;
+                const displayName = userId; // No @ symbol in stored username
                 mockLogin(userId, displayName);
             } else {
                 showToast("Invalid OTP. Hint: 123456", "error");
@@ -8109,7 +8109,7 @@ ${historyText}`;
                 html += `
                     <div class="ui-panel">
                         <div class="flex justify-between items-center mb-3">
-                            <span class="text-xs text-gray-400 font-light">By @${displayName}</span>
+                            <span class="text-xs text-gray-400 font-light">By ${displayName}</span>
                             <div class="flex items-center space-x-2">
                                 <span class="badge ${market.isNoLoss ? 'badge-blue' : 'badge-green'}">${market.isNoLoss ? 'No-Loss' : 'Classic'}</span>
                                 <div class.badge badge-timer flex items-center space-x-1.5">
