@@ -197,7 +197,17 @@
             animation: fadeIn 0.3s ease-out;
         }
         .screen-inactive {
-            display: none;
+            display: none !important;
+        }
+
+        /* Full-screen auth screens */
+        #login-screen, #otp-screen {
+            z-index: 9999;
+        }
+
+        #login-screen.screen-active,
+        #otp-screen.screen-active {
+            display: flex !important;
         }
 
         @keyframes fadeIn {
@@ -682,6 +692,169 @@
             100% {
                 transform: rotateY(0deg);
             }
+        }
+
+        /* === LOGIN PAGE ANIMATIONS === */
+
+        /* Floating Orbs */
+        .login-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .login-orb-1 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #38BDF8, #6366F1);
+            top: -100px;
+            right: -100px;
+            animation: float-orb-1 20s ease-in-out infinite;
+        }
+
+        .login-orb-2 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #6366F1, #A855F7);
+            bottom: -150px;
+            left: -150px;
+            animation: float-orb-2 25s ease-in-out infinite;
+        }
+
+        .login-orb-3 {
+            width: 250px;
+            height: 250px;
+            background: linear-gradient(135deg, #EC4899, #EF4444);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: float-orb-3 30s ease-in-out infinite;
+        }
+
+        @keyframes float-orb-1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-50px, 50px) scale(1.1); }
+        }
+
+        @keyframes float-orb-2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, -50px) scale(1.2); }
+        }
+
+        @keyframes float-orb-3 {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-30%, -30%) scale(0.9); }
+        }
+
+        /* Light Mode Orbs */
+        :root.light-mode .login-orb-1,
+        body.light-mode .login-orb-1 {
+            background: linear-gradient(135deg, #5CC6FF, #7B8CFF);
+            opacity: 0.15;
+        }
+
+        :root.light-mode .login-orb-2,
+        body.light-mode .login-orb-2 {
+            background: linear-gradient(135deg, #7B8CFF, #C084FC);
+            opacity: 0.15;
+        }
+
+        :root.light-mode .login-orb-3,
+        body.light-mode .login-orb-3 {
+            background: linear-gradient(135deg, #F26D85, #FACC15);
+            opacity: 0.12;
+        }
+
+        /* Logo Bounce Animation */
+        .login-logo-bounce {
+            animation: logo-bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes logo-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Slide Up Animations */
+        .login-slide-up {
+            animation: slide-up 0.6s ease-out backwards;
+        }
+
+        .login-slide-up-delay-1 {
+            animation: slide-up 0.6s ease-out 0.1s backwards;
+        }
+
+        .login-slide-up-delay-2 {
+            animation: slide-up 0.6s ease-out 0.2s backwards;
+        }
+
+        .login-slide-up-delay-3 {
+            animation: slide-up 0.6s ease-out 0.3s backwards;
+        }
+
+        .login-slide-up-delay-4 {
+            animation: slide-up 0.6s ease-out 0.4s backwards;
+        }
+
+        .login-slide-up-delay-5 {
+            animation: slide-up 0.6s ease-out 0.5s backwards;
+        }
+
+        @keyframes slide-up {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Login Button Hover Effects */
+        .login-btn-hover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .login-btn-hover:hover::before {
+            left: 100%;
+        }
+
+        /* Login Theme Toggle Button */
+        .login-theme-btn {
+            background: rgba(22, 27, 34, 0.5);
+            border-color: rgba(48, 54, 61, 0.5);
+            color: #9CA3AF;
+        }
+
+        .login-theme-btn:hover {
+            background: rgba(22, 27, 34, 0.8);
+            color: #38BDF8;
+            border-color: #38BDF8;
+        }
+
+        :root.light-mode .login-theme-btn,
+        body.light-mode .login-theme-btn {
+            background: rgba(255, 255, 255, 0.5);
+            border-color: #CBD5F5;
+            color: #475569;
+        }
+
+        :root.light-mode .login-theme-btn:hover,
+        body.light-mode .login-theme-btn:hover {
+            background: rgba(255, 255, 255, 0.9);
+            color: #5CC6FF;
+            border-color: #5CC6FF;
         }
 
         /* Fix Light Mode Text Contrast - Targeted Coverage */
@@ -1265,33 +1438,140 @@
 
             <main class="max-w-md md:max-w-xl lg:max-w-7xl mx-auto relative p-4">
 
-            <div id="login-screen" class="screen screen-active space-y-6 max-w-md mx-auto lg:max-w-lg lg:space-y-8">
-                <h1 class="text-3xl lg:text-4xl font-bold gradient-text text-center">Welcome to Predora</h1>
-                <p class="text-center text-gray-300 lg:text-lg">Select a demo account to get started.</p>
+            <div id="login-screen" class="screen screen-active space-y-6 max-w-md mx-auto lg:max-w-lg lg:space-y-8 fixed inset-0 overflow-hidden flex items-center justify-center theme-bg">
 
-                <div class="space-y-3 lg:space-y-4">
-                    <button onclick="mockLogin('judge-123', 'Judge')" class="btn btn-primary lg:text-lg">Sign in as Judge</button>
-                    <button onclick="mockLogin('alice-456', 'Alice')" class="btn btn-secondary lg:text-lg">Sign in as Alice</button>
-                    <button onclick="mockLogin('bob-789', 'Bob')" class="btn btn-secondary lg:text-lg">Sign in as Bob</button>
-                </div>
+                <!-- Floating orbs background -->
+                <div class="login-orb login-orb-1"></div>
+                <div class="login-orb login-orb-2"></div>
+                <div class="login-orb login-orb-3"></div>
 
-                <div class="ui-panel space-y-4 lg:space-y-5">
-                    <p class="text-center text-gray-400 text-sm lg:text-base">Or, test the (mock) OTP flow:</p>
-                    <input id="mock-email-input" type="email" class="ui-input lg:text-lg" placeholder="your-email@gmail.com">
-                    <button onclick="validateAndShowOtp()" class="btn btn-secondary w-full lg:text-lg">Sign in with Email</button>
+                <!-- Theme Toggle - Fixed Top Right -->
+                <button id="login-theme-toggle" onclick="toggleTheme()" class="fixed top-6 right-6 z-50 w-12 h-12 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 backdrop-blur-md border login-theme-btn" title="Toggle theme">
+                    <svg id="login-theme-icon-sun" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    <svg id="login-theme-icon-moon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                </button>
 
+                <div class="relative z-10 w-full px-4">
+                    <!-- Logo -->
+                    <div class="flex justify-center mb-6">
+                        <div class="w-28 h-28 lg:w-32 lg:h-32 rounded-3xl overflow-hidden shadow-2xl login-logo-bounce transform hover:scale-105 transition-transform duration-500 flex items-center justify-center">
+                            <img src="https://res.cloudinary.com/djslxbghy/image/upload/Predora-app.png" alt="Predora Logo" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+
+                    <h1 class="text-4xl lg:text-5xl font-extrabold gradient-text text-center mb-3 login-slide-up">predora</h1>
+                    <p class="text-center theme-text-secondary text-sm lg:text-base mb-2 login-slide-up-delay-1">predict. stake. win.</p>
+                    <p class="text-center theme-text-secondary text-xs lg:text-sm mb-10 login-slide-up-delay-2 opacity-70">bet on tomorrow, profit today 💸</p>
+
+                    <div class="space-y-3 lg:space-y-4 login-slide-up-delay-3">
+                        <button onclick="mockLogin('judge-123', 'Judge')" class="btn btn-primary lg:text-lg login-btn-hover group relative overflow-hidden">
+                            <span class="relative z-10 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                                Sign in as Judge
+                            </span>
+                        </button>
+                        <button onclick="mockLogin('alice-456', 'Alice')" class="btn btn-secondary lg:text-lg login-btn-hover group relative overflow-hidden">
+                            <span class="relative z-10 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Sign in as Alice
+                            </span>
+                        </button>
+                        <button onclick="mockLogin('bob-789', 'Bob')" class="btn btn-secondary lg:text-lg login-btn-hover group relative overflow-hidden">
+                            <span class="relative z-10 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Sign in as Bob
+                            </span>
+                        </button>
+                    </div>
+
+                    <div class="my-6 flex items-center justify-center login-slide-up-delay-4">
+                        <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent"></div>
+                        <span class="px-4 text-xs theme-text-secondary">or</span>
+                        <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent"></div>
+                    </div>
+
+                    <div class="ui-panel space-y-4 lg:space-y-5 login-slide-up-delay-5 backdrop-blur-sm">
+                        <p class="text-center theme-text-secondary text-xs lg:text-sm">test the OTP flow</p>
+                        <input id="mock-email-input" type="email" class="ui-input lg:text-lg" placeholder="your-email@gmail.com">
+                        <button onclick="validateAndShowOtp()" class="btn btn-secondary w-full lg:text-lg login-btn-hover group relative overflow-hidden">
+                            <span class="relative z-10 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                                Continue with Email
+                            </span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div id="otp-screen" class="screen screen-inactive space-y-4 max-w-md mx-auto lg:max-w-lg lg:space-y-6">
-                <button onclick="showScreen('login-screen')" class="flex items-center text-sky-400 font-medium lg:text-lg">
-                    <svg class="w-5 h-5 mr-1 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                    Back
+            <div id="otp-screen" class="screen screen-inactive space-y-4 max-w-md mx-auto lg:max-w-lg lg:space-y-6 fixed inset-0 overflow-hidden flex items-center justify-center theme-bg">
+
+                <!-- Floating orbs background -->
+                <div class="login-orb login-orb-1"></div>
+                <div class="login-orb login-orb-2"></div>
+                <div class="login-orb login-orb-3"></div>
+
+                <!-- Theme Toggle - Fixed Top Right -->
+                <button onclick="toggleTheme()" class="fixed top-6 right-6 z-50 w-12 h-12 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 backdrop-blur-md border login-theme-btn" title="Toggle theme">
+                    <svg class="w-6 h-6 hidden theme-sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    <svg class="w-6 h-6 theme-moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
                 </button>
-                <h1 class="text-2xl lg:text-3xl font-bold gradient-text">Enter OTP</h1>
-                <p class="text-gray-300 lg:text-lg">A (mock) code was sent. <br> Hint: It's `123456`</p>
-                <input id="mock-otp-input" type="text" class="ui-input text-center text-2xl lg:text-3xl tracking-[1em]" placeholder="123456" maxlength="6">
-                <button onclick="mockOtpLogin()" class="btn btn-primary w-full lg:text-lg">Verify & Sign In</button>
+
+                <div class="relative z-10 w-full px-4">
+                    <button onclick="showScreen('login-screen')" class="flex items-center text-sky-400 font-medium lg:text-lg mb-8 hover:scale-105 transition-transform">
+                        <svg class="w-5 h-5 mr-1 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        Back
+                    </button>
+
+                    <!-- Logo with Lock Overlay -->
+                    <div class="flex justify-center mb-6">
+                        <div class="w-24 h-24 lg:w-28 lg:h-28 rounded-3xl overflow-hidden shadow-2xl login-logo-bounce relative">
+                            <img src="https://res.cloudinary.com/djslxbghy/image/upload/Predora-app.png" alt="Predora Logo" class="w-full h-full object-cover opacity-90">
+                            <div class="absolute inset-0 bg-gradient-to-br from-sky-500/30 to-indigo-600/30 backdrop-blur-[2px] flex items-center justify-center">
+                                <svg class="w-10 h-10 lg:w-12 lg:h-12 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h1 class="text-3xl lg:text-4xl font-extrabold gradient-text text-center mb-3">check your email</h1>
+                    <p class="text-center theme-text-secondary text-sm lg:text-base mb-8">
+                        We sent you a code<br>
+                        <span class="text-xs opacity-70">(hint: it's 123456)</span>
+                    </p>
+
+                    <div class="space-y-4">
+                        <input id="mock-otp-input" type="text" class="ui-input text-center text-2xl lg:text-3xl tracking-[0.5em] font-mono" placeholder="● ● ● ● ● ●" maxlength="6" autocomplete="off">
+                        <button onclick="mockOtpLogin()" class="btn btn-primary w-full lg:text-lg login-btn-hover group relative overflow-hidden">
+                            <span class="relative z-10 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Verify & Continue
+                            </span>
+                        </button>
+                    </div>
+
+                    <p class="text-center text-xs theme-text-secondary mt-6 opacity-60">
+                        Didn't receive a code? Check spam or try again
+                    </p>
+                </div>
             </div>
 
                 <div id="home-screen" class="screen screen-inactive space-y-5">
@@ -2621,6 +2901,8 @@
             const moonIcon = document.getElementById('theme-icon-moon');
             const profileSunIcon = document.getElementById('profile-theme-icon-sun');
             const profileMoonIcon = document.getElementById('profile-theme-icon-moon');
+            const loginSunIcon = document.getElementById('login-theme-icon-sun');
+            const loginMoonIcon = document.getElementById('login-theme-icon-moon');
 
             html.classList.toggle('light-mode');
             body.classList.toggle('light-mode');
@@ -2636,6 +2918,35 @@
                     moonIcon.classList.remove('hidden');
                 }
             }
+
+            // Toggle login screen icons
+            if (loginSunIcon && loginMoonIcon) {
+                if (isLightMode) {
+                    loginSunIcon.classList.remove('hidden');
+                    loginMoonIcon.classList.add('hidden');
+                } else {
+                    loginSunIcon.classList.add('hidden');
+                    loginMoonIcon.classList.remove('hidden');
+                }
+            }
+
+            // Toggle OTP screen icons (theme-sun-icon and theme-moon-icon classes)
+            const otpSunIcons = document.querySelectorAll('.theme-sun-icon');
+            const otpMoonIcons = document.querySelectorAll('.theme-moon-icon');
+            otpSunIcons.forEach(icon => {
+                if (isLightMode) {
+                    icon.classList.remove('hidden');
+                } else {
+                    icon.classList.add('hidden');
+                }
+            });
+            otpMoonIcons.forEach(icon => {
+                if (isLightMode) {
+                    icon.classList.add('hidden');
+                } else {
+                    icon.classList.remove('hidden');
+                }
+            });
 
             // Toggle profile icons
             if (profileSunIcon && profileMoonIcon) {
@@ -2660,6 +2971,10 @@
             const moonIcon = document.getElementById('theme-icon-moon');
             const profileSunIcon = document.getElementById('profile-theme-icon-sun');
             const profileMoonIcon = document.getElementById('profile-theme-icon-moon');
+            const loginSunIcon = document.getElementById('login-theme-icon-sun');
+            const loginMoonIcon = document.getElementById('login-theme-icon-moon');
+
+            const isLightMode = savedTheme === 'light';
 
             // Sync body class with html class (set by inline script)
             if (html.classList.contains('light-mode')) {
@@ -2668,7 +2983,7 @@
 
             // Sync desktop icons
             if (sunIcon && moonIcon) {
-                if (savedTheme === 'light') {
+                if (isLightMode) {
                     sunIcon.classList.remove('hidden');
                     moonIcon.classList.add('hidden');
                 } else {
@@ -2679,7 +2994,7 @@
 
             // Sync profile icons
             if (profileSunIcon && profileMoonIcon) {
-                if (savedTheme === 'light') {
+                if (isLightMode) {
                     profileSunIcon.classList.remove('hidden');
                     profileMoonIcon.classList.add('hidden');
                 } else {
@@ -2687,6 +3002,35 @@
                     profileMoonIcon.classList.remove('hidden');
                 }
             }
+
+            // Sync login screen icons
+            if (loginSunIcon && loginMoonIcon) {
+                if (isLightMode) {
+                    loginSunIcon.classList.remove('hidden');
+                    loginMoonIcon.classList.add('hidden');
+                } else {
+                    loginSunIcon.classList.add('hidden');
+                    loginMoonIcon.classList.remove('hidden');
+                }
+            }
+
+            // Sync OTP screen icons (using class selectors)
+            const otpSunIcons = document.querySelectorAll('.theme-sun-icon');
+            const otpMoonIcons = document.querySelectorAll('.theme-moon-icon');
+            otpSunIcons.forEach(icon => {
+                if (isLightMode) {
+                    icon.classList.remove('hidden');
+                } else {
+                    icon.classList.add('hidden');
+                }
+            });
+            otpMoonIcons.forEach(icon => {
+                if (isLightMode) {
+                    icon.classList.add('hidden');
+                } else {
+                    icon.classList.remove('hidden');
+                }
+            });
         }
 
         // Initialize theme on load
