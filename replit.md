@@ -82,7 +82,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Multi-Option Markets (Polymarket-Style) - ✅ COMPLETE
 
-**Status**: Fully implemented and production-ready.
+**Status**: Fully implemented, production-ready, and **Oracle auto-resolution enabled**.
 
 **Concept**: Instead of binary YES/NO predictions, users can choose from multiple price ranges or outcomes.
 
@@ -111,6 +111,14 @@ Preferred communication style: Simple, everyday language.
 - Payout calculation uses correct option odds
 - Compatible with both Fixed Pot Yield and Traditional AMM market types
 - Full staking flow: saves option ID and label to pledge documents
+
+**Oracle Auto-Resolution** (NEW - COMPLETED November 2025):
+- AI Oracle now detects multi-option markets and resolves them automatically
+- Gemini API determines winning option ID from all available options
+- Quote-stripping sanitization prevents misclassification of valid responses
+- Payout calculation uses option-specific odds (not binary YES/NO odds)
+- Fully integrated into `/api/run-jobs` endpoint alongside binary resolution
+- End-to-end flow: create → stake → auto-resolve → payout (works for both market types)
 
 ## External Dependencies
 
