@@ -2225,6 +2225,39 @@
                 <button onclick="closeMockWalletModal()" class="btn btn-primary w-full mt-6">Got it</button>
             </div>
         </div>
+        
+        <!-- Share Modal -->
+        <div id="share-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+            <div class="ui-panel p-6 w-11/12 max-w-2xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold gradient-text">Share Your Prediction 🚀</h2>
+                    <button onclick="closeShareModal()" class="text-gray-400 hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div id="share-canvas-container" class="bg-black/20 rounded-lg p-4 mb-4 flex justify-center">
+                    <!-- Canvas will be inserted here -->
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="download-share-btn" class="btn btn-secondary">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        Download Image
+                    </button>
+                    <button id="twitter-share-btn" class="btn btn-primary">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+                        </svg>
+                        Share on 𝕏
+                    </button>
+                </div>
+            </div>
+        </div>
 
     </div>
 
@@ -4025,24 +4058,33 @@
                         : '';
 
                     html += `
-                      <button onclick="showVerdictModal('${doc.id}')" class="ui-panel p-4 mb-3 w-full text-left ${isWinner ? 'border-l-4 border-green-400' : 'border-l-4 border-red-400'}">
-                            <h3 class="theme-text-primary font-semibold text-base mb-3">${pledge.marketTitle || 'Market'}</h3>
-                            <div class="mb-3">
-                                <span class="theme-text-secondary text-xs">Result:</span>
-                                <p class="${resultClass} font-bold text-2xl">${result}</p>
+                      <div class="ui-panel p-4 mb-3 ${isWinner ? 'border-l-4 border-green-400' : 'border-l-4 border-red-400'}">
+                            <div class="flex justify-between items-start mb-3">
+                                <h3 class="theme-text-primary font-semibold text-base flex-1">${pledge.marketTitle || 'Market'}</h3>
+                                <button onclick="shareHistoryStake(event, '${doc.id}', ${isWinner})" class="text-sky-400 hover:text-sky-300 transition-colors ml-2" title="Share">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+                                    </svg>
+                                </button>
                             </div>
-                            <div class="border-t border-white/10 pt-3 mt-3 grid grid-cols-2 gap-3">
-                                <div>
-                                    <span class="theme-text-secondary text-xs">Stake:</span>
-                                    <p class="theme-text-primary font-bold">${pledge.amount.toFixed(2)} ${pledge.asset}</p>
+                            <button onclick="showVerdictModal('${doc.id}')" class="w-full text-left">
+                                <div class="mb-3">
+                                    <span class="theme-text-secondary text-xs">Result:</span>
+                                    <p class="${resultClass} font-bold text-2xl">${result}</p>
                                 </div>
-                                <div>
-                                    <span class="theme-text-secondary text-xs">Net P&L:</span>
-                                    <p class="${resultClass} font-bold">${payoutText}</p>
+                                <div class="border-t border-white/10 pt-3 mt-3 grid grid-cols-2 gap-3">
+                                    <div>
+                                        <span class="theme-text-secondary text-xs">Stake:</span>
+                                        <p class="theme-text-primary font-bold">${pledge.amount.toFixed(2)} ${pledge.asset}</p>
+                                    </div>
+                                    <div>
+                                        <span class="theme-text-secondary text-xs">Net P&L:</span>
+                                        <p class="${resultClass} font-bold">${payoutText}</p>
+                                    </div>
                                 </div>
-                            </div>
-                            ${txHashHtml}
-                        </button>
+                                ${txHashHtml}
+                            </button>
+                        </div>
                     `;
                 });
                 dom.historyContent.innerHTML = html;
@@ -7549,6 +7591,214 @@ ${historyText}`;
                 dom.tickerPostBtn.disabled = false;
             }
         }
+
+        // =====================================================================
+        // --- SHARE IMAGE GENERATOR ---
+        // =====================================================================
+
+        /**
+         * Generate shareable image for wins, stakes, or markets
+         * @param {string} type - 'win', 'loss', 'stake', 'market'
+         * @param {object} data - Bet/market data
+         */
+        window.generateShareImage = async (type, data) => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1200;
+            canvas.height = 675;
+            const ctx = canvas.getContext('2d');
+            
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, 1200, 675);
+            if (type === 'win') {
+                gradient.addColorStop(0, '#10b981'); // Green
+                gradient.addColorStop(1, '#059669');
+            } else if (type === 'loss') {
+                gradient.addColorStop(0, '#ef4444'); // Red
+                gradient.addColorStop(1, '#dc2626');
+            } else {
+                gradient.addColorStop(0, '#3b82f6'); // Blue
+                gradient.addColorStop(1, '#2563eb');
+            }
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 1200, 675);
+            
+            // Add glassmorphism effect
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fillRect(60, 60, 1080, 555);
+            
+            // Title emoji and text
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 72px Inter, Arial, sans-serif';
+            const titleText = type === 'win' ? '🎉 I WON!' : type === 'loss' ? '😔 Better luck next time' : type === 'stake' ? '📈 I\'m betting!' : '🔮 New Market';
+            ctx.fillText(titleText, 100, 160);
+            
+            // Market title
+            ctx.font = '48px Inter, Arial, sans-serif';
+            ctx.fillStyle = '#ffffff';
+            const marketTitle = data.marketTitle || data.title || 'Prediction Market';
+            const wrappedTitle = wrapText(ctx, marketTitle, 1000);
+            let yPos = 260;
+            wrappedTitle.forEach(line => {
+                ctx.fillText(line, 100, yPos);
+                yPos += 60;
+            });
+            
+            // Stats section
+            yPos += 40;
+            ctx.font = 'bold 42px Inter, Arial, sans-serif';
+            
+            if (type === 'win' || type === 'loss') {
+                // Show stake and payout
+                ctx.fillText(`Stake: $${data.stake.toFixed(2)}`, 100, yPos);
+                yPos += 60;
+                const pnl = type === 'win' ? (data.payout - data.stake) : -data.stake;
+                const pnlText = pnl >= 0 ? `+$${pnl.toFixed(2)}` : `-$${Math.abs(pnl).toFixed(2)}`;
+                ctx.fillStyle = type === 'win' ? '#4ade80' : '#fca5a5';
+                ctx.fillText(`${type === 'win' ? 'Profit' : 'Loss'}: ${pnlText}`, 100, yPos);
+            } else if (type === 'stake') {
+                // Show current stake
+                ctx.fillText(`My bet: $${data.stake.toFixed(2)} on ${data.pick}`, 100, yPos);
+                yPos += 60;
+                ctx.fillStyle = '#a5f3fc';
+                ctx.fillText(`Current odds: ${data.odds}%`, 100, yPos);
+            } else if (type === 'market') {
+                // Show market type
+                const marketType = data.isNoLoss ? 'No-Loss Market' : 'Classic Market';
+                ctx.fillText(marketType, 100, yPos);
+                yPos += 60;
+                ctx.fillStyle = '#a5f3fc';
+                ctx.fillText(`Created by ${stripAt(data.creator)}`, 100, yPos);
+            }
+            
+            // Footer
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '36px Inter, Arial, sans-serif';
+            ctx.fillText('predora-app.vercel.app', 100, 600);
+            
+            return canvas;
+        };
+        
+        /**
+         * Wrap text to fit within width
+         */
+        function wrapText(ctx, text, maxWidth) {
+            const words = text.split(' ');
+            const lines = [];
+            let currentLine = words[0];
+            
+            for (let i = 1; i < words.length; i++) {
+                const word = words[i];
+                const width = ctx.measureText(currentLine + ' ' + word).width;
+                if (width < maxWidth) {
+                    currentLine += ' ' + word;
+                } else {
+                    lines.push(currentLine);
+                    currentLine = word;
+                }
+            }
+            lines.push(currentLine);
+            return lines;
+        }
+        
+        /**
+         * Download canvas as image
+         */
+        window.downloadShareImage = (canvas, filename) => {
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('Image downloaded! 📸', 'success');
+            });
+        };
+        
+        /**
+         * Share to Twitter/X
+         */
+        window.shareToTwitter = (text, url) => {
+            const encodedText = encodeURIComponent(text);
+            const encodedUrl = encodeURIComponent(url);
+            window.open(
+                `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
+                '_blank',
+                'width=550,height=420'
+            );
+        };
+        
+        /**
+         * Share history stake (win/loss)
+         */
+        window.shareHistoryStake = async (event, stakeId, isWinner) => {
+            event.stopPropagation();
+            
+            // Find the stake data
+            const stake = userHistoryData.find(s => s.stakeId === stakeId || userHistoryData.indexOf(s) === parseInt(stakeId));
+            if (!stake) {
+                showToast('Could not find stake data', 'error');
+                return;
+            }
+            
+            const type = isWinner ? 'win' : 'loss';
+            const data = {
+                marketTitle: stake.marketTitle,
+                stake: stake.amountUsd,
+                payout: stake.payout || 0,
+                pick: stake.pick
+            };
+            
+            const canvas = await generateShareImage(type, data);
+            
+            // Show share modal
+            showShareModal(canvas, type, stake.marketTitle);
+        };
+        
+        /**
+         * Show share modal with generated canvas
+         */
+        window.showShareModal = (canvas, type, marketTitle) => {
+            const modal = document.getElementById('share-modal');
+            const container = document.getElementById('share-canvas-container');
+            
+            // Clear and add canvas
+            container.innerHTML = '';
+            canvas.style.maxWidth = '100%';
+            canvas.style.height = 'auto';
+            canvas.style.borderRadius = '8px';
+            container.appendChild(canvas);
+            
+            // Setup download button
+            const downloadBtn = document.getElementById('download-share-btn');
+            downloadBtn.onclick = () => {
+                const filename = `predora-${type}-${Date.now()}.png`;
+                downloadShareImage(canvas, filename);
+            };
+            
+            // Setup Twitter share button
+            const twitterBtn = document.getElementById('twitter-share-btn');
+            twitterBtn.onclick = () => {
+                const text = type === 'win' 
+                    ? `🎉 I just won on "${marketTitle}" on Predora!` 
+                    : `💪 Just made a prediction on "${marketTitle}" on Predora!`;
+                const url = 'https://predora-app.vercel.app';
+                shareToTwitter(text, url);
+            };
+            
+            // Show modal
+            modal.classList.remove('hidden');
+        };
+        
+        /**
+         * Close share modal
+         */
+        window.closeShareModal = () => {
+            const modal = document.getElementById('share-modal');
+            modal.classList.add('hidden');
+        };
 
         // =====================================================================
         // --- SOCIAL GRAPH (FOLLOW) FUNCTIONS ---
