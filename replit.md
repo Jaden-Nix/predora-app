@@ -73,9 +73,10 @@ Preferred communication style: Simple, everyday language.
 - **Gamification: Prediction Streaks**: Win streak tracking with visual badges (5-win 🌟, 10-win 💎, 20-win 👑), XP multipliers (1.2×, 1.5×, 2×), and dedicated streak modal with progress visualization. Streaks reset on losses and award bonus XP for maintaining winning runs.
 - **Time Machine (Historical Odds)**: View how market odds changed over time with snapshots of 1-day-ago, 1-week-ago, and creation odds. Includes "hindsight score" showing early advantage for users who bet before odds shifted significantly.
 - **Social Sentiment Heatmap**: Visual breakdown showing which side your network is betting on vs. everyone else. Network percentage displays follower betting patterns with intelligent messaging (bullish/bearish/crowd-aligned). Helps users leverage social proof in prediction decisions.
-- **Quick Predictions Hub**: Unified side-by-side screen combining two engagement systems:
-  - **Quick Play** (Left): Fast binary predictions with real money stakes from the pledge pool
-  - **Quick Polls** (Right): XP staking system where users stake minimum 10 XP per vote, winners split the total XP pot proportionally. Creates XP demand and practice ground for real markets, building XP economy for future airdrops. No real money risk.
+- **Quick Predictions Hub**: Tab-based interface (like Follow/Following) combining two engagement systems:
+  - **Quick Play Tab**: Fast binary predictions with real money stakes from the pledge pool
+  - **Quick Polls Tab**: XP staking system where users stake minimum 10 XP per vote, winners split the total XP pot proportionally. Creates XP demand and practice ground for real markets, building XP economy for future airdrops. No real money risk.
+  - **UX Design**: Clean tab switching interface instead of side-by-side layout, optimized for mobile and desktop
 - **XP Economy**: Users earn XP from tasks (creating markets, voting, winning predictions), can stake it on polls, and build toward future airdrop. XP is both a reward and a stakeable asset.
 - **AI-Generated Event Images**: Market creators can upload custom images or use AI to generate eye-catching event images with gradient backgrounds and overlaid titles. Enhances visual appeal and engagement.
 - **Auto-Generated Quick Play Events**: Backend Oracle automatically generates 2 new Quick Play events every 4 hours using AI. Ensures fresh content without manual curation. AI selects topics from 10 categories (politics, crypto, sports, gaming, etc.) and creates timely 24-48 hour predictions with balanced odds.

@@ -1790,19 +1790,21 @@
                 </div>
             </div>
 
-            <div id="pledge-pool-screen" class="screen screen-inactive space-y-6">
-                <h1 class="text-2xl lg:text-3xl font-bold gradient-text text-center">Quick Predictions</h1>
-                <p class="text-gray-400 text-center text-sm">Fast predictions with real money (left) or XP only (right)</p>
+            <div id="pledge-pool-screen" class="screen screen-inactive space-y-4">
+                <h1 class="text-2xl lg:text-3xl font-bold gradient-text">Quick Predictions</h1>
                 
-                <!-- Side-by-side layout for desktop, stacked for mobile -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Tabs like Follow/Following -->
+                <div class="flex justify-around border-b border-white/10">
+                    <button id="quick-tab-play" class="profile-tab active" onclick="handleQuickTab('play')">
+                        💰 Quick Play
+                    </button>
+                    <button id="quick-tab-polls" class="profile-tab" onclick="handleQuickTab('polls')">
+                        🗳 Quick Polls
+                    </button>
+                </div>
                 
-                    <!-- LEFT COLUMN: Pledge Pool (Quick Play with Money) -->
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <h2 class="text-xl font-bold text-white">💰 Quick Play</h2>
-                            <span class="text-xs text-gray-400">Real money stakes</span>
-                        </div>
+                <!-- Quick Play Content -->
+                <div id="quick-play-content" class="space-y-4">
                 
                 <!-- Empty State -->
                 <div id="pledge-pool-empty" class="hidden max-w-2xl mx-auto text-center py-8">
@@ -1850,17 +1852,11 @@
                         Confirm Pledges
                     </button>
                 </div>
-                    </div>
-                    <!-- END LEFT COLUMN -->
-                    
-                    <!-- RIGHT COLUMN: Quick Polls (XP Staking) -->
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <h2 class="text-xl font-bold text-white">🗳 Quick Polls</h2>
-                            <span class="text-xs text-gray-400">Stake XP only</span>
-                        </div>
-                        
-                        <div class="ui-panel p-4 space-y-3 text-sm">
+                </div>
+                
+                <!-- Quick Polls Content (hidden by default) -->
+                <div id="quick-polls-content" class="hidden space-y-4">
+                    <div class="ui-panel p-4 space-y-3 text-sm">
                             <p class="text-gray-300">
                                 <strong class="text-sky-400">Stake XP, win XP!</strong> Vote on community polls using your XP. Winners split the pot.
                             </p>
@@ -1875,14 +1871,10 @@
                             </button>
                         </div>
                         
-                        <div id="quick-polls-container" class="space-y-3">
-                            <div class="text-center text-gray-500 py-4 text-sm">Loading polls...</div>
-                        </div>
+                    <div id="quick-polls-container" class="space-y-3">
+                        <div class="text-center text-gray-500 py-4 text-sm">Loading polls...</div>
                     </div>
-                    <!-- END RIGHT COLUMN -->
-                    
                 </div>
-                <!-- END GRID -->
             </div>
 
             <div id="profile-screen" class="screen screen-inactive space-y-6">
@@ -5361,15 +5353,8 @@
                 const systemPrompt = 'You are a creative assistant that generates detailed image descriptions for prediction market events. Create a vivid, professional image description suitable for DALL-E or Midjourney based on the market title.';
                 const userPrompt = `Generate a detailed, visually striking image prompt for this prediction market: "${title}". Make it professional, eye-catching, and relevant to the event. Keep it under 100 words.`;
                 
-                const schema = {
-                    type: "OBJECT",
-                    properties: {
-                        "imagePrompt": { "type": "STRING" }
-                    },
-                    required: ["imagePrompt"]
-                };
-                
-                const response = await callGemini(systemPrompt, userPrompt, schema);
+                // Just get a simple text response for the image description
+                const response = await callGemini(systemPrompt, userPrompt, null);
                 
                 // For now, we'll use a placeholder gradient based on the prompt
                 // In production, you'd integrate with DALL-E or another image generation API
@@ -7635,6 +7620,26 @@ ${historyText}`;
                 followersContent.classList.add('hidden');
                 followingContent.classList.remove('hidden');
                 renderFollowingList();
+            }
+        }
+        
+        // Handle Quick Play/Polls tab switching
+        window.handleQuickTab = (tab) => {
+            const playBtn = document.getElementById('quick-tab-play');
+            const pollsBtn = document.getElementById('quick-tab-polls');
+            const playContent = document.getElementById('quick-play-content');
+            const pollsContent = document.getElementById('quick-polls-content');
+            
+            if (tab === 'play') {
+                playBtn.classList.add('active');
+                pollsBtn.classList.remove('active');
+                playContent.classList.remove('hidden');
+                pollsContent.classList.add('hidden');
+            } else {
+                playBtn.classList.remove('active');
+                pollsBtn.classList.add('active');
+                playContent.classList.add('hidden');
+                pollsContent.classList.remove('hidden');
             }
         }
 
