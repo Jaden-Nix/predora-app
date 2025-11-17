@@ -205,3 +205,38 @@ Implemented comprehensive light mode styling with "Luminous & Airy" aesthetic to
   - Nested reply display with reduced styling
   - Cancel reply mode when posting
 - Helper function `getTimeAgo()` converts timestamps to human-readable format
+
+### Expanded Market Categories (November 17, 2025)
+- Added 6 new market categories to appeal to GenZ and niche communities:
+  - **Creator & Social**: Micro-Influencer Predictions, Creator Personal Milestones, Gossip Predictions
+  - **Local & Campus**: Campus Predictions, Local Football Predictions
+  - **Gaming**: Gaming/E-sports Round Predictions
+- Create Market screen now features organized dropdown with optgroups for easy category selection
+- Home filter bar updated with concise category labels (Influencers, Creators, Gossip, Campus, Local Sports, Gaming)
+- Category selector integrated with existing `createMarket()` function for automatic persistence
+
+### Notification System (November 17, 2025)
+- Implemented comprehensive notification infrastructure for user engagement
+- **UI Components**:
+  - Notification bell icon in top nav with pulsing red badge showing unread count
+  - Dropdown panel (fixed positioning) with header, filters, feed, and preferences link
+  - 3 filter tabs: All, Markets, Social for categorizing notifications
+- **Notification Types Supported**:
+  - `market_resolved`: Green checkmark icon, triggers when staked market resolves
+  - `market_disputed`: Yellow warning icon, alerts when resolution is disputed
+  - `new_follower`: Blue user icon, notifies when someone follows you
+  - `comment_reply`: Purple chat icon, alerts when someone replies to your comment
+- **Features**:
+  - Real-time Firestore listener updates badge count and refreshes panel when open
+  - Click notification to mark as read and navigate to relevant screen
+  - "Mark all read" bulk action for clearing unread notifications
+  - Safe icon/title/message defaults prevent UI breaks from unknown notification types
+  - Time ago formatting (e.g., "2m ago", "5h ago") for recency context
+- **Firestore Schema**:
+  - Collection: `users/{userId}/notifications`
+  - Fields: `type`, `message`, `actionUrl`, `read` (boolean), `timestamp`
+- **Integration**:
+  - Listener initialized in `initializeUserProfile()` after login
+  - Badge and feed stay synced via snapshot listener on all notifications
+  - Navigation handled via `handleNotificationAction()` with screen routing
+- **Note**: Notification preferences UI placeholder added (planned for future implementation)
