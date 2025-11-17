@@ -1939,7 +1939,7 @@
                             <div class="grid grid-cols-2 gap-4 text-center">
                                 <div>
                                     <span class="text-xs text-gray-400">Total Staked</span>
-                                    <p id="total-principal" class="text-xl lg:text-2xl font-semibold text-white">$0.00</p>
+                                    <p id="total-principal" class="text-xl lg:text-2xl font-semibold text-gray-400">Loading...</p>
                                 </div>
                                 <div>
                                     <span class="text-xs text-gray-400">Mock BUSD</span>
@@ -4059,7 +4059,7 @@
                 }
                 snapshot.forEach(doc => {
                     const pledge = doc.data();
-                    userHistoryData.push(pledge); // Add to local cache
+                    userHistoryData.push({ ...pledge, docId: doc.id }); // Add to local cache with doc ID
                     const isWinner = pledge.isWinner === true;
                     const result = isWinner ? 'WON' : 'LOST';
                     const resultClass = isWinner ? 'text-green-400' : 'text-red-400';
@@ -4113,7 +4113,11 @@
          */
         function updateStakingSummary(principal) {
             const principalEl = document.querySelector('#profile-screen #total-principal');
-            if(principalEl) principalEl.innerText = `$${principal.toFixed(2)}`;
+            if(principalEl) {
+                principalEl.innerText = `$${principal.toFixed(2)}`;
+                principalEl.classList.remove('text-gray-400');
+                principalEl.classList.add('text-white');
+            }
         }
 
         // =====================================================================
@@ -7750,13 +7754,14 @@ ${historyText}`;
         /**
          * Share history stake (win/loss)
          */
-        window.shareHistoryStake = async (event, stakeId, isWinner) => {
+        window.shareHistoryStake = async (event, docId, isWinner) => {
             event.stopPropagation();
             
-            // Find the stake data
-            const stake = userHistoryData.find(s => s.stakeId === stakeId || userHistoryData.indexOf(s) === parseInt(stakeId));
+            // Find the stake data by doc ID
+            const stake = userHistoryData.find(s => s.docId === docId);
             if (!stake) {
                 showToast('Could not find stake data', 'error');
+                console.error('Share failed: stake not found in cache', docId, userHistoryData);
                 return;
             }
             
@@ -7784,17 +7789,24 @@ ${historyText}`;
             const stake = userActiveStakesData.find(s => s.docId === docId);
             if (!stake) {
                 showToast('Could not find stake data', 'error');
+                console.error('Share failed: stake not found in cache', docId, userActiveStakesData);
                 return;
             }
             
-            // Get current market data to get odds
+            // Use cached market data if available, otherwise fetch it
             const { doc, getDoc } = window.firebase.firestore;
             try {
-                const marketRef = doc(db, 'artifacts', APP_ID, 'public', 'data', MARKETS_COLLECTION, stake.marketId);
-                const marketSnap = await getDoc(marketRef);
-                const market = marketSnap.exists() ? marketSnap.data() : null;
+                let odds = 50; // Default odds
                 
-                const odds = market ? (stake.pick === 'YES' ? market.yesPercent : market.noPercent) : 50;
+                // Try to get market data for current odds
+                if (stake.marketId) {
+                    const marketRef = doc(db, 'artifacts', APP_ID, 'public', 'data', MARKETS_COLLECTION, stake.marketId);
+                    const marketSnap = await getDoc(marketRef);
+                    if (marketSnap.exists()) {
+                        const market = marketSnap.data();
+                        odds = stake.pick === 'YES' ? market.yesPercent : market.noPercent;
+                    }
+                }
                 
                 const data = {
                     marketTitle: stake.marketTitle,
@@ -7808,8 +7820,17 @@ ${historyText}`;
                 // Show share modal
                 showShareModal(canvas, 'stake', stake.marketTitle);
             } catch (error) {
-                console.error('Error getting market data:', error);
-                showToast('Could not load market data', 'error');
+                console.error('Error in shareActiveStake:', error.message || error);
+                // Even if market data fails, still try to share with default odds
+                const data = {
+                    marketTitle: stake.marketTitle,
+                    stake: stake.amountUsd,
+                    pick: stake.pick,
+                    odds: 50
+                };
+                
+                const canvas = await generateShareImage('stake', data);
+                showShareModal(canvas, 'stake', stake.marketTitle);
             }
         };
         
