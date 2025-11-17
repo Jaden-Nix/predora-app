@@ -1174,6 +1174,12 @@
                             <button class="filter-pill" onclick="filterMarkets('Entertainment')">Entertainment</button>
                             <button class="filter-pill" onclick="filterMarkets('Finance')">Finance</button>
                             <button class="filter-pill" onclick="filterMarkets('Tech')">Tech</button>
+                            <button class="filter-pill" onclick="filterMarkets('Micro-Influencer')">Influencers</button>
+                            <button class="filter-pill" onclick="filterMarkets('Creator Milestones')">Creators</button>
+                            <button class="filter-pill" onclick="filterMarkets('Gossip')">Gossip</button>
+                            <button class="filter-pill" onclick="filterMarkets('Campus')">Campus</button>
+                            <button class="filter-pill" onclick="filterMarkets('Local Sports')">Local Sports</button>
+                            <button class="filter-pill" onclick="filterMarkets('Gaming')">Gaming</button>
                             <button class="filter-pill" onclick="filterMarkets('Other')">Other</button>
                         </div>
                     </div>
@@ -1207,6 +1213,35 @@
 
                 <div class="space-y-4">
                     <h3 class="text-base font-semibold text-gray-200">Market Details (Manual Entry)</h3>
+                    
+                    <div class="space-y-2">
+                        <label for="market-category-select" class="text-sm font-medium text-gray-300">Category</label>
+                        <select id="market-category-select" class="ui-input">
+                            <option value="">Select a category...</option>
+                            <optgroup label="Popular">
+                                <option value="Crypto">Crypto</option>
+                                <option value="Sports">Sports</option>
+                                <option value="Politics">Politics</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Tech">Tech</option>
+                            </optgroup>
+                            <optgroup label="Creator & Social">
+                                <option value="Micro-Influencer">Micro-Influencer Predictions</option>
+                                <option value="Creator Milestones">Creator Personal Milestones</option>
+                                <option value="Gossip">Gossip Predictions</option>
+                            </optgroup>
+                            <optgroup label="Local & Campus">
+                                <option value="Campus">Campus Predictions</option>
+                                <option value="Local Sports">Local Football Predictions</option>
+                            </optgroup>
+                            <optgroup label="Gaming">
+                                <option value="Gaming">Gaming/E-sports Round Predictions</option>
+                            </optgroup>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
                     <div class="space-y-2">
                         <label for="market-title-input" class="text-sm font-medium text-gray-300">Title</label>
                         <textarea id="market-title-input" rows="3" class="ui-input" placeholder="e.g., Will ETH reach $5,000 by EOY?"></textarea>
@@ -1813,7 +1848,7 @@
         </nav>
 
         <div id="toast-notification">
-            <span id="toast-message" class="text-sm font-medium text-white"></span>
+            <span id="toast-message" class="text-sm font-medium text-gray-900 dark:text-white"></span>
         </div>
 
         <div id="loading-overlay" class="hidden fixed inset-0 bg-black/80 z-[998] flex justify-center items-center backdrop-blur-sm">
@@ -5812,26 +5847,31 @@ ${historyText}`;
                 
                 if (replyingTo) {
                     // Posting a reply
+                    console.log('Posting reply to comment:', replyingTo.commentId);
                     const commentRef = doc(db, 'artifacts', APP_ID, 'public', 'data', MARKET_COMMENTS_COLLECTION, replyingTo.commentId.toString());
                     const repliesCol = collection(commentRef, 'replies');
                     
                     await addDoc(repliesCol, {
                         userId: currentUserId,
                         displayName: userProfile.displayName,
-                        avatarUrl: userProfile.avatarUrl || LOGO_URL,
+                        avatarUrl: userProfile.avatarUrl || YOUR_LOGO_URL,
                         commentText: commentText,
                         timestamp: serverTimestamp()
                     });
                     
+                    console.log('Reply posted successfully');
                     showToast('Reply posted!');
                     cancelReply();
+                    
+                    // Reload the ticker feed to show the new reply
+                    loadTickerFeed();
                 } else {
                     // Posting a top-level comment
                     const docRef = await addDoc(collection(db, 'artifacts', APP_ID, 'public', 'data', MARKET_COMMENTS_COLLECTION), {
                         marketId: currentMarketId,
                         userId: currentUserId,
                         displayName: userProfile.displayName,
-                        avatarUrl: userProfile.avatarUrl || LOGO_URL,
+                        avatarUrl: userProfile.avatarUrl || YOUR_LOGO_URL,
                         pick: null,
                         commentText: commentText,
                         timestamp: serverTimestamp()
