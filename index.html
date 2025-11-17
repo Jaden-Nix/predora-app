@@ -1139,45 +1139,6 @@
             </div>
         </nav>
 
-        <!-- Notification Dropdown Panel -->
-        <div id="notification-panel" class="hidden fixed top-16 right-4 md:right-8 lg:right-12 w-80 md:w-96 max-h-[600px] overflow-y-auto ui-panel z-50 shadow-2xl">
-            <div class="sticky top-0 bg-[#161B22] dark:bg-[#161B22] light:bg-white border-b border-[#30363D] dark:border-[#30363D] light:border-gray-200 p-4 flex justify-between items-center">
-                <h3 class="text-lg font-semibold text-white dark:text-white light:text-gray-900">Notifications</h3>
-                <div class="flex items-center space-x-2">
-                    <button onclick="markAllNotificationsRead()" class="text-xs text-sky-400 hover:text-sky-300 font-medium">Mark all read</button>
-                    <button onclick="toggleNotifications()" class="text-gray-400 hover:text-white">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Notification Filter Tabs -->
-            <div class="flex border-b border-[#30363D] dark:border-[#30363D] light:border-gray-200 bg-[#0D1117] dark:bg-[#0D1117] light:bg-gray-50">
-                <button onclick="filterNotifications('all')" class="notif-tab flex-1 px-4 py-2 text-sm font-medium text-gray-400 hover:text-white border-b-2 border-transparent hover:border-sky-400 transition-all active" data-filter="all">
-                    All
-                </button>
-                <button onclick="filterNotifications('markets')" class="notif-tab flex-1 px-4 py-2 text-sm font-medium text-gray-400 hover:text-white border-b-2 border-transparent hover:border-sky-400 transition-all" data-filter="markets">
-                    Markets
-                </button>
-                <button onclick="filterNotifications('social')" class="notif-tab flex-1 px-4 py-2 text-sm font-medium text-gray-400 hover:text-white border-b-2 border-transparent hover:border-sky-400 transition-all" data-filter="social">
-                    Social
-                </button>
-            </div>
-
-            <!-- Notifications Feed -->
-            <div id="notifications-feed" class="divide-y divide-[#30363D] dark:divide-[#30363D] light:divide-gray-200">
-                <p class="text-gray-400 text-center py-8 text-sm">No notifications yet</p>
-            </div>
-            
-            <!-- Notification Preferences Link -->
-            <div class="sticky bottom-0 bg-[#161B22] dark:bg-[#161B22] light:bg-white border-t border-[#30363D] dark:border-[#30363D] light:border-gray-200 p-3">
-                <button onclick="showNotificationPreferences()" class="w-full text-center text-sm text-sky-400 hover:text-sky-300 font-medium">
-                    <svg class="w-4 h-4 inline-block mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    Notification Preferences
-                </button>
-            </div>
-        </div>
-
         <div class="min-h-screen relative">
 
             <main class="max-w-md md:max-w-xl lg:max-w-7xl mx-auto relative p-4">
@@ -1675,10 +1636,14 @@
                     <div class="lg:col-span-2">
 
                 <div>
-                    <div class="grid grid-cols-4 border-b border-white/10">
+                    <div class="grid grid-cols-5 border-b border-white/10">
                         <button id="tab-active" class="profile-tab active" onclick="handleProfileTab('active')">Active</button>
                         <button id="tab-history" class="profile-tab" onclick="handleProfileTab('history')">History</button>
-                        <button id="tab-networking" class="profile-tab" onclick="handleProfileTab('networking')">Networking</button>
+                        <button id="tab-notifications" class="profile-tab relative" onclick="handleProfileTab('notifications')">
+                            Alerts
+                            <span id="notification-badge-profile" class="hidden absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-xs font-bold rounded-full flex items-center justify-center">0</span>
+                        </button>
+                        <button id="tab-networking" class="profile-tab" onclick="handleProfileTab('networking')">Network</button>
                         <button id="tab-assets" class="profile-tab" onclick="handleProfileTab('assets')">Assets</button>
                     </div>
                     <div class="pt-4">
@@ -1687,6 +1652,26 @@
                         </div>
                         <div id="history-content" class="hidden">
                             <p class="text-gray-400 text-center pt-8">Loading history...</p>
+                        </div>
+                        
+                        <div id="notifications-content" class="hidden space-y-3">
+                            <!-- Notification Filter Tabs -->
+                            <div class="flex border-b border-[#30363D] dark:border-[#30363D] light:border-gray-200 mb-4">
+                                <button onclick="filterNotifications('all')" class="notif-tab flex-1 px-4 py-2 text-sm font-medium text-gray-400 hover:text-white border-b-2 border-transparent hover:border-sky-400 transition-all active" data-filter="all">
+                                    All
+                                </button>
+                                <button onclick="filterNotifications('markets')" class="notif-tab flex-1 px-4 py-2 text-sm font-medium text-gray-400 hover:text-white border-b-2 border-transparent hover:border-sky-400 transition-all" data-filter="markets">
+                                    Markets
+                                </button>
+                                <button onclick="filterNotifications('social')" class="notif-tab flex-1 px-4 py-2 text-sm font-medium text-gray-400 hover:text-white border-b-2 border-transparent hover:border-sky-400 transition-all" data-filter="social">
+                                    Social
+                                </button>
+                            </div>
+                            
+                            <!-- Notifications Feed -->
+                            <div id="notifications-feed-profile" class="space-y-3">
+                                <p class="text-gray-400 text-center py-8 text-sm">No notifications yet</p>
+                            </div>
                         </div>
 
                 <div id="assets-content" class="hidden space-y-3">
@@ -1903,12 +1888,6 @@
             </button>
             <button onclick="showScreen('create-market-screen')" class="nav-button flex flex-col items-center text-gray-400 -mt-2 bg-gradient-to-br from-indigo-600 to-blue-600 p-3 rounded-full shadow-lg shadow-blue-500/30 border-2 border-sky-400">
                 <svg class="w-5 h-5" fill="none" stroke="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-            </button>
-            <button onclick="toggleNotifications()" class="nav-button flex flex-col items-center text-gray-400 relative">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                <span class="text-xs mt-1">Alerts</span>
-                <!-- Mobile notification badge -->
-                <span id="notification-badge-mobile" class="hidden absolute top-0 right-2 w-4 h-4 bg-rose-500 text-white text-xs font-bold rounded-full flex items-center justify-center">0</span>
             </button>
             <button onclick="showScreen('pledge-pool-screen')" class="nav-button flex flex-col items-center text-gray-400">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
@@ -2658,18 +2637,11 @@
         let currentNotificationFilter = 'all';
         
         /**
-         * Toggle notification panel visibility
+         * Toggle notification panel visibility (navigate to profile)
          */
         window.toggleNotifications = () => {
-            const panel = document.getElementById('notification-panel');
-            const isHidden = panel.classList.contains('hidden');
-            
-            if (isHidden) {
-                panel.classList.remove('hidden');
-                loadNotifications();
-            } else {
-                panel.classList.add('hidden');
-            }
+            showScreen('profile-screen');
+            handleProfileTab('notifications');
         };
         
         /**
@@ -2748,7 +2720,9 @@
                 
                 const snapshot = await getDocs(q);
                 
-                const feed = document.getElementById('notifications-feed');
+                const feed = document.getElementById('notifications-feed-profile');
+                if (!feed) return;
+                
                 feed.innerHTML = '';
                 
                 if (snapshot.empty) {
@@ -2854,7 +2828,6 @@
         window.handleNotificationAction = (actionUrl) => {
             if (!actionUrl) return;
             
-            toggleNotifications(); // Close panel
             // Parse actionUrl and navigate accordingly
             // Format: screen:market-detail:marketId or screen:profile:userId
             const parts = actionUrl.split(':');
@@ -2869,17 +2842,21 @@
          */
         function updateNotificationBadge(count) {
             const badge = document.getElementById('notification-badge');
-            const badgeMobile = document.getElementById('notification-badge-mobile');
+            const badgeProfile = document.getElementById('notification-badge-profile');
             
             if (count > 0) {
                 const displayCount = count > 99 ? '99+' : count;
                 badge.textContent = displayCount;
                 badge.classList.remove('hidden');
-                badgeMobile.textContent = displayCount;
-                badgeMobile.classList.remove('hidden');
+                if (badgeProfile) {
+                    badgeProfile.textContent = displayCount;
+                    badgeProfile.classList.remove('hidden');
+                }
             } else {
                 badge.classList.add('hidden');
-                badgeMobile.classList.add('hidden');
+                if (badgeProfile) {
+                    badgeProfile.classList.add('hidden');
+                }
             }
         }
         
@@ -2899,9 +2876,9 @@
                 const unreadCount = snapshot.docs.filter(d => !d.data().read).length;
                 updateNotificationBadge(unreadCount);
                 
-                // Refresh feed if panel is open
-                const panel = document.getElementById('notification-panel');
-                if (panel && !panel.classList.contains('hidden')) {
+                // Refresh feed if notifications tab is open
+                const notificationsContent = document.getElementById('notifications-content');
+                if (notificationsContent && !notificationsContent.classList.contains('hidden')) {
                     loadNotifications();
                 }
                 
@@ -3323,6 +3300,10 @@
             // Hide the new networking panel
             const networkingContent = document.getElementById('networking-content');
             if(networkingContent) networkingContent.classList.add('hidden');
+            
+            // Hide notifications panel
+            const notificationsContent = document.getElementById('notifications-content');
+            if(notificationsContent) notificationsContent.classList.add('hidden');
             // --- END NEW ---
 
             // Show the correct content panel
@@ -3332,6 +3313,7 @@
             // Load data for the selected tab
         // ...
             if (tabName === 'active') renderActiveStakes();
+            if (tabName === 'notifications') loadNotifications();
             else if (tabName === 'history') renderHistoryStakes();
                 else if (tabName === 'networking') {
                     // Show the networking panel and load its default sub-tab

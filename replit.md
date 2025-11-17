@@ -28,7 +28,7 @@ Preferred communication style: Simple, everyday language.
 - Glow-pulse animations for interactive feedback in both themes
 - Modern GenZ-friendly navigation: Sleek top navigation bar with pill-style buttons instead of traditional sidebar
   - Desktop: Centered glassmorphic pill container with rounded navigation buttons
-  - Mobile: Bottom navigation bar with 6 buttons (Home, Leaders, Create, Alerts, Pledges, Profile) for full feature access with easy thumb reach
+  - Mobile: Bottom navigation bar with 5 buttons (Home, Leaders, Create, Pledges, Profile) for full feature access with easy thumb reach
   - Smooth transitions and hover effects with gradient active states
   - Navigation automatically hidden on login/OTP screens for clean authentication UX
 
@@ -218,9 +218,9 @@ Implemented comprehensive light mode styling with "Luminous & Airy" aesthetic to
 - Implemented comprehensive notification infrastructure for user engagement
 - **UI Components**:
   - Notification bell icon in top nav (desktop) with pulsing red badge showing unread count
-  - "Alerts" button in mobile bottom nav for easy thumb access with synced badge
-  - Dropdown panel (fixed positioning) with header, filters, feed, and preferences link
-  - 3 filter tabs: All, Markets, Social for categorizing notifications
+  - "Alerts" tab in profile screen with badge for easy access
+  - Profile has 5 tabs: Active, History, Alerts, Network, Assets
+  - 3 filter sub-tabs in Alerts: All, Markets, Social for categorizing notifications
 - **Notification Types Supported**:
   - `market_resolved`: Green checkmark icon, triggers when staked market resolves
   - `market_disputed`: Yellow warning icon, alerts when resolution is disputed
