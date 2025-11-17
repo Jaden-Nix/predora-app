@@ -1506,7 +1506,7 @@
                     <div class="px-4 pb-4 pt-2 space-y-4 bg-black/10">
                         <!-- Initial Liquidity -->
                         <div class="space-y-2">
-                            <label class="text-xs font-medium theme-text-secondary">Initial Liquidity</label>
+                            <label class="text-xs font-medium theme-text-secondary">Initial Liquidity (Min: $1,000)</label>
                             <div id="traditional-liquidity-info" class="text-xs theme-text-secondary mb-2">
                                 ⚠️ Traditional markets need liquidity to seed the pool
                             </div>
@@ -1515,12 +1515,20 @@
                             </div>
                             <div class="grid grid-cols-3 gap-2">
                                 <div class="col-span-2">
-                                    <input type="number" id="market-liquidity-input" class="ui-input text-sm" placeholder="Amount">
+                                    <input type="number" id="market-liquidity-input" class="ui-input text-sm" placeholder="Min: 1000" min="1000">
                                 </div>
                                 <div class="col-span-1">
                                     <select id="market-liquidity-asset" class="ui-select text-sm">
                                     </select>
                                 </div>
+                            </div>
+                            <div class="p-2 bg-blue-500/10 border border-blue-400/30 rounded-lg">
+                                <p class="text-xs text-blue-300">
+                                    💡 <strong>Higher liquidity = More stable odds</strong><br>
+                                    • $1,000: Moderate stability<br>
+                                    • $5,000+: High stability (recommended)<br>
+                                    • $10,000+: Very stable odds
+                                </p>
                             </div>
                             <p class="text-xs text-green-400">💰 100% refund at $100 volume from 10+ stakers</p>
                         </div>
@@ -1634,7 +1642,7 @@
                          <p id="market-tvl-text" class="text-3xl font-bold text-white">$0.00</p>
                      </div>
 
-                     <div>
+                     <div style="position: relative; height: 250px; width: 100%;">
                          <canvas id="marketVolumeChart"></canvas>
                      </div>
 
@@ -5739,6 +5747,14 @@
                 return;
             }
 
+            // NEW: Minimum liquidity validation (must be at least $1,000 USD)
+            // NOTE: This is client-side validation only (appropriate for demo/hackathon)
+            // Production apps should enforce this via Firestore security rules or backend validation
+            if (liquidityAmountInUsd < 1000) {
+                showToast("⚠️ Minimum liquidity is $1,000 USD. Higher liquidity creates more stable odds!", "warning");
+                return;
+            }
+
             // For binary markets, validate YES/NO percentages
             if (marketStructure === 'binary') {
                 if (isNaN(yesPercent) || isNaN(noPercent)) {
@@ -5816,10 +5832,11 @@
                     if (marketStructure === 'binary') {
                         marketData.yesPercent = yesPercent;
                         marketData.noPercent = noPercent;
+                        // Use creator's liquidity - this determines odds stability
                         marketData.yesPool = liquidityAmountInUsd * (yesPercent / 100);
                         marketData.noPool = liquidityAmountInUsd * (noPercent / 100);
                     } else {
-                        // Multi-option market
+                        // Multi-option market - use creator's liquidity
                         marketData.options = multiOptions.map(opt => ({
                             ...opt,
                             pool: liquidityAmountInUsd * (opt.odds / 100)
@@ -6338,9 +6355,9 @@ ${historyText}`;
                     noPercent,
 
                     // --- ADD THESE LINES FOR AMM ---
-                    // We'll add $1000 of virtual liquidity, just like standard markets
-                    yesPool: 1000 * (yesPercent / 100),
-                    noPool: 1000 * (noPercent / 100),
+                    // We'll add $50000 of virtual liquidity for stable odds
+                    yesPool: 50000 * (yesPercent / 100),
+                    noPool: 50000 * (noPercent / 100),
                     totalStakeVolume: 0,
                     // --- END OF NEW LINES ---
 
@@ -6390,10 +6407,8 @@ ${historyText}`;
                 let markets = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    // We manually filter out the mock market
-                    if (data.isMock !== true) {
-                        markets.push({ id: doc.id, ...data });
-                    }
+                    // Include all markets for admin resolution (including mock/demo markets)
+                    markets.push({ id: doc.id, ...data });
                 });
 
                 // Sort markets to show unresolved first
@@ -7102,14 +7117,26 @@ ${historyText}`;
          * Draws the actual chart using Chart.js
          */
         function drawMarketChart(labels, data) {
-            const ctx = document.getElementById('marketVolumeChart').getContext('2d');
+            try {
+                const canvas = document.getElementById('marketVolumeChart');
+                if (!canvas) {
+                    console.error('Chart canvas not found');
+                    return;
+                }
 
-            // Destroy the old chart if it exists
-            if (marketChart) {
-                marketChart.destroy();
-            }
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    console.error('Could not get canvas context');
+                    return;
+                }
 
-            marketChart = new Chart(ctx, {
+                // Destroy the old chart if it exists
+                if (marketChart) {
+                    marketChart.destroy();
+                    marketChart = null;
+                }
+
+                marketChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
@@ -7159,8 +7186,12 @@ ${historyText}`;
                             }
                         }
                     }
-                }
+                },
+                maintainAspectRatio: false
             });
+            } catch (error) {
+                console.error('Error drawing market chart:', error);
+            }
         }
 
 

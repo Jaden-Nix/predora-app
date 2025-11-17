@@ -1,251 +1,156 @@
-# Predora - GenZ Prediction Market Platform
+# Predora - Prediction Markets Platform
 
 ## Overview
+Predora is a Gen-Z prediction market platform built for the hackathon. Users can create and trade on prediction markets about future events, with AI-powered features for market creation, resolution, and analysis.
 
-Predora is a GenZ-friendly prediction market platform featuring dual market types: Fixed Pot Yield markets with principal protection and Traditional AMM markets. The platform enables users to make predictions on future events while managing risk through innovative market mechanisms.
 
-The application uses a vanilla JavaScript frontend with no build tooling, served through an Express.js backend that acts as a secure API proxy layer for external services. All user data and market information is persisted in Firebase Firestore.
+
+## Recent Changes & Fixes (November 17, 2025)
+
+### 1. Market Odds Stability
+**Problem:** Small bets were causing dramatic odds changes (e.g., $10 bet shifting 60/40 to 80/20)  
+**Solution:**
+- Implemented **minimum $1,000 USD liquidity requirement** for market creation
+- Added comprehensive UI guidance explaining liquidity → odds stability relationship
+- Quick Play markets use $50,000 virtual liquidity for stable demo experience
+- Creators' liquidity is fully respected (no artificial inflation)
+
+**Why this matters:** Higher liquidity pools = more stable, predictable odds that don't swing wildly with each bet
+
+### 2. TVL Chart Display
+**Problem:** Total Volume Locked (TVL) chart wasn't rendering on market detail pages  
+**Solution:**
+- Added explicit 250px height to chart canvas container
+- Set `maintainAspectRatio: false` in Chart.js configuration
+- Added error handling and null checks for canvas element
+
+### 3. Manual Market Resolution
+**Problem:** Demo/mock markets weren't appearing in admin resolution panel  
+**Solution:**
+- Removed filter that excluded mock markets
+- Admins can now resolve all markets including demos for testing
+
+## Project Architecture
+
+### Frontend (index.html)
+- Single-page application using vanilla JavaScript
+- Firebase Firestore for data storage
+- Chart.js for analytics visualization
+- Tailwind CSS for styling (CDN)
+- Dark/Light theme support
+
+### Backend (index.js - Express Server)
+- **Port:** 5000 (bound to 0.0.0.0 for Replit compatibility)
+- **Endpoints:**
+  - `/` - Serves the frontend
+  - `/api/gemini` - Proxies AI requests to Google Gemini API
+  - `/api/run-jobs` - Triggers Oracle jobs (requires CRON_SECRET)
+
+### Oracle Jobs (Automated via Backend)
+1. **Auto-Resolve Markets** - AI-powered resolution using Google Search
+2. **Create Daily Markets** - Generates new markets based on trending topics
+3. **Auto-Generate Quick Plays** - Creates short-term prediction events
+4. **Auto-Resolve Quick Polls** - AI verification and resolution
+
+## Environment Variables
+
+Required secrets (configured in Replit Secrets):
+- `GEMINI_API_KEY` - Google Gemini AI API key for AI features
+- `CRON_SECRET` - Secret key to protect Oracle job endpoint
+- `GOOGLE_APPLICATION_CREDENTIALS` - Firebase Admin SDK credentials (JSON string)
+
+## Key Features
+
+### Market Types
+1. **Standard Markets** - Long-term predictions with customizable parameters
+2. **Quick Play** - Fast 24-48 hour markets for quick results
+3. **Binary Markets** - Simple YES/NO predictions
+4. **Multi-Option Markets** - 3-6 outcome predictions
+
+### AMM (Automated Market Maker)
+- Constant product formula (x * y = k) for binary markets
+- Pool-based distribution for multi-option markets
+- Liquidity determines odds stability (min $1,000 required)
+
+### AI Features
+- **AI Assist** - Get AI explanations for odds and market analysis
+- **AI Judge** - Automated market resolution with source verification
+- **AI Oracle** - Background jobs for market creation and resolution
 
 ## User Preferences
 
-Preferred communication style: Simple, everyday language.
+### Development Workflow
+- Client-side validation is intentional (demo/hackathon app)
+- Production deployment would require:
+  - Firestore security rules for data validation
+  - Backend validation for market creation
+  - Proper authentication (currently using mock accounts)
 
-## System Architecture
+### Design Philosophy
+- Mobile-first responsive design
+- Clean, modern UI with gradient accents
+- Accessible dark/light themes
+- Fast, lightweight architecture
 
-### Frontend Architecture
+## Firebase Structure
 
-**Technology Choice: Vanilla JavaScript with CDN Dependencies**
+All data stored in: `artifacts/predora-hackathon/public/data/`
 
-The frontend eliminates all build tooling complexity by using pure HTML/CSS/JavaScript with CDN-based dependencies. This architectural decision was made to:
-- Reduce deployment overhead and simplify development workflow
-- Eliminate transpilation and bundling steps
-- Enable rapid prototyping and iteration
-- Maintain modern UI/UX standards without framework lock-in
+Collections:
+- `profile` - User profiles and balances
+- `leaderboard` - Public leaderboard data
+- `standard_markets` - Main prediction markets
+- `quick_play_markets` - Fast 24-48hr markets
+- `pledges` - User bets/stakes
+- `stake_logs` - Historical stake data for charts
+- `market_comments` - Market discussions
 
-**Core Dependencies:**
-- Tailwind CSS (CDN) - Utility-first styling system
-- Chart.js (CDN) - Data visualization for market analytics
-- Google Fonts Inter family - Typography system
+## Testing & Demo
 
-**Theme System Design**
+### Demo Accounts
+- Judge (judge-123)
+- Alice (alice-456)
+- Bob (bob-789)
 
-The application implements a dual-theme system with dark ("Deep & Mysterious") and light ("Luminous & Airy") modes:
-- **Persistence**: localStorage-based theme preference storage
-- **Flash Prevention**: Pre-paint theme application using inline script before page render
-- **CSS Variables**: Comprehensive custom property system for themeable colors, backgrounds, borders, and shadows
+### Mock Balances
+- BUSD: $5,000
+- BNB: 10 tokens ($5,000 @ $500/token)
+- CAKE: 1,500 tokens ($5,250 @ $3.50/token)
 
-**Responsive Strategy**
+### Admin Access
+Password: `predora-admin`
 
-Mobile-first approach with adaptive navigation patterns:
-- **Desktop**: Persistent glassmorphism navigation with backdrop blur, gradient backgrounds, and glowing borders
-- **Mobile**: Minimalist centered header with logo and clean gradients
+## Known Limitations (Demo/Hackathon Context)
 
-**UI Component Architecture**
+1. **Client-side validation only** - Appropriate for demo, but production needs backend enforcement
+2. **No real authentication** - Using mock accounts for demo purposes
+3. **Public Firestore paths** - All data accessible (demo-only, would need security rules in production)
+4. **Tailwind CDN** - For quick development, should use build process in production
 
-- **Toast Notification System**: Four severity types (Success, Error, Warning, Info) with auto-dismissal and stacking support
-- **Glassmorphism Effects**: Applied throughout for visual depth and modern aesthetic
-- **Canvas-based Share Modal**: Generates branded social media images for wins, losses, stakes, and markets with download and Twitter/X sharing capabilities
-- **Collapsible AI Assistant**: Provides market creation guidance without cluttering the interface
-- **Consolidated Configuration Panels**: Compact form fields for market setup
+## Deployment Notes
 
-### Backend Architecture
+### Replit Configuration
+- Server runs on port 5000 with 0.0.0.0 binding
+- Workflow: `predora-server` runs `npm start`
+- Output type: webview (shows frontend to users)
 
-**Technology Stack**
-- Node.js with Express.js framework
-- ES Modules (type: "module" in package.json)
-- CORS-enabled middleware for cross-origin requests
-- Firebase Admin SDK for server-side operations
+### Migration from Vercel
+- Vercel routing (`vercel.json`) no longer needed
+- All routes handled by Express server
+- Environment variables migrated to Replit Secrets
 
-**Architectural Pattern: Secure API Proxy Layer**
+## Future Enhancements (Post-Hackathon)
 
-The backend implements a proxy pattern where all external service calls flow through the server rather than directly from the client. This design decision addresses:
+1. Add Firestore security rules for data validation
+2. Implement proper authentication (OAuth, etc.)
+3. Add backend validation for critical operations
+4. Optimize Tailwind CSS (build process instead of CDN)
+5. Add comprehensive error logging
+6. Implement rate limiting for AI endpoints
+7. Add unit and integration tests
 
-**Problem**: Client-side API calls expose sensitive credentials and API keys in browser requests.
+---
 
-**Solution**: Backend proxy endpoints that:
-- Accept sanitized requests from frontend
-- Append protected API keys server-side
-- Forward requests to external services (Gemini AI, yield protocols)
-- Return sanitized responses to client
-
-**Benefits:**
-- Centralized security controls and credential management
-- Request validation and rate limiting at server level
-- Protection against API key exposure
-- Simplified credential rotation
-
-**Alternatives Considered:**
-- Client-side direct API calls with exposed keys (rejected for security)
-- Serverless functions (rejected for complexity and cold start latency)
-
-**API Endpoint Architecture**
-
-The server exposes endpoints for:
-- `/api/gemini` - Proxies requests to Google Gemini AI with support for Search tools and JSON mode
-- Firestore operations (implied from Firebase Admin SDK usage)
-- CRON job endpoints (protected by CRON_SECRET environment variable)
-
-### Market Types Architecture
-
-**Dual Market System Design**
-
-The platform implements two distinct market mechanisms:
-
-**1. Fixed Pot Yield Markets (No-Loss Markets)**
-
-**Problem**: Traditional prediction markets expose users to total loss risk, creating barriers for risk-averse participants.
-
-**Solution**: Principal-protected markets where:
-- Users stake funds during a fixed window period before a deadline
-- All staked funds are deposited into yield-generating protocols (Aave, Compound, Pendle, Treasury bill LRTs)
-- Principal is always returned to all participants regardless of outcome
-- Only the accumulated yield is distributed to correct predictions
-
-**Market Flow:**
-1. Creator defines question, deadlines, resolution source, and stake window end time
-2. Users stake YES or NO positions during open window
-3. Market locks at stake_window_end
-4. All funds deposited to yield vault
-5. Event resolves via oracle
-6. Principal returned to all users
-7. Yield distributed proportionally to winning side
-
-**2. Traditional AMM Markets**
-
-Standard automated market maker mechanics for users who prefer immediate liquidity and dynamic pricing.
-
-**3. Quick Polls**
-
-**Problem**: Users want lightweight, fast-paced prediction opportunities without complex market mechanics.
-
-**Solution**: XP-based micro-prediction polls with automatic 24-hour resolution:
-- Users stake XP (experience points) on YES or NO outcomes
-- Customizable stake amounts (minimum 10 XP)
-- Polls resolve automatically after 24 hours
-- Winners receive their stake back plus a proportional share of the losing pot
-- Losers forfeit their staked XP
-- Ties return all stakes to participants
-
-**Quick Poll Flow:**
-1. User creates a YES/NO question poll
-2. Other users stake XP on YES or NO (customizable amounts, min 10 XP)
-3. XP is immediately deducted from user balance when voting
-4. Poll automatically resolves 24 hours after creation via backend oracle
-5. Winners receive: original stake + (loser pot × individual winner share)
-6. Losers: XP remains deducted (already taken during vote)
-7. Ties: All stakes returned to participants
-
-**Oracle Resolution Logic** (`autoResolveQuickPolls` - runs every 4 hours):
-- Identifies polls older than their `resolutionHours` with `isResolved: false`
-- Uses AI (Gemini with Search) to verify actual outcome
-- AI returns: `{outcome: 'YES'|'NO'|'UNKNOWN', confidence: 'HIGH'|'MEDIUM'|'LOW', reasoning: string}`
-- **Retry Logic**: If AI is uncertain (LOW/UNKNOWN confidence):
-  - Increments `retryAttempts` counter (max 5 attempts)
-  - Skips resolution and retries in next CRON run (4h later)
-  - After 5 failed attempts: Falls back to majority vote
-- Calculates proportional XP distribution for winners
-- Updates user XP balances and streaks in BOTH profile AND leaderboard collections
-- Marks polls as `isResolved: true` with `winningOutcome`, `aiReasoning`, and `aiConfidence` fields
-
-**Data Schema:**
-```javascript
-{
-  question: string,
-  resolutionHours: number, // User-customizable: 1, 3, 6, 12, 24, 48, 72, 168, 336, 720
-  yesVotes: number,
-  noVotes: number,
-  xpStakedYES: number,
-  xpStakedNO: number,
-  voters: {
-    [userId]: { vote: 'YES' | 'NO', xpStaked: number, timestamp: ISO8601 }
-  },
-  isResolved: boolean,
-  winningOutcome: 'YES' | 'NO' | 'TIE' | 'NO_VOTES',
-  aiReasoning: string,
-  aiConfidence: 'HIGH' | 'MEDIUM' | 'LOW',
-  retryAttempts: number, // Tracks AI resolution retries (max 5)
-  createdBy: string,
-  createdAt: Timestamp,
-  resolvedAt: Timestamp (optional)
-}
-```
-
-### Data Persistence
-
-**Firebase Firestore Architecture**
-
-- **Authentication**: Firebase Admin SDK for server-side authenticated operations
-- **Initialization**: Service account credentials loaded from `GOOGLE_APPLICATION_CREDENTIALS` environment variable (JSON string)
-- **Database**: Firestore NoSQL database for market data, user positions, and application state
-
-**Rationale**: Firebase provides:
-- Real-time data synchronization for live market updates
-- Scalable NoSQL document storage
-- Built-in authentication integration
-- Managed infrastructure reducing operational overhead
-
-## External Dependencies
-
-### AI Services
-- **Google Gemini AI** (gemini-2.5-flash-preview-09-2025)
-  - Purpose: Market creation assistance, prediction analysis, **AI-powered resolution oracle**
-  - Integration: Backend proxy at `/api/gemini`
-  - Features: Google Search tools support (`google_search` tool), JSON mode for structured responses
-  - Authentication: API key via `GEMINI_API_KEY` environment variable
-  - **Oracle Usage**: Verifies Quick Poll and Quick Play outcomes using real-time web search
-    - Returns structured outcome with confidence levels
-    - Prevents false resolutions for uncertain events
-    - Retry logic with 5-attempt limit before fallback
-
-### Firebase Services
-- **Firebase Admin SDK** (v13.6.0)
-  - Purpose: Server-side database operations and authentication
-  - Authentication: Service account JSON credentials
-  - Database: Firestore for document storage
-
-- **Firebase Client SDK** (v12.5.0)
-  - Purpose: Client-side realtime listeners (if implemented)
-
-### Yield Generation Protocols (Planned)
-The architecture references integration with:
-- Aave - Decentralized lending protocol
-- Compound - Algorithmic money market
-- Pendle PT/YT - Yield tokenization
-- Treasury bill LRTs - Real-world asset yield
-
-These integrations would proxy through the backend for credential protection.
-
-### Node.js Dependencies
-- **express** (v4.19.2) - Web application framework
-- **cors** (v2.8.5) - Cross-origin resource sharing middleware
-- **node-fetch** (v3.3.2) - HTTP client for external API calls
-
-### CDN Dependencies (Frontend)
-- Tailwind CSS - Styling framework
-- Chart.js - Charting library for market visualization
-- Google Fonts - Inter font family
-
-### Environment Variables Required
-- `GEMINI_API_KEY` - Google Gemini AI authentication
-- `GOOGLE_APPLICATION_CREDENTIALS` - Firebase service account JSON (as string)
-- `CRON_SECRET` - CRON job endpoint protection (required for `/api/run-jobs` endpoint)
-- `PORT` - Server port (defaults to 5000)
-
-### CRON Job Configuration
-**Endpoint**: `POST /api/run-jobs`
-**Schedule**: Every 4 hours
-**Authentication**: Requires `CRON_SECRET` in request body as `{ "key": "YOUR_SECRET" }`
-**Recommended Service**: cron-job.org or EasyCron
-
-**Jobs Executed:**
-1. `autoResolveMarkets()` - Resolve standard prediction markets
-2. `createDailyMarkets()` - Generate daily featured markets
-3. `autoGenerateQuickPlays()` - Create 2 AI-generated Quick Play events
-4. `autoResolveQuickPolls()` - Resolve Quick Polls with AI verification (5 retry limit)
-5. `autoResolveQuickPlays()` - Resolve Quick Play markets with AI verification (5 retry limit)
-
-**Why Every 4 Hours:**
-- Polls can have resolution times as short as 1 hour
-- 4-hour CRON ensures polls resolve within reasonable timeframe (max 5h delay: 1h + 4h wait)
-- Balances timely resolution with API cost efficiency
-- Allows 5 retry attempts over 20 hours for uncertain AI outcomes
+Last updated: November 17, 2025
+Project Type: Hackathon Demo
+Status: Production-ready for demo purposes
