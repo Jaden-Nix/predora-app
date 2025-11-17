@@ -474,9 +474,62 @@ async function autoGenerateQuickPlays() {
     console.log("ORACLE: Finished auto-generating Quick Play events.");
 }
 
-// --- Oracle Job 4: Auto-Resolve Quick Polls (Runs Daily) ---
+// --- Helper: AI-Powered Outcome Verification ---
+async function verifyOutcomeWithAI(question) {
+    console.log(`  Verifying outcome for: "${question}"`);
+    
+    try {
+        const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        const systemPrompt = `You are a fact-checking oracle. Your job is to determine if a YES/NO prediction question has resolved as YES or NO based on current factual information. Today is ${today}. Use web search to verify current facts and news.`;
+        const userPrompt = `Question: "${question}"\n\nHas this resolved as YES or NO? If you cannot determine with confidence (not enough information, event hasn't happened yet, or ambiguous), respond with UNKNOWN. Be strict - only say YES or NO if you have factual evidence.`;
+        
+        const schema = {
+            type: "OBJECT",
+            properties: {
+                "outcome": { 
+                    "type": "STRING",
+                    "description": "Must be exactly 'YES', 'NO', or 'UNKNOWN'"
+                },
+                "confidence": { 
+                    "type": "STRING",
+                    "description": "HIGH, MEDIUM, or LOW confidence in this outcome"
+                },
+                "reasoning": { 
+                    "type": "STRING",
+                    "description": "Brief explanation of why this is the outcome"
+                }
+            },
+            required: ["outcome", "confidence", "reasoning"]
+        };
+        
+        const payload = {
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+            contents: [{ parts: [{ text: userPrompt }] }],
+            generationConfig: {
+                responseMimeType: "application/json",
+                responseSchema: schema
+            },
+            tools: [{
+                google_search: {}
+            }]
+        };
+        
+        const response = await callGoogleApi(payload);
+        const result = JSON.parse(response.candidates[0].content.parts[0].text);
+        
+        console.log(`  AI Outcome: ${result.outcome} (${result.confidence} confidence)`);
+        console.log(`  Reasoning: ${result.reasoning}`);
+        
+        return result;
+    } catch (error) {
+        console.error(`  AI verification failed:`, error.message);
+        return { outcome: 'UNKNOWN', confidence: 'LOW', reasoning: 'AI verification error' };
+    }
+}
+
+// --- Oracle Job 4: Auto-Resolve Quick Polls (AI-Powered) ---
 async function autoResolveQuickPolls() {
-    console.log("ORACLE: Auto-resolving expired Quick Polls...");
+    console.log("ORACLE: Auto-resolving expired Quick Polls with AI...");
     
     try {
         const pollsRef = db.collection(`artifacts/${APP_ID}/public/data/quick_polls`);
@@ -497,9 +550,11 @@ async function autoResolveQuickPolls() {
         for (const pollDoc of snapshot.docs) {
             const poll = pollDoc.data();
             const createdAt = poll.createdAt?.toDate() || new Date(0);
+            const resolutionHours = poll.resolutionHours || 24; // Default to 24 hours if not set
+            const pollExpiryThreshold = new Date(now.getTime() - (resolutionHours * 60 * 60 * 1000));
             
-            // Resolve polls older than 24 hours
-            if (createdAt < expiryThreshold) {
+            // Resolve polls older than their resolution time
+            if (createdAt < pollExpiryThreshold) {
                 const yesVotes = poll.yesVotes || 0;
                 const noVotes = poll.noVotes || 0;
                 const totalVotes = yesVotes + noVotes;
@@ -509,14 +564,24 @@ async function autoResolveQuickPolls() {
                     batch.update(pollDoc.ref, { 
                         isResolved: true,
                         resolvedAt: admin.firestore.FieldValue.serverTimestamp(),
-                        winningOutcome: 'NO_VOTES'
+                        winningOutcome: 'NO_VOTES',
+                        aiReasoning: 'No votes cast'
                     });
                     resolvedCount++;
                     continue;
                 }
                 
-                // Determine winning outcome
-                const winningOutcome = yesVotes > noVotes ? 'YES' : yesVotes < noVotes ? 'NO' : 'TIE';
+                // Use AI to verify the actual outcome
+                const aiResult = await verifyOutcomeWithAI(poll.question);
+                let winningOutcome = aiResult.outcome;
+                
+                // If AI can't determine, fall back to majority vote
+                if (winningOutcome === 'UNKNOWN' || aiResult.confidence === 'LOW') {
+                    console.log(`  AI uncertain, using majority vote as fallback`);
+                    winningOutcome = yesVotes > noVotes ? 'YES' : yesVotes < noVotes ? 'NO' : 'TIE';
+                    aiResult.reasoning = `AI uncertain. Majority vote: ${winningOutcome}`;
+                }
+                
                 const xpStakedYES = poll.xpStakedYES || 0;
                 const xpStakedNO = poll.xpStakedNO || 0;
                 const totalXPPot = xpStakedYES + xpStakedNO;
@@ -525,7 +590,9 @@ async function autoResolveQuickPolls() {
                 batch.update(pollDoc.ref, { 
                     isResolved: true,
                     resolvedAt: admin.firestore.FieldValue.serverTimestamp(),
-                    winningOutcome: winningOutcome
+                    winningOutcome: winningOutcome,
+                    aiReasoning: aiResult.reasoning,
+                    aiConfidence: aiResult.confidence
                 });
                 
                 // Distribute XP to winners
@@ -548,12 +615,24 @@ async function autoResolveQuickPolls() {
                                 streak: admin.firestore.FieldValue.increment(1)
                             });
                             
+                            // Also update leaderboard
+                            const leaderboardRef = db.doc(`artifacts/${APP_ID}/public/data/leaderboard/${userId}`);
+                            batch.update(leaderboardRef, {
+                                xp: admin.firestore.FieldValue.increment(winnings)
+                            });
+                            
                             console.log(`  Awarded ${winnings} XP to ${userId} for winning poll "${poll.question}"`);
                         } else {
                             // Loser gets nothing (XP was already deducted when voting)
                             const profileRef = db.doc(`artifacts/${APP_ID}/public/data/profile/${userId}`);
                             batch.update(profileRef, {
                                 streak: 0 // Reset streak
+                            });
+                            
+                            // Update leaderboard streak too
+                            const leaderboardRef = db.doc(`artifacts/${APP_ID}/public/data/leaderboard/${userId}`);
+                            batch.update(leaderboardRef, {
+                                streak: 0
                             });
                         }
                     }
@@ -563,6 +642,12 @@ async function autoResolveQuickPolls() {
                         const xpStaked = voterData.xpStaked || 10;
                         const profileRef = db.doc(`artifacts/${APP_ID}/public/data/profile/${userId}`);
                         batch.update(profileRef, {
+                            xp: admin.firestore.FieldValue.increment(xpStaked)
+                        });
+                        
+                        // Also update leaderboard
+                        const leaderboardRef = db.doc(`artifacts/${APP_ID}/public/data/leaderboard/${userId}`);
+                        batch.update(leaderboardRef, {
                             xp: admin.firestore.FieldValue.increment(xpStaked)
                         });
                     }
@@ -585,6 +670,63 @@ async function autoResolveQuickPolls() {
     }
 }
 
+// --- Oracle Job 5: Auto-Resolve Quick Play Markets (AI-Powered) ---
+async function autoResolveQuickPlays() {
+    console.log("ORACLE: Auto-resolving expired Quick Play markets with AI...");
+    
+    try {
+        const quickPlaysRef = db.collection(`artifacts/${APP_ID}/public/data/quick_play_markets`);
+        const now = new Date();
+        
+        // Get all unresolved Quick Play markets
+        const snapshot = await quickPlaysRef.where('isResolved', '==', false).get();
+        
+        if (snapshot.empty) {
+            console.log("ORACLE: No Quick Play markets to resolve.");
+            return;
+        }
+        
+        let resolvedCount = 0;
+        
+        for (const marketDoc of snapshot.docs) {
+            const market = marketDoc.data();
+            const expiresAt = market.expiresAt ? new Date(market.expiresAt) : null;
+            
+            // Check if market has expired
+            if (expiresAt && now > expiresAt) {
+                console.log(`  Resolving Quick Play: "${market.title}"`);
+                
+                // Use AI to verify the actual outcome
+                const aiResult = await verifyOutcomeWithAI(market.title);
+                let winningOutcome = aiResult.outcome;
+                
+                // Only resolve if AI is confident
+                if (winningOutcome === 'UNKNOWN' || aiResult.confidence === 'LOW') {
+                    console.log(`  AI uncertain about "${market.title}", skipping for now`);
+                    continue;
+                }
+                
+                // Mark market as resolved
+                await marketDoc.ref.update({
+                    isResolved: true,
+                    resolvedAt: admin.firestore.FieldValue.serverTimestamp(),
+                    winningOutcome: winningOutcome,
+                    aiReasoning: aiResult.reasoning,
+                    aiConfidence: aiResult.confidence
+                });
+                
+                console.log(`  ✓ Resolved as ${winningOutcome}: "${market.title}"`);
+                resolvedCount++;
+            }
+        }
+        
+        console.log(`ORACLE: Resolved ${resolvedCount} Quick Play markets`);
+        
+    } catch (error) {
+        console.error("ORACLE: Error resolving Quick Play markets:", error);
+    }
+}
+
 // --- API Endpoint 2: Secure Cron Job Runner ---
 app.post('/api/run-jobs', async (req, res) => {
     console.log("Server: /api/run-jobs endpoint hit");
@@ -598,8 +740,9 @@ app.post('/api/run-jobs', async (req, res) => {
     try {
         await autoResolveMarkets();
         await createDailyMarkets();
-        await autoGenerateQuickPlays(); // NEW: Generate 2 Quick Play events
-        await autoResolveQuickPolls(); // NEW: Resolve expired Quick Polls
+        await autoGenerateQuickPlays(); // Generate 2 Quick Play events
+        await autoResolveQuickPolls(); // Resolve expired Quick Polls with AI
+        await autoResolveQuickPlays(); // Resolve expired Quick Play markets with AI
         res.status(200).json({ success: true, message: "Oracle jobs ran successfully." });
     } catch (e) {
         console.error("ORACLE: A job failed to run.", e);

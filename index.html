@@ -2335,13 +2335,30 @@
                         <p class="text-xs text-gray-500 mt-1">Must be a yes/no question. Keep it simple and clear!</p>
                     </div>
 
+                    <div>
+                        <label class="text-sm font-medium text-gray-300 block mb-2">Resolution Time</label>
+                        <select id="poll-resolution-time" class="ui-input">
+                            <option value="1">1 hour</option>
+                            <option value="3">3 hours</option>
+                            <option value="6">6 hours</option>
+                            <option value="12">12 hours</option>
+                            <option value="24" selected>24 hours (default)</option>
+                            <option value="48">2 days</option>
+                            <option value="72">3 days</option>
+                            <option value="168">1 week</option>
+                            <option value="336">2 weeks</option>
+                            <option value="720">1 month</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">AI will verify the outcome after this time</p>
+                    </div>
+
                     <div class="p-3 bg-sky-500/10 rounded-lg border border-sky-400/20">
-                        <h4 class="text-sm font-semibold text-sky-300 mb-1">Quick Poll Benefits</h4>
+                        <h4 class="text-sm font-semibold text-sky-300 mb-1">How It Works</h4>
                         <ul class="text-xs text-gray-400 space-y-1">
-                            <li>✓ No liquidity or stakes required</li>
-                            <li>✓ Instant community engagement</li>
-                            <li>✓ +2 XP for every vote</li>
-                            <li>✓ Test market interest before creating full markets</li>
+                            <li>✓ AI verifies outcome using web search</li>
+                            <li>✓ Winners get XP back + share of loser pot</li>
+                            <li>✓ Falls back to majority vote if AI unsure</li>
+                            <li>✓ Stake custom XP amounts (min 10 XP)</li>
                         </ul>
                     </div>
                 </div>
@@ -9026,9 +9043,14 @@ ${historyText}`;
                 
                 await updateDoc(pollRef, updateData);
                 
-                // Deduct XP from user
+                // Deduct XP from user profile
                 const profileRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'profile', currentUserId);
                 await updateDoc(profileRef, { xp: increment(-stakeXP) });
+                
+                // Also update leaderboard
+                const leaderboardRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'leaderboard', currentUserId);
+                await updateDoc(leaderboardRef, { xp: increment(-stakeXP) });
+                
                 userProfile.xp = (userProfile.xp || 0) - stakeXP;
                 updateProfileBadges();
                 
@@ -9047,6 +9069,7 @@ ${historyText}`;
         window.openPollCreator = () => {
             document.getElementById('poll-creator-modal').classList.remove('hidden');
             document.getElementById('poll-question-input').value = '';
+            document.getElementById('poll-resolution-time').value = '24';
             document.getElementById('poll-question-input').focus();
         };
         
@@ -9056,7 +9079,9 @@ ${historyText}`;
         
         window.submitQuickPoll = async () => {
             const questionInput = document.getElementById('poll-question-input');
+            const resolutionTimeSelect = document.getElementById('poll-resolution-time');
             const question = questionInput.value.trim();
+            const resolutionHours = parseInt(resolutionTimeSelect.value);
             
             if (question.length < 10) {
                 showToast('Poll question must be at least 10 characters', 'warning');
@@ -9082,12 +9107,13 @@ ${historyText}`;
                     xpStakedNO: 0,
                     voters: {},
                     isResolved: false,
+                    resolutionHours: resolutionHours,
                     createdBy: userProfile.displayName || 'Anonymous',
                     createdAt: serverTimestamp()
                 });
                 
                 showLoadingOverlay(false);
-                showToast('Poll created successfully! 🎉', 'success');
+                showToast(`Poll created! Resolves in ${resolutionHours}h 🎉`, 'success');
                 closePollCreator();
                 loadQuickPolls();
                 
