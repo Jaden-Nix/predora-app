@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predora Pitch Deck</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], mono: ['Space Grotesk', 'monospace'] },
+                    colors: { glass: "rgba(255, 255, 255, 0.05)" }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #050505; color: white; overflow: hidden; }
+
+        /* Background Animation */
+        .blob-cont { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: float 20s infinite alternate; }
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #4f46e5; }
+        .blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: #0ea5e9; animation-delay: -5s; }
+        .blob-3 { top: 30%; left: 40%; width: 40vw; height: 40vw; background: #d946ef; opacity: 0.3; }
+        @keyframes float { 0% { transform: translate(0,0); } 100% { transform: translate(30px, -30px); } }
+        .grid-pattern { background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; mask-image: radial-gradient(circle at center, black 40%, transparent 100%); position: absolute; inset: 0; }
+
+        /* Slide Logic */
+        .slide { display: none; height: 100vh; width: 100vw; padding: 4rem; flex-direction: column; justify-content: center; align-items: center; animation: fadeIn 0.5s ease-out; }
+        .slide.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        /* Design Elements */
+        .glass-card { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        .gradient-text { background: linear-gradient(to right, #38BDF8, #818CF8, #C084FC); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* Controls */
+        .controls { position: fixed; bottom: 20px; right: 20px; z-index: 50; display: flex; gap: 10px; }
+        .control-btn { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 50%; cursor: pointer; transition: 0.2s; }
+        .control-btn:hover { background: rgba(255,255,255,0.3); }
+        .progress-bar { position: fixed; bottom: 0; left: 0; height: 4px; background: #38BDF8; transition: width 0.3s; }
+    </style>
+</head>
+<body>
+
+    <div class="blob-cont">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="grid-pattern"></div>
+    </div>
+
+    <!-- SLIDE 1: TITLE -->
+    <div class="slide active text-center">
+        <img src="https://res.cloudinary.com/djslxbghy/image/upload/IMG_4551_e9bv2x.jpg" class="w-32 h-32 rounded-3xl shadow-2xl mb-8 border-4 border-white/10 animate-bounce">
+        <h1 class="text-8xl font-extrabold tracking-tighter mb-4">Predora</h1>
+        <h2 class="text-4xl font-light text-gray-300">Where Opinions Have <span class="gradient-text font-bold">Liquidity</span>.</h2>
+        <div class="mt-12 flex gap-6 justify-center">
+            <div class="glass-card px-6 py-3 text-sky-400 font-mono text-sm">🛡️ No-Loss Engine</div>
+            <div class="glass-card px-6 py-3 text-purple-400 font-mono text-sm">⚡ Gas-less UX</div>
+            <div class="glass-card px-6 py-3 text-green-400 font-mono text-sm">🤖 Built-in AI Oracle</div>
+        </div>
+    </div>
+
+    <!-- SLIDE 2: THE PROBLEM -->
+    <div class="slide">
+        <h2 class="text-5xl font-bold mb-12 text-center">Prediction Markets are <span class="text-red-400">Broken</span> for Normies.</h2>
+        <div class="grid grid-cols-2 gap-8 w-full max-w-6xl">
+            <div class="glass-card p-8 hover:bg-white/5 transition">
+                <i data-lucide="alert-triangle" class="w-10 h-10 text-red-500 mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">Too Risky</h3>
+                <p class="text-gray-400">Winner-take-all means 100% loss is possible. New users churn after one bad bet.</p>
+            </div>
+            <div class="glass-card p-8 hover:bg-white/5 transition">
+                <i data-lucide="help-circle" class="w-10 h-10 text-orange-500 mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">Too Confusing</h3>
+                <p class="text-gray-400">Order books look like spreadsheets. Gas fees per transaction kill the fun.</p>
+            </div>
+            <div class="glass-card p-8 hover:bg-white/5 transition">
+                <i data-lucide="clock" class="w-10 h-10 text-yellow-500 mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">Too Slow</h3>
+                <p class="text-gray-400">Oracle delays of 24-48h. Low liquidity markets get botted.</p>
+            </div>
+            <div class="glass-card p-8 hover:bg-white/5 transition">
+                <i data-lucide="users" class="w-10 h-10 text-gray-400 mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">Anti-Social</h3>
+                <p class="text-gray-400">Zero social graph. Zero virality. Just lonely numbers on a screen.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 3: THE SOLUTION -->
+    <div class="slide">
+        <h2 class="text-5xl font-bold mb-12">Simple. Social. <span class="text-green-400">Safe.</span></h2>
+        <div class="grid grid-cols-4 gap-6 w-full max-w-7xl">
+            <div class="glass-card p-6 text-center border-t-4 border-sky-500">
+                <div class="text-6xl mb-4">👆</div>
+                <h3 class="text-xl font-bold">Simple</h3>
+                <p class="text-sm text-gray-400 mt-2">Tinder-style "Quick Play" feed. Tap to bet. AI-Assisted creation.</p>
+            </div>
+            <div class="glass-card p-6 text-center border-t-4 border-green-500">
+                <div class="text-6xl mb-4">🛡️</div>
+                <h3 class="text-xl font-bold">Safe</h3>
+                <p class="text-sm text-gray-400 mt-2">No-Loss Markets. Losers get principal back via DeFi yield.</p>
+            </div>
+            <div class="glass-card p-6 text-center border-t-4 border-purple-500">
+                <div class="text-6xl mb-4">⚡</div>
+                <h3 class="text-xl font-bold">Fast</h3>
+                <p class="text-sm text-gray-400 mt-2">Pledge Pool batches 20 bets into 1 tx. AI Judge resolves in minutes.</p>
+            </div>
+            <div class="glass-card p-6 text-center border-t-4 border-pink-500">
+                <div class="text-6xl mb-4">🔥</div>
+                <h3 class="text-xl font-bold">Viral</h3>
+                <p class="text-sm text-gray-400 mt-2">Dynamic "Receipts" for Twitter. XP-based onboarding.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 4: CHALLENGE FIT -->
+    <div class="slide">
+        <h2 class="text-4xl font-bold mb-10">We Built What You Asked For</h2>
+        <div class="glass-card p-10 w-full max-w-4xl">
+            <div class="space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="bg-green-500/20 p-2 rounded-lg"><i data-lucide="check" class="text-green-400"></i></div>
+                    <div>
+                        <h4 class="font-bold text-xl">AI Oracles</h4>
+                        <p class="text-gray-400">Built. Gemini 2.5 Judge uses real-time search & verified URLs.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="bg-green-500/20 p-2 rounded-lg"><i data-lucide="check" class="text-green-400"></i></div>
+                    <div>
+                        <h4 class="font-bold text-xl">Gas-less UX</h4>
+                        <p class="text-gray-400">Built. "Cart" system batches unlimited predictions into 1 signature.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="bg-green-500/20 p-2 rounded-lg"><i data-lucide="check" class="text-green-400"></i></div>
+                    <div>
+                        <h4 class="font-bold text-xl">Dispute Incentives</h4>
+                        <p class="text-gray-400">Built. Top 20 Leaderboard Jury system.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="bg-yellow-500/20 p-2 rounded-lg"><i data-lucide="loader" class="text-yellow-400"></i></div>
+                    <div>
+                        <h4 class="font-bold text-xl">Sybil Resistance</h4>
+                        <p class="text-gray-400">In Progress. "10 Unique Staker" rule enforced by smart contract.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 5: MARKET ENGINES -->
+    <div class="slide">
+        <h2 class="text-4xl font-bold mb-12">Two Engines. One App.</h2>
+        <div class="grid grid-cols-2 gap-12 w-full max-w-5xl">
+            <div class="glass-card p-8 border border-purple-500/30 relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-purple-600 text-xs font-bold px-3 py-1 rounded-bl-lg">FOR DEGENS</div>
+                <h3 class="text-3xl font-bold mb-4 text-purple-400">Traditional Market</h3>
+                <ul class="space-y-3 text-gray-300">
+                    <li>• Classic AMM (Yes/No or Multi)</li>
+                    <li>• High Upside / High Risk</li>
+                    <li>• $1,000 Creator Stake required</li>
+                    <li>• Competitive Odds</li>
+                </ul>
+            </div>
+            <div class="glass-card p-8 border border-green-500/30 relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-green-600 text-xs font-bold px-3 py-1 rounded-bl-lg">FOR NEWBIES</div>
+                <h3 class="text-3xl font-bold mb-4 text-green-400">No-Loss Market</h3>
+                <ul class="space-y-3 text-gray-300">
+                    <li>• <strong>Zero Risk</strong> Onboarding</li>
+                    <li>• Stakes go into DeFi Yield Vault</li>
+                    <li>• Losers get 100% Principal Back</li>
+                    <li>• Winners split the Yield</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 6: GAS-LESS UX (SCREENSHOT) -->
+    <div class="slide">
+        <div class="grid grid-cols-2 gap-12 items-center w-full max-w-6xl">
+            <div>
+                <h2 class="text-5xl font-bold mb-6 leading-tight">The Gas-less <br><span class="gradient-text">Social UX</span></h2>
+                <p class="text-xl text-gray-400 mb-8">Built entirely on mobile. Feels like TikTok, not like DeFi.</p>
+                <div class="space-y-4">
+                    <div class="glass-card p-4 border-l-4 border-sky-500">
+                        <h4 class="font-bold">Quick Play Feed</h4>
+                        <p class="text-sm text-gray-400">Tap-style interaction. 20 predictions in 30 seconds.</p>
+                    </div>
+                    <div class="glass-card p-4 border-l-4 border-indigo-500">
+                        <h4 class="font-bold">Pledge Pool</h4>
+                        <p class="text-sm text-gray-400">Bets stack up as drafts. Sign once, execute all.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center">
+                <!-- PHONE MOCKUP CONTAINER -->
+                <div class="relative w-[300px] h-[600px] bg-black rounded-[40px] border-[8px] border-gray-800 shadow-2xl overflow-hidden ring-2 ring-white/20">
+                    <img src="https://res.cloudinary.com/djslxbghy/image/upload/IMG_5172_bvweki.jpg" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 7: ANALYTICS (SCREENSHOT) -->
+    <div class="slide">
+        <h2 class="text-4xl font-bold mb-8">Deep Market Analytics</h2>
+        <div class="grid grid-cols-2 gap-8 w-full max-w-7xl h-full max-h-[600px]">
+            <div class="glass-card p-4 flex items-center justify-center overflow-hidden">
+                <img src="https://res.cloudinary.com/djslxbghy/image/upload/IMG_5174_koybqk.jpg" class="w-full h-full object-contain rounded-xl">
+            </div>
+            <div class="flex flex-col gap-4">
+                <div class="glass-card p-4 flex-1 flex items-center justify-center overflow-hidden">
+                    <img src="https://res.cloudinary.com/djslxbghy/image/upload/IMG_5175_qswu3w.jpg" class="w-full h-full object-contain rounded-xl">
+                </div>
+                <div class="glass-card p-6">
+                    <h3 class="text-xl font-bold mb-2 text-sky-400">Smart Tools</h3>
+                    <ul class="text-sm space-y-2 text-gray-300">
+                        <li>📈 <strong>TVL Chart:</strong> Spot smart money flow.</li>
+                        <li>🕰️ <strong>Time Machine:</strong> Rewind odds history.</li>
+                        <li>📡 <strong>Social Sentiment:</strong> Your Friends vs. The Crowd.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 8: SOCIAL NETWORK -->
+    <div class="slide">
+        <h2 class="text-5xl font-bold mb-16 text-center">Not Just a Tool.<br>A Prediction <span class="gradient-text">Social Network</span>.</h2>
+        <div class="grid grid-cols-3 gap-8 w-full max-w-6xl">
+            <div class="glass-card p-8 text-center transform hover:-translate-y-2 transition">
+                <i data-lucide="network" class="w-16 h-16 text-indigo-400 mx-auto mb-6"></i>
+                <h3 class="text-2xl font-bold mb-2">Social Graph</h3>
+                <p class="text-gray-400">Follow top forecasters. View stats, heatmaps, and bet history.</p>
+            </div>
+            <div class="glass-card p-8 text-center transform hover:-translate-y-2 transition">
+                <i data-lucide="message-circle" class="w-16 h-16 text-sky-400 mx-auto mb-6"></i>
+                <h3 class="text-2xl font-bold mb-2">Stake-to-Chat</h3>
+                <p class="text-gray-400">Only participants can chat. Zero spam. Discuss with skin in the game.</p>
+            </div>
+            <div class="glass-card p-8 text-center transform hover:-translate-y-2 transition">
+                <i data-lucide="trophy" class="w-16 h-16 text-yellow-400 mx-auto mb-6"></i>
+                <h3 class="text-2xl font-bold mb-2">XP System</h3>
+                <p class="text-gray-400">New users play for free using XP. Polls simulate markets without risk.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 9: AI ENGINE (SCREENSHOT) -->
+    <div class="slide flex-row-reverse">
+        <div class="w-1/2 pl-12">
+            <h2 class="text-5xl font-bold mb-6">The AI Trust Engine</h2>
+            <div class="space-y-6">
+                <div class="glass-card p-6 border-l-4 border-purple-500">
+                    <h3 class="text-xl font-bold">1. AI Creator</h3>
+                    <p class="text-gray-400">Google Gemini finds the event, sets the question, and generates cover art.</p>
+                </div>
+                <div class="glass-card p-6 border-l-4 border-sky-500">
+                    <h3 class="text-xl font-bold">2. AI Oracle</h3>
+                    <p class="text-gray-400">Fetches outcome + source URL from Google Search. Immediate payout.</p>
+                </div>
+                <div class="glass-card p-6 border-l-4 border-orange-500">
+                    <h3 class="text-xl font-bold">3. The Jury</h3>
+                    <p class="text-gray-400">Decentralized dispute resolution via Top 20 Users.</p>
+                </div>
+            </div>
+        </div>
+        <div class="w-1/2 flex justify-center">
+            <div class="relative w-[320px] h-[640px] bg-black rounded-[45px] border-[8px] border-gray-800 shadow-2xl overflow-hidden">
+                <img src="https://res.cloudinary.com/djslxbghy/image/upload/IMG_5177_gyy5ha.jpg" class="w-full h-full object-cover">
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 10: VIRAL LOOP (SCREENSHOTS) -->
+    <div class="slide">
+        <h2 class="text-4xl font-bold mb-8 text-center">The "I WON" Viral Loop</h2>
+        <p class="text-center text-gray-400 mb-12 max-w-2xl">Every win uploads itself to X. Dynamic cards auto-render stats, winnings, and themes.</p>
+
+        <div class="grid grid-cols-4 gap-4 w-full max-w-7xl">
+            <img src="https://res.cloudinary.com/djslxbghy/image/upload/IMG_5189_badbny.png" class="rounded-xl shadow-lg hover:scale-105 transition border border-white/10">
+            <img src="https://res.cloudinary.com/djslxbghy/image/upload/IMG_5190_fa5hpb.png" class="rounded-xl shadow-lg hover:scale-105 transition border border-white/10">
+            <img src="https://res.cloudinary.com/djslxbghy/image/upload/IMG_5188_rjifcv.png" class="rounded-xl shadow-lg hover:scale-105 transition border border-white/10">
+            <img src="https://res.cloudinary.com/djslxbghy/image/upload/IMG_5191_dovrbs.png" class="rounded-xl shadow-lg hover:scale-105 transition border border-white/10">
+        </div>
+    </div>
+
+    <!-- SLIDE 11: ROADMAP -->
+    <div class="slide">
+        <h2 class="text-5xl font-bold mb-16">Roadmap</h2>
+        <div class="relative border-l-2 border-sky-500/30 ml-10 space-y-12">
+            <div class="pl-10 relative">
+                <div class="absolute -left-[9px] top-0 w-4 h-4 bg-sky-500 rounded-full"></div>
+                <h3 class="text-2xl font-bold text-sky-400">Q1 2026: The Foundation</h3>
+                <p class="text-gray-400">Full Next.js refactor, Gitcoin Passport, XP Sybil resistance.</p>
+            </div>
+            <div class="pl-10 relative">
+                <div class="absolute -left-[9px] top-0 w-4 h-4 bg-gray-700 rounded-full border border-sky-500"></div>
+                <h3 class="text-2xl font-bold">Q2 2026: BNB Chain Launch</h3>
+                <p class="text-gray-400">Deploy Pledge Pool on BNB. Integrate Venus for No-Loss yield.</p>
+            </div>
+            <div class="pl-10 relative">
+                <div class="absolute -left-[9px] top-0 w-4 h-4 bg-gray-700 rounded-full border border-sky-500"></div>
+                <h3 class="text-2xl font-bold">Q3 2026: Social 2.0</h3>
+                <p class="text-gray-400">Copy-trading, Smart follow lists, Auto-mirror bets.</p>
+            </div>
+            <div class="pl-10 relative">
+                <div class="absolute -left-[9px] top-0 w-4 h-4 bg-gray-700 rounded-full border border-sky-500"></div>
+                <h3 class="text-2xl font-bold">Q1 2027: AI Market Intelligence</h3>
+                <p class="text-gray-400">Personalized alpha feed, AI trader assistant.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 12: CLOSING -->
+    <div class="slide text-center">
+        <img src="https://res.cloudinary.com/djslxbghy/image/upload/IMG_4551_e9bv2x.jpg" class="w-24 h-24 rounded-2xl shadow-2xl mb-6 mx-auto">
+        <h1 class="text-7xl font-extrabold mb-6">Predora</h1>
+        <p class="text-2xl text-gray-300 mb-12">Smarter. Faster. Safer.</p>
+        <a href="https://predora-app.vercel.app" target="_blank" class="inline-block px-10 py-4 bg-white text-black font-bold rounded-full text-xl hover:scale-105 transition shadow-[0_0_30px_rgba(255,255,255,0.4)]">
+            Launch Live Demo
+        </a>
+    </div>
+
+    <!-- NAVIGATION -->
+    <div class="progress-bar" id="progress"></div>
+    <div class="controls">
+        <div class="control-btn" onclick="prevSlide()"><i data-lucide="chevron-left"></i></div>
+        <div class="control-btn" onclick="nextSlide()"><i data-lucide="chevron-right"></i></div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const progress = document.getElementById('progress');
+
+        function showSlide(n) {
+            slides.forEach(s => s.classList.remove('active'));
+            currentSlide = (n + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+            progress.style.width = ((currentSlide + 1) / slides.length) * 100 + '%';
+        }
+
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+            if (e.key === 'f') document.documentElement.requestFullscreen();
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>
