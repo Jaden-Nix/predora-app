@@ -7864,7 +7864,8 @@ ${historyText}`;
             ctx.font = 'bold 52px Inter, Arial, sans-serif';
 
             if (type === 'win' || type === 'loss') {
-                // STAKE AMOUNT
+            // STAKE AMOUNT
+                ctx.textAlign = 'left'; 
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
                 ctx.font = '600 32px Inter, Arial, sans-serif';
                 ctx.fillText('STAKED', 150, yPos);
@@ -7873,16 +7874,23 @@ ${historyText}`;
                 ctx.fillText(`$${data.stake.toFixed(0)}`, 150, yPos + 55);
 
                 // P&L
+                ctx.textAlign = 'right'; 
                 const pnl = type === 'win' ? (data.payout - data.stake) : -data.stake;
                 const pnlText = pnl >= 0 ? `+$${pnl.toFixed(0)}` : `-$${Math.abs(pnl).toFixed(0)}`;
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
                 ctx.font = '600 32px Inter, Arial, sans-serif';
-                ctx.fillText(type === 'win' ? 'PROFIT' : 'LOSS', 550, yPos);
-                ctx.fillStyle = type === 'win' ? '#4ade80' : '#fca5a5';
+                ctx.fillText(type === 'win' ? 'PROFIT' : 'LOSS', 1050, yPos); 
+                if (type === 'win') {
+                    ctx.fillStyle = isDarkMode ? '#4ade80' : '#065f46';
+                } else {
+                    ctx.fillStyle = isDarkMode ? '#fca5a5' : '#9f1239';
+                }
+
                 ctx.font = 'bold 56px Inter, Arial, sans-serif';
-                ctx.fillText(pnlText, 550, yPos + 55);
-            } else if (type === 'stake') {
+                ctx.fillText(pnlText, 1050, yPos + 55); 
+                } else if (type === 'stake') {
                 // BET INFO
+                ctx.textAlign = 'left'; 
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
                 ctx.font = '600 32px Inter, Arial, sans-serif';
                 ctx.fillText('BETTING', 150, yPos);
@@ -7891,12 +7899,14 @@ ${historyText}`;
                 ctx.fillText(`$${data.stake.toFixed(0)} on ${data.pick}`, 150, yPos + 55);
 
                 // ODDS
+                ctx.textAlign = 'right';
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
                 ctx.font = '600 32px Inter, Arial, sans-serif';
-                ctx.fillText('ODDS', 700, yPos);
-                ctx.fillStyle = '#a5f3fc';
+                ctx.fillText('ODDS', 1050, yPos); 
+                ctx.fillStyle = isDarkMode ? '#a5f3fc' : '#0e7490';
+
                 ctx.font = 'bold 56px Inter, Arial, sans-serif';
-                ctx.fillText(`${Math.round(data.odds)}%`, 700, yPos + 55);
+                ctx.fillText(`${Math.round(data.odds)}%`, 1050, yPos + 55);
             } else if (type === 'market') {
                 // MARKET TYPE
                 const marketType = data.isNoLoss ? '🛡️ NO-LOSS' : '⚡ CLASSIC';
@@ -7905,13 +7915,14 @@ ${historyText}`;
                 ctx.fillText(marketType, 150, yPos + 30);
             }
 
-            // FOOTER INSIDE CARD (at bottom of glass card) - READABLE
             ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
             ctx.font = 'bold 24px Inter, Arial, sans-serif';
             const footerText = 'predora-app.vercel.app';
-            const footerWidth = ctx.measureText(footerText).width;
-            const footerX = 600 - footerWidth / 2; // Center horizontally
-            ctx.fillText(footerText, footerX, 560);
+
+            ctx.textAlign = 'center';
+
+
+            ctx.fillText(footerText, 600, 560);
 
             return canvas;
         };
