@@ -7463,7 +7463,7 @@ ${historyText}`;
                 let html = '';
                 for (const comment of comments) {
                     const pickClass = comment.pick === 'YES' ? 'badge-pick-yes' : 'badge-pick-no';
-                    const avatarUrl = comment.avatarUrl || YOUR_LOGO_URL;
+                    const avatarUrl = comment.avatarUrl || LOGO_URL;
                     const displayName = comment.displayName || 'Anonymous';
                     const commentId = comment.commentId;
                     const timeAgo = comment.timestamp ? getTimeAgo(comment.timestamp.seconds) : 'just now';
@@ -7484,7 +7484,7 @@ ${historyText}`;
 
                             repliesHtml += `
                                 <div class="flex space-x-2 text-sm">
-                                    <img src="${reply.avatarUrl || YOUR_LOGO_URL}" class="w-6 h-6 rounded-full" alt="Avatar">
+                                    <img src="${reply.avatarUrl || LOGO_URL}" class="w-6 h-6 rounded-full" alt="Avatar">
                                     <div class="flex-grow">
                                         <div class="flex items-center space-x-2">
                                             <span class="font-semibold text-gray-900 dark:text-gray-200 text-xs">${stripAt(reply.displayName)}</span>
@@ -7662,7 +7662,7 @@ ${historyText}`;
                     await addDoc(repliesCol, {
                         userId: currentUserId,
                         displayName: userProfile.displayName,
-                        avatarUrl: userProfile.avatarUrl || YOUR_LOGO_URL,
+                        avatarUrl: userProfile.avatarUrl || LOGO_URL,
                         commentText: commentText,
                         replyingTo: replyingTo.displayName, // Store who they're replying to
                         replyingToUserId: replyingTo.userId,
@@ -7700,7 +7700,7 @@ ${historyText}`;
                         marketId: currentMarketId,
                         userId: currentUserId,
                         displayName: userProfile.displayName,
-                        avatarUrl: userProfile.avatarUrl || YOUR_LOGO_URL,
+                        avatarUrl: userProfile.avatarUrl || LOGO_URL,
                         pick: null,
                         commentText: commentText,
                         timestamp: serverTimestamp()
