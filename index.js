@@ -1,8 +1,4 @@
-/*
- * index.js - The Secure Backend Server for Predora
- *
- * FINAL VERSION 4 - Added "Auto-Retry" for Google 503 Overload Errors
- */
+
 
 // --- ESM Imports ---
 import express from 'express';
@@ -59,6 +55,11 @@ app.get('/', (req, res) => {
 app.get('/app.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'app.html'));
 });
+
+app.get('/pitch-deck', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pitch-deck', 'index.html'));
+});
+
 
 // --- NEW HELPER: Retry Logic for 503 Errors ---
 async function fetchWithRetry(url, options, retries = 3, backoff = 2000) {
@@ -177,7 +178,7 @@ async function autoResolveMarkets() {
             const outcome = response.candidates[0].content.parts[0].text.trim().toUpperCase();
 
             if (outcome === 'YES' || outcome === 'NO') {
-                // ... (Payout logic remains the same)
+                // ... (Payout logic )
                  await doc.ref.update({ isResolved: true, winningOutcome: outcome });
                  console.log(`ORACLE: Resolved ${market.title} as ${outcome}`);
             }
